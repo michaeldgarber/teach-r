@@ -7,5 +7,6 @@ output:
       after_body: footer.html
 ---
 
-Session 1:
-https://michaeldgarber.github.io/teach-r/1-dplyr-nyt-covid.html
+Session 1: https://michaeldgarber.github.io/teach-r/1-dplyr-nyt-covid.html
+
+Session 2: https://michaeldgarber.github.io/teach-r/2-dplyr-mapview-tidycensus.html

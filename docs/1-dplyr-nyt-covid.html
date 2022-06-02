@@ -14,6 +14,7 @@
 
 <title>R for data wrangling 1: learning the ground rules of dplyr with publicly available COVID-19 data</title>
 
+<script src="site_libs/header-attrs-2.14/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
@@ -345,93 +346,221 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">R for data wrangling 1: learning the ground rules of dplyr with publicly available COVID-19 data</h1>
+<h1 class="title toc-ignore">R for data wrangling 1: learning the ground
+rules of dplyr with publicly available COVID-19 data</h1>
 <h4 class="author">Michael D. Garber, PhD MPH</h4>
 <h4 class="date">Revised June 2, 2022</h4>
 
 </div>
 
 
-<div id="outline" class="section level1" number="1">
-<h1><span class="header-section-number">1</span> Outline</h1>
+<div id="outline" class="section level1">
+<h1>Outline</h1>
 <ol style="list-style-type: decimal">
 <li>Introduction and pre-requisites</li>
 <li>Install packages and download the data</li>
 <li>Explore the NYT state COVID-19 data using dplyr</li>
 </ol>
 </div>
-<div id="introduction-and-pre-requisites" class="section level1" number="2">
-<h1><span class="header-section-number">2</span> Introduction and pre-requisites</h1>
-<div id="purpose" class="section level2" number="2.1">
-<h2><span class="header-section-number">2.1</span> Purpose</h2>
-<p>The purpose of this tutorial is to learn the basics of dplyr in the context of an applied example with publicly available COVID-19 data from The New York Times.</p>
+<div id="introduction-and-pre-requisites" class="section level1">
+<h1>Introduction and pre-requisites</h1>
+<div id="purpose" class="section level2">
+<h2>Purpose</h2>
+<p>The purpose of this tutorial is to learn the basics of dplyr in the
+context of an applied example with publicly available COVID-19 data from
+The New York Times.</p>
 </div>
-<div id="target-audience" class="section level2" number="2.2">
-<h2><span class="header-section-number">2.2</span> Target audience</h2>
-<p>The target audience for this demo is someone with little to no experience using R. I will also assume no experience with any statistical programming language, although some experience with SAS or STATA would certainly not hurt. I imagine the target audience will have familiarity with the basics of data management in a spreadsheet-based program like Excel and may want to try out using a programming-oriented tool for data management. For an excellent overview of why it can be preferable to analyze and manage data with a programming language rather than spreadsheet tools, see here: <a href="https://www.jessesadler.com/post/excel-vs-r/" class="uri">https://www.jessesadler.com/post/excel-vs-r/</a></p>
-<p><em>Author’s ote: this material is an updated version of an earlier demo available here (<a href="https://rpubs.com/michaeldgarber/dplyr_1" class="uri">https://rpubs.com/michaeldgarber/dplyr_1</a>). I have left that link live, but this version is more current.</em></p>
+<div id="target-audience" class="section level2">
+<h2>Target audience</h2>
+<p>The target audience for this demo is someone with little to no
+experience using R. I will also assume no experience with any
+statistical programming language, although some experience with SAS or
+STATA would certainly not hurt. I imagine the target audience will have
+familiarity with the basics of data management in a spreadsheet-based
+program like Excel and may want to try out using a programming-oriented
+tool for data management. For an excellent overview of why it can be
+preferable to analyze and manage data with a programming language rather
+than spreadsheet tools, see here: <a
+href="https://www.jessesadler.com/post/excel-vs-r/"
+class="uri">https://www.jessesadler.com/post/excel-vs-r/</a></p>
+<p><em>Author’s note: this material is an updated version of an earlier
+demo available here (<a href="https://rpubs.com/michaeldgarber/dplyr_1"
+class="uri">https://rpubs.com/michaeldgarber/dplyr_1</a>). I have left
+that link live, but this version is more current.</em></p>
 </div>
-<div id="what-is-dplyr" class="section level2" number="2.3">
-<h2><span class="header-section-number">2.3</span> What is dplyr?</h2>
-<p><a href="https://dplyr.tidyverse.org/">Dplyr</a> is a set of functions for managing and manipulating data in R. As stated on the webpage:</p>
+<div id="what-is-dplyr" class="section level2">
+<h2>What is dplyr?</h2>
+<p><a href="https://dplyr.tidyverse.org/">Dplyr</a> is a set of
+functions for managing and manipulating data in R. As stated on the
+webpage:</p>
 <blockquote>
-<p>“dplyr is a grammar of data manipulation, providing a consistent set of verbs that help you solve the most common data manipulation challenges.”</p>
+<p>“dplyr is a grammar of data manipulation, providing a consistent set
+of verbs that help you solve the most common data manipulation
+challenges.”</p>
 </blockquote>
-<p>There are several ways to manage data in R, including <a href="https://stat.ethz.ch/R-manual/R-devel/library/base/html/00Index.html">base R</a>. I focus here on dplyr because it’s widely used and, I think, intuitive. Dplyr is part of the larger collection of packages called the <a href="https://www.tidyverse.org/">tidyverse</a>, which includes other popular packages like ggplot2. One advantage of dplyr is that, when combined with the pipe operator (explained below), it is quite human readable. Like good writing , it emphasizes the verbs (Zinsser, On Writing Well, Chapter 10).</p>
+<p>There are several ways to manage data in R, including <a
+href="https://stat.ethz.ch/R-manual/R-devel/library/base/html/00Index.html">base
+R</a>. I focus here on dplyr because it’s widely used and, I think,
+intuitive. Dplyr is part of the larger collection of packages called the
+<a href="https://www.tidyverse.org/">tidyverse</a>, which includes other
+popular packages like ggplot2. One advantage of dplyr is that, when
+combined with the pipe operator (explained below), it is quite human
+readable. Like good writing , it emphasizes the verbs (Zinsser, On
+Writing Well, Chapter 10).</p>
 </div>
-<div id="the-goal-of-this-tutorial" class="section level2" number="2.4">
-<h2><span class="header-section-number">2.4</span> The goal of this tutorial</h2>
-<p>The goal of this tutorial is to illustrate the basics of dplyr using publicly available data on COVID-19 incidence posted by <a href="https://github.com/nytimes/covid-19-data">The New York Times</a>. We plan for this tutorial to eventually be a part of a series of short tutorials focused on using R for geospatial data management and analyses.</p>
+<div id="the-goal-of-this-tutorial" class="section level2">
+<h2>The goal of this tutorial</h2>
+<p>The goal of this tutorial is to illustrate the basics of dplyr using
+publicly available data on COVID-19 incidence posted by <a
+href="https://github.com/nytimes/covid-19-data">The New York Times</a>.
+We plan for this tutorial to eventually be a part of a series of short
+tutorials focused on using R for geospatial data management and
+analyses.</p>
 </div>
-<div id="prerequisites" class="section level2" number="2.5">
-<h2><span class="header-section-number">2.5</span> Prerequisites</h2>
+<div id="prerequisites" class="section level2">
+<h2>Prerequisites</h2>
 <ol style="list-style-type: decimal">
-<li><strong>Install R and RStudio.</strong> Both R and RStudio are needed, but worry not: they are both free and easy to download.</li>
+<li><strong>Install R and RStudio.</strong> Both R and RStudio are
+needed, but worry not: they are both free and easy to download.</li>
 </ol>
 <ul>
-<li>To download R, go to CRAN and download R from the location nearest you: <a href="https://cran.r-project.org/mirrors.html" class="uri">https://cran.r-project.org/mirrors.html</a>.</li>
-<li>Then, install RStudio Desktop (the free version) at this link: <a href="https://rstudio.com/products/rstudio/download" class="uri">https://rstudio.com/products/rstudio/download</a> .</li>
+<li>To download R, go to CRAN and download R from the location nearest
+you: <a href="https://cran.r-project.org/mirrors.html"
+class="uri">https://cran.r-project.org/mirrors.html</a>.</li>
+<li>Then, install RStudio Desktop (the free version) at this link: <a
+href="https://rstudio.com/products/rstudio/download"
+class="uri">https://rstudio.com/products/rstudio/download</a> .</li>
 </ul>
-<p>The <a href="https://rstudio-education.github.io/hopr/starting.html#how-to-download-and-install-r">Appendix</a> of this free online book - <a href="https://rstudio-education.github.io/hopr/">Hands-On Programming with R</a>, by Garrett Grolemund - explains why both R and RStudio should be downloaded.</p>
+<p>The <a
+href="https://rstudio-education.github.io/hopr/starting.html#how-to-download-and-install-r">Appendix</a>
+of this free online book - <a
+href="https://rstudio-education.github.io/hopr/">Hands-On Programming
+with R</a>, by Garrett Grolemund - explains why both R and RStudio
+should be downloaded.</p>
 <ol start="2" style="list-style-type: decimal">
-<li><strong>Familiarize yourself with the RStudio interface.</strong> There are two ways to write code in R. You can use the <em>console</em> or you can create a <a href="https://rstudio-education.github.io/hopr/basics.html#scripts"><em>script</em></a> that can be saved and edited as you would save a Word document. I almost always use scripts. The book linked above also provides an overview of <a href="https://rstudio-education.github.io/hopr/basics.html#the-r-user-interface">RStudio’s user interface</a>. Here’s a screenshot of what the script window might look like:</li>
+<li><strong>Familiarize yourself with the RStudio interface.</strong>
+There are two ways to write code in R. You can use the <em>console</em>
+or you can create a <a
+href="https://rstudio-education.github.io/hopr/basics.html#scripts"><em>script</em></a>
+that can be saved and edited as you would save a Word document. I almost
+always use scripts. The book linked above also provides an overview of
+<a
+href="https://rstudio-education.github.io/hopr/basics.html#the-r-user-interface">RStudio’s
+user interface</a>. Here’s a screenshot of what the script window might
+look like:</li>
 </ol>
 <p><img src="images/script-screenshot.PNG" width="958" /></p>
 <ol start="3" style="list-style-type: decimal">
-<li><strong>Explore resources on dplyr.</strong> Finally, although we’ll cover the basics of <em>dplyr</em> here, you might peruse some of the excellent existing material on dplyr:</li>
+<li><strong>Explore resources on dplyr.</strong> Finally, although we’ll
+cover the basics of <em>dplyr</em> here, you might peruse some of the
+excellent existing material on dplyr:</li>
 </ol>
 <ul>
-<li><a href="https://dplyr.tidyverse.org/" class="uri">https://dplyr.tidyverse.org/</a> - The main webpage contains a short overview of the package and describes the key functions, aka verbs, as we will also do here.</li>
-<li><a href="https://dplyr.tidyverse.org/articles/dplyr.html" class="uri">https://dplyr.tidyverse.org/articles/dplyr.html</a> - The vignette expands upon the main landing page with some examples.</li>
-<li><a href="https://r4ds.had.co.nz/transform.html" class="uri">https://r4ds.had.co.nz/transform.html</a> - Chapter 5 of the online book, <a href="https://r4ds.had.co.nz/">R for Data Science</a>, by Wickham and Grolemund, is another intro to <em>dplyr</em>. This book is the go-to resource for programming in the <em>tidyverse</em> in general.</li>
+<li><a href="https://dplyr.tidyverse.org/"
+class="uri">https://dplyr.tidyverse.org/</a> - The main webpage contains
+a short overview of the package and describes the key functions, aka
+verbs, as we will also do here.</li>
+<li><a href="https://dplyr.tidyverse.org/articles/dplyr.html"
+class="uri">https://dplyr.tidyverse.org/articles/dplyr.html</a> - The
+vignette expands upon the main landing page with some examples.</li>
+<li><a href="https://r4ds.had.co.nz/transform.html"
+class="uri">https://r4ds.had.co.nz/transform.html</a> - Chapter 5 of the
+online book, <a href="https://r4ds.had.co.nz/">R for Data Science</a>,
+by Wickham and Grolemund, is another intro to <em>dplyr</em>. This book
+is the go-to resource for programming in the <em>tidyverse</em> in
+general.</li>
 </ul>
 </div>
 </div>
-<div id="install-packages-and-download-the-data" class="section level1" number="3">
-<h1><span class="header-section-number">3</span> Install packages and download the data</h1>
-<div id="install-packages" class="section level2" number="3.1">
-<h2><span class="header-section-number">3.1</span> Install packages</h2>
-<p>Now that we have RStudio installed and up and running, our first step is to install packages. Grolemund defines packages in the above-linked <a href="https://rstudio-education.github.io/hopr/packages2.html">book</a>:</p>
+<div id="install-packages-and-download-the-data" class="section level1">
+<h1>Install packages and download the data</h1>
+<div id="install-packages" class="section level2">
+<h2>Install packages</h2>
+<p>Now that we have RStudio installed and up and running, our first step
+is to install packages. Grolemund defines packages in the above-linked
+<a
+href="https://rstudio-education.github.io/hopr/packages2.html">book</a>:</p>
 <blockquote>
-<p>“Many of R’s most useful functions do not come preloaded when you start R, but reside in packages that can be installed on top of R. R packages are similar to libraries in C, C++, and Javascript, packages in Python, and gems in Ruby. An R package bundles together useful functions, help files, and data sets.”</p>
+<p>“Many of R’s most useful functions do not come preloaded when you
+start R, but reside in packages that can be installed on top of R. R
+packages are similar to libraries in C, C++, and Javascript, packages in
+Python, and gems in Ruby. An R package bundles together useful
+functions, help files, and data sets.”</p>
 </blockquote>
-<p>Using a package requires first installing it with the <code>install.packages("package_name")</code> function and then loading it using the <code>library(package_name)</code> function. (Note the absence of quotes when loading a package (<code>library(package_name)</code>). Some stackoverflow <a href="https://stackoverflow.com/questions/36802132/the-use-of-quotation-marks-when-loading-a-package-in-r">discussion</a> exists on whether or not to use quotes when loading packages. In my experience, it works better to <em>not</em> use quotes when loading packages but to use them when installing packages.</p>
-<p>For this exercise, let’s install the full <em>tidyverse</em>, which will install all of its component packages, including <em>dplyr</em>. So here is our first code chunk to run:</p>
+<p>Using a package requires first installing it with the
+<code>install.packages("package_name")</code> function and then loading
+it using the <code>library(package_name)</code> function. (Note the
+absence of quotes when loading a package
+(<code>library(package_name)</code>). Some stackoverflow <a
+href="https://stackoverflow.com/questions/36802132/the-use-of-quotation-marks-when-loading-a-package-in-r">discussion</a>
+exists on whether or not to use quotes when loading packages. In my
+experience, it works better to <em>not</em> use quotes when loading
+packages but to use them when installing packages.</p>
+<p>For this exercise, let’s install the full <em>tidyverse</em>, which
+will install all of its component packages, including <em>dplyr</em>. So
+here is our first code chunk to run:</p>
 <pre class="r"><code>install.packages(&quot;tidyverse&quot;)</code></pre>
-<p>To run the code, put your cursor on that line or highlight that line of code, and then click the <strong>Run</strong> button in the top-right part of the scripts window (screenshot <a href="https://rstudio-education.github.io/hopr/basics.html#scripts">here</a>). A keyboard shortcut for <strong>Run</strong> is <strong>control+enter</strong>. On a Mac, it’s <strong>command+enter</strong>.</p>
+<p>To run the code, put your cursor on that line or highlight that line
+of code, and then click the <strong>Run</strong> button in the top-right
+part of the scripts window (screenshot <a
+href="https://rstudio-education.github.io/hopr/basics.html#scripts">here</a>).
+A keyboard shortcut for <strong>Run</strong> is
+<strong>control+enter</strong>. On a Mac, it’s
+<strong>command+enter</strong>.</p>
 <p>Now that the package is installed, load it:</p>
 <pre class="r"><code>library(tidyverse)</code></pre>
-<p>In my experience, it’s usually fine to let R pick where it installs the packages on your computer. Whether or not this is okay may depend on whether you’re on your own PC or a network with limited access to certain drives. If needed, you can specify where you want the package to land by adding the <code>lib= "file path"</code> argument in the <code>install.packages()</code> function. For example: <code>install.packages("tidyverse", lib = "C:\")</code>. Note: if we wished to install <em>dplyr</em> without the rest of the <em>tidyverse</em>, we could instead use <code>install.packages("dplyr")</code> and then <code>library(dplyr)</code>.</p>
+<p>In my experience, it’s usually fine to let R pick where it installs
+the packages on your computer. Whether or not this is okay may depend on
+whether you’re on your own PC or a network with limited access to
+certain drives. If needed, you can specify where you want the package to
+land by adding the <code>lib= "file path"</code> argument in the
+<code>install.packages()</code> function. For example:
+<code>install.packages("tidyverse", lib = "C:\")</code>. Note: if we
+wished to install <em>dplyr</em> without the rest of the
+<em>tidyverse</em>, we could instead use
+<code>install.packages("dplyr")</code> and then
+<code>library(dplyr)</code>.</p>
 </div>
-<div id="load-the-covid-19-data-from-the-new-york-times" class="section level2" number="3.2">
-<h2><span class="header-section-number">3.2</span> Load the COVID-19 data from <em>The New York Times</em></h2>
-<p>For this example, we will use COVID-19 data from <a href="https://github.com/nytimes/covid-19-data">The New York Times’ GitHub repository</a>. There are a few datasets available at varying geographic scales. Let’s use their state-level dataset. The data include the number of cumulative cases and the number of cumulative deaths by state by day, beginning January 21, 2020.</p>
-<p>We’ll load the data two ways, with hopes that at least one of them works.</p>
-<div id="load-the-data-directly-from-their-github-repo" class="section level3" number="3.2.1">
-<h3><span class="header-section-number">3.2.1</span> Load the data directly from their Github repo</h3>
-<p>First, let’s try the fancy way, loading it directly from GitHub. Below, the first line of code defines an object, <code>nyt_state_url</code> to be the URL where the NYT data are located. The second line of code uses a base R function, <code>url()</code>, to parse that URL as a CSV. We then convert it from a CSV to an R object using <code>read_csv()</code>. <code>read_csv()</code> is a function in <em>readr</em>, another package in the <em>tidyverse</em>. Accordingly, the resulting output of these few lines of code will be a <a href="https://r4ds.had.co.nz/tibbles.html"><em>tibble</em></a>, <em>tidyverse</em> speak for a “tidy table.” Basically, a tibble is a table, or data frame, with some formatting advantages that make it easy to work with.</p>
-<p>Of note, the last three lines of include our first use of the <code>%&gt;%</code> (read: <a href="https://magrittr.tidyverse.org/reference/pipe.html">pipe</a>) operator. The pipe operator is part of the <em>magrittr</em> package, which is also a part of the <em>tidyverse</em>. The pipe separates the action-oriented functions, <code>read_csv()</code> and <code>url</code> from the object, <code>nyt_state_url</code>. In my opinion, this separation makes it easier to read, as I’ll discuss more in the next section.</p>
-<p>One other side-note: I use the equals sign, <code>=</code>, when assigning new objects, because for me it’s easier to read and type than R’s traditional assignment operator, <code>&lt;-</code>. I’ve heard <code>&lt;-</code> has advantages, but I’ve never had an issue using <code>=</code>.</p>
+<div id="load-the-covid-19-data-from-the-new-york-times"
+class="section level2">
+<h2>Load the COVID-19 data from <em>The New York Times</em></h2>
+<p>For this example, we will use COVID-19 data from <a
+href="https://github.com/nytimes/covid-19-data">The New York Times’
+GitHub repository</a>. There are a few datasets available at varying
+geographic scales. Let’s use their state-level dataset. The data include
+the number of cumulative cases and the number of cumulative deaths by
+state by day, beginning January 21, 2020.</p>
+<p>We’ll load the data two ways, with hopes that at least one of them
+works.</p>
+<div id="load-the-data-directly-from-their-github-repo"
+class="section level3">
+<h3>Load the data directly from their Github repo</h3>
+<p>First, let’s try the fancy way, loading it directly from GitHub.
+Below, the first line of code defines an object,
+<code>nyt_state_url</code> to be the URL where the NYT data are located.
+The second line of code uses a base R function, <code>url()</code>, to
+parse that URL as a CSV. We then convert it from a CSV to an R object
+using <code>read_csv()</code>. <code>read_csv()</code> is a function in
+<em>readr</em>, another package in the <em>tidyverse</em>. Accordingly,
+the resulting output of these few lines of code will be a <a
+href="https://r4ds.had.co.nz/tibbles.html"><em>tibble</em></a>,
+<em>tidyverse</em> speak for a “tidy table.” Basically, a tibble is a
+table, or data frame, with some formatting advantages that make it easy
+to work with.</p>
+<p>Of note, the last three lines of include our first use of the
+<code>%&gt;%</code> (read: <a
+href="https://magrittr.tidyverse.org/reference/pipe.html">pipe</a>)
+operator. The pipe operator is part of the <em>magrittr</em> package,
+which is also a part of the <em>tidyverse</em>. The pipe separates the
+action-oriented functions, <code>read_csv()</code> and <code>url</code>
+from the object, <code>nyt_state_url</code>. In my opinion, this
+separation makes it easier to read, as I’ll discuss more in the next
+section.</p>
+<p>One other side-note: I use the equals sign, <code>=</code>, when
+assigning new objects, because for me it’s easier to read and type than
+R’s traditional assignment operator, <code>&lt;-</code>. I’ve heard
+<code>&lt;-</code> has advantages, but I’ve never had an issue using
+<code>=</code>.</p>
 <pre class="r"><code>nyt_state_url = &quot;https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv&quot;
 
 nyt_state_data = nyt_state_url %&gt;% 
@@ -446,14 +575,34 @@ nyt_state_data = nyt_state_url %&gt;%
 ## 
 ## ℹ Use `spec()` to retrieve the full column specification for this data.
 ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-<p>An alternative, equivalent, way to write it would be to use the traditional nested parentheses. The nested parentheses aren’t so bad when just a few functions are used, but as the number of functions increases, the nested parentheses become difficult to read.</p>
+<p>An alternative, equivalent, way to write it would be to use the
+traditional nested parentheses. The nested parentheses aren’t so bad
+when just a few functions are used, but as the number of functions
+increases, the nested parentheses become difficult to read.</p>
 <pre class="r"><code>nyt_state_url = &quot;https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv&quot;
 nyt_state_data = read_csv(url(nyt_state_url))</code></pre>
-<p>Either way we write it, we get a resulting dataset, <code>nyt_state_data</code>, which should be visible in the top-right corner of RStudio’s interface. It tells us that the data have 18,934 observations and 5 variables. (The number of observations may be higher when you run it.)</p>
+<p>Either way we write it, we get a resulting dataset,
+<code>nyt_state_data</code>, which should be visible in the top-right
+corner of RStudio’s interface. It tells us that the data have 18,934
+observations and 5 variables. (The number of observations may be higher
+when you run it.)</p>
 <p><img src="images/nyt-state-data-image.PNG" width="274" /></p>
-<p>As noted above, <code>read_csv()</code> is part of the <strong>readr</strong> package. Accordingly, its default behavior is to read in data as a “<a href="https://r4ds.had.co.nz/tibbles.html">tibble</a>”, tidyverse speak for “tidy table”. One benefit of using tibbles, as noted <a href="https://r4ds.had.co.nz/tibbles.html">here</a>, is that they can be printed without overwhelming the console. (This is not necessarily true of data frames more generally).</p>
-<p>Let’s first confirm that <code>nyt_state_data</code> is a tibble using the base-R <code>class()</code> function, which returns the object’s class. The tibble object class is denoted by <code>tbl_df</code>. And then we can print the data to get a sense of its dimensions (rows and columns) and what the variables look like.</p>
-<p>At this writing, there are 22,509 observations and 5 columns. The variable type is denoted below the variable names. We can also use class to grab the type for a single column.</p>
+<p>As noted above, <code>read_csv()</code> is part of the
+<strong>readr</strong> package. Accordingly, its default behavior is to
+read in data as a “<a
+href="https://r4ds.had.co.nz/tibbles.html">tibble</a>”, tidyverse speak
+for “tidy table”. One benefit of using tibbles, as noted <a
+href="https://r4ds.had.co.nz/tibbles.html">here</a>, is that they can be
+printed without overwhelming the console. (This is not necessarily true
+of data frames more generally).</p>
+<p>Let’s first confirm that <code>nyt_state_data</code> is a tibble
+using the base-R <code>class()</code> function, which returns the
+object’s class. The tibble object class is denoted by
+<code>tbl_df</code>. And then we can print the data to get a sense of
+its dimensions (rows and columns) and what the variables look like.</p>
+<p>At this writing, there are 22,509 observations and 5 columns. The
+variable type is denoted below the variable names. We can also use class
+to grab the type for a single column.</p>
 <pre class="r"><code>class(nyt_state_data)</code></pre>
 <pre><code>## [1] &quot;spec_tbl_df&quot; &quot;tbl_df&quot;      &quot;tbl&quot;         &quot;data.frame&quot;</code></pre>
 <pre class="r"><code>nyt_state_data</code></pre>
@@ -474,17 +623,48 @@ nyt_state_data = read_csv(url(nyt_state_url))</code></pre>
 <pre class="r"><code>class(nyt_state_data$state) #character</code></pre>
 <pre><code>## [1] &quot;character&quot;</code></pre>
 </div>
-<div id="download-the-data-i-saved-and-load-using-read_csv" class="section level3" number="3.2.2">
-<h3><span class="header-section-number">3.2.2</span> Download the data I saved and load using <code>read_csv()</code></h3>
-<p>If the direct call to NYT GitHub didn’t work, here’s a back-up way that should work to read the data into R. On February 9th, 2021, I downloaded the data as a CSV. They’re available in this Dropbox folder: <a href="https://www.dropbox.com/sh/crauwqsy64r33k7/AAAGuyfNQlSzws3Ey-uj012fa?dl=0" class="uri">https://www.dropbox.com/sh/crauwqsy64r33k7/AAAGuyfNQlSzws3Ey-uj012fa?dl=0</a>. If needed, download the CSV, save locally to your computer, and then use <code>read_csv()</code> to <a href="https://r4ds.had.co.nz/data-import.html">import</a> the csv into R. <code>setwd()</code> function used to set the working directory, and <code>file.path()</code> is a convenient way to make your file path to be <a href="https://stackoverflow.com/questions/51533664/file-path-function-in-r">operating-system independent</a>. <code>read_csv()</code> loads the data relative to the working directory. That is, if you assign your working directory to be <code>C:\hi\how\are</code>, but the data are in <code>C:\hi\how\are\you</code>, then in the <code>read_csv()</code> call, you’d write <code>("you\filename.csv")</code>.</p>
+<div id="download-the-data-i-saved-and-load-using-read_csv"
+class="section level3">
+<h3>Download the data I saved and load using
+<code>read_csv()</code></h3>
+<p>If the direct call to NYT GitHub didn’t work, here’s a back-up way
+that should work to read the data into R. On February 9th, 2021, I
+downloaded the data as a CSV. They’re available in this Dropbox folder:
+<a
+href="https://www.dropbox.com/sh/crauwqsy64r33k7/AAAGuyfNQlSzws3Ey-uj012fa?dl=0"
+class="uri">https://www.dropbox.com/sh/crauwqsy64r33k7/AAAGuyfNQlSzws3Ey-uj012fa?dl=0</a>.
+If needed, download the CSV, save locally to your computer, and then use
+<code>read_csv()</code> to <a
+href="https://r4ds.had.co.nz/data-import.html">import</a> the csv into
+R. <code>setwd()</code> function used to set the working directory, and
+<code>file.path()</code> is a convenient way to make your file path to
+be <a
+href="https://stackoverflow.com/questions/51533664/file-path-function-in-r">operating-system
+independent</a>. <code>read_csv()</code> loads the data relative to the
+working directory. That is, if you assign your working directory to be
+<code>C:\hi\how\are</code>, but the data are in
+<code>C:\hi\how\are\you</code>, then in the <code>read_csv()</code>
+call, you’d write <code>("you\filename.csv")</code>.</p>
 <pre class="r"><code>setwd(file.path(&quot;C:&quot;, &quot;Users&quot;, &quot;maybe your name&quot;, &quot;a subfolder&quot;, &quot;maybe another subfolder&quot;, &quot;the folder with the csv&quot;))
 nyt_state_data = read_csv(&quot;nyt-covid-19-state-2021-02-09.csv&quot;)</code></pre>
 </div>
-<div id="explore-the-data-a-bit-more-before-further-manipulation-using-dplyr-verbs." class="section level3" number="3.2.3">
-<h3><span class="header-section-number">3.2.3</span> Explore the data a bit more before further manipulation using dplyr verbs.</h3>
-<p>Aside from printing the tibble by simply typing its name (<code>nyt_state_data</code>) we can use <code>View</code> (note the capital <em>V</em>) to view the data in a new window and interact with it in a more hands-on way. <code>View()</code> can be slow as the number of observations rises, but 20,000-ish shouldn’t be too bad. <code>View()</code> allows you to sort the data by values in the columns. We can sort the data by state in the <code>View()</code> window to confirm that the data are, in fact, cumulative: cases and deaths only increase.</p>
+<div
+id="explore-the-data-a-bit-more-before-further-manipulation-using-dplyr-verbs."
+class="section level3">
+<h3>Explore the data a bit more before further manipulation using dplyr
+verbs.</h3>
+<p>Aside from printing the tibble by simply typing its name
+(<code>nyt_state_data</code>) we can use <code>View</code> (note the
+capital <em>V</em>) to view the data in a new window and interact with
+it in a more hands-on way. <code>View()</code> can be slow as the number
+of observations rises, but 20,000-ish shouldn’t be too bad.
+<code>View()</code> allows you to sort the data by values in the
+columns. We can sort the data by state in the <code>View()</code> window
+to confirm that the data are, in fact, cumulative: cases and deaths only
+increase.</p>
 <pre class="r"><code>View(nyt_state_data)</code></pre>
-<p>Here are some useful base-R commands for describing the basic aspects of the data.</p>
+<p>Here are some useful base-R commands for describing the basic aspects
+of the data.</p>
 <pre class="r"><code>nrow(nyt_state_data) #How many rows?</code></pre>
 <pre><code>## [1] 45422</code></pre>
 <pre class="r"><code>ncol(nyt_state_data) #How many columns?</code></pre>
@@ -512,31 +692,77 @@ nyt_state_data = read_csv(&quot;nyt-covid-19-state-2021-02-09.csv&quot;)</code><
 </div>
 </div>
 </div>
-<div id="explore-the-nyt-covid-19-data-using-dplyr" class="section level1" number="4">
-<h1><span class="header-section-number">4</span> Explore the NYT COVID-19 data using dplyr</h1>
-<p>In this section, I’ll introduce common dplyr verbs. We’ll first go through each verb one by one. Then, we’ll put them together in a sequence.</p>
-<div id="essential-dplyr-verbs" class="section level2" number="4.1">
-<h2><span class="header-section-number">4.1</span> Essential dplyr verbs</h2>
-<p>The seven dplyr verbs I use the most are <code>mutate()</code>, <code>filter()</code>, <code>select()</code>, <code>arrange()</code>, <code>group_by()</code>, <code>summarise()</code>, and <code>left_join()</code>:</p>
+<div id="explore-the-nyt-covid-19-data-using-dplyr"
+class="section level1">
+<h1>Explore the NYT COVID-19 data using dplyr</h1>
+<p>In this section, I’ll introduce common dplyr verbs. We’ll first go
+through each verb one by one. Then, we’ll put them together in a
+sequence.</p>
+<div id="essential-dplyr-verbs" class="section level2">
+<h2>Essential dplyr verbs</h2>
+<p>The seven dplyr verbs I use the most are <code>mutate()</code>,
+<code>filter()</code>, <code>select()</code>, <code>arrange()</code>,
+<code>group_by()</code>, <code>summarise()</code>, and
+<code>left_join()</code>:</p>
 <ul>
-<li><code>mutate()</code> adds new variables (or columns) that can be functions of existing variables.</li>
-<li><code>filter()</code> is essentially a subset operator. It picks rows based on their values.</li>
-<li><code>select()</code> selects variables (or columns) based on their names. It can also be thought of as a subset operator by column rather than by row.</li>
-<li><code>arrange()</code> sorts data. It orders the rows of a data frame by the values of selected columns. The default behavior is to sort ascending, meaning the lowest value will be on top. Use <code>desc()</code> within the <code>arrange()</code> function to sort descending.</li>
-<li><code>group_by()</code> groups the table by a variable. <code>group_by()</code> is often but not always used with <code>summarise()</code>. When the two are used together, the result is akin to a pivot table in Excel.</li>
-<li><code>summarise()</code> creates a new data frame, with rows corresponding to combinations of the grouping variables. <code>summarise()</code> is like a summary operator in an Excel pivot table.</li>
-<li><code>left_join()</code> joins two tables together. It’s like a vlookup in Excel or, as the name implies, a JOIN in SQL. It’s distinct from the other verbs in this list in that it is a <a href="https://dplyr.tidyverse.org/articles/two-table.html">two-table verb</a>. There are <a href="https://dplyr.tidyverse.org/reference/join.html">other types of joins</a>, but I almost exclusively use <code>left_join()</code>. In the below set of examples, <code>left_join</code> isn’t used. It is used in our <a href="https://rpubs.com/michaeldgarber/dplyr_2_tidycensus_mapview">next tutorial</a>, though.</li>
+<li><code>mutate()</code> adds new variables (or columns) that can be
+functions of existing variables.</li>
+<li><code>filter()</code> is essentially a subset operator. It picks
+rows based on their values.</li>
+<li><code>select()</code> selects variables (or columns) based on their
+names. It can also be thought of as a subset operator by column rather
+than by row.</li>
+<li><code>arrange()</code> sorts data. It orders the rows of a data
+frame by the values of selected columns. The default behavior is to sort
+ascending, meaning the lowest value will be on top. Use
+<code>desc()</code> within the <code>arrange()</code> function to sort
+descending.</li>
+<li><code>group_by()</code> groups the table by a variable.
+<code>group_by()</code> is often but not always used with
+<code>summarise()</code>. When the two are used together, the result is
+akin to a pivot table in Excel.</li>
+<li><code>summarise()</code> creates a new data frame, with rows
+corresponding to combinations of the grouping variables.
+<code>summarise()</code> is like a summary operator in an Excel pivot
+table.</li>
+<li><code>left_join()</code> joins two tables together. It’s like a
+vlookup in Excel or, as the name implies, a JOIN in SQL. It’s distinct
+from the other verbs in this list in that it is a <a
+href="https://dplyr.tidyverse.org/articles/two-table.html">two-table
+verb</a>. There are <a
+href="https://dplyr.tidyverse.org/reference/join.html">other types of
+joins</a>, but I almost exclusively use <code>left_join()</code>. In the
+below set of examples, <code>left_join</code> isn’t used. It is used in
+our <a
+href="https://rpubs.com/michaeldgarber/dplyr_2_tidycensus_mapview">next
+tutorial</a>, though.</li>
 </ul>
-<p>There are <a href="https://github.com/rstudio/cheatsheets/blob/master/data-transformation.pdf">several other</a> verbs within dplyr, but many, perhaps most, data-wrangling tasks can be done with just these seven tools.</p>
+<p>There are <a
+href="https://github.com/rstudio/cheatsheets/blob/master/data-transformation.pdf">several
+other</a> verbs within dplyr, but many, perhaps most, data-wrangling
+tasks can be done with just these seven tools.</p>
 </div>
-<div id="mutate" class="section level2" number="4.2">
-<h2><span class="header-section-number">4.2</span> mutate</h2>
-<p>For a demo of <code>mutate()</code>, let’s create a new variable called <code>cases_plus_1</code>, which is simply the number of cases plus 1. The first argument inside the <code>mutate()</code> call is the object to be operated on. And the second argument creates the new variable as a function of the old variable and, in this example, the number 1. Adding the number 1 to the <em>cases</em> variable works because <em>cases</em> is a numeric variable. If <em>cases</em> were a character variable, it would not work.</p>
+<div id="mutate" class="section level2">
+<h2>mutate</h2>
+<p>For a demo of <code>mutate()</code>, let’s create a new variable
+called <code>cases_plus_1</code>, which is simply the number of cases
+plus 1. The first argument inside the <code>mutate()</code> call is the
+object to be operated on. And the second argument creates the new
+variable as a function of the old variable and, in this example, the
+number 1. Adding the number 1 to the <em>cases</em> variable works
+because <em>cases</em> is a numeric variable. If <em>cases</em> were a
+character variable, it would not work.</p>
 <pre class="r"><code>nyt_state_data_2 = mutate(nyt_state_data, cases_plus_1 = cases+1)</code></pre>
-<p>Now let’s try the same thing but written with the pipe (<code>%&gt;%</code>) operator. As mentioned above, the pipe brings the object out of the parentheses to focus on the action-oriented part of the function, making it easier to read.</p>
+<p>Now let’s try the same thing but written with the pipe
+(<code>%&gt;%</code>) operator. As mentioned above, the pipe brings the
+object out of the parentheses to focus on the action-oriented part of
+the function, making it easier to read.</p>
 <pre class="r"><code>nyt_state_data_2_pipe = nyt_state_data %&gt;% 
   mutate(cases_plus_1 = cases+1)</code></pre>
-<p>Check our work by printing each one. They should be the same. Note the new column, <code>cases_plus_1</code>, in the objects <code>nyt_state_data_2</code> and <code>nyt_state_data_2_pipe</code>.</p>
+<p>Check our work by printing each one. They should be the same. Note
+the new column, <code>cases_plus_1</code>, in the objects
+<code>nyt_state_data_2</code> and
+<code>nyt_state_data_2_pipe</code>.</p>
 <pre class="r"><code>nyt_state_data_2</code></pre>
 <pre><code>## # A tibble: 45,422 × 6
 ##    date       state      fips  cases deaths cases_plus_1
@@ -567,7 +793,10 @@ nyt_state_data = read_csv(&quot;nyt-covid-19-state-2021-02-09.csv&quot;)</code><
 ##  9 2020-01-26 Arizona    04        1      0            2
 ## 10 2020-01-26 California 06        2      0            3
 ## # … with 45,412 more rows</code></pre>
-<p>Note, also that two new variables can be created in the same <code>mutate()</code> call. Each new variable is separated by a comma. For those familiar with SAS, this begins to look like a SAS data step.</p>
+<p>Note, also that two new variables can be created in the same
+<code>mutate()</code> call. Each new variable is separated by a comma.
+For those familiar with SAS, this begins to look like a SAS data
+step.</p>
 <pre class="r"><code>nyt_state_data_2vars  = nyt_state_data %&gt;% 
   mutate(
     cases_plus_1 = cases+1,
@@ -589,47 +818,93 @@ nyt_state_data_2vars</code></pre>
 ## 10 2020-01-26 California 06        2      0            3            4
 ## # … with 45,412 more rows</code></pre>
 </div>
-<div id="filter" class="section level2" number="4.3">
-<h2><span class="header-section-number">4.3</span> filter</h2>
-<p>What if we only care about one state? Use <code>filter()</code> to subset values to Michigan. Again, we’ll do this with and without the pipe operator.</p>
+<div id="filter" class="section level2">
+<h2>filter</h2>
+<p>What if we only care about one state? Use <code>filter()</code> to
+subset values to Michigan. Again, we’ll do this with and without the
+pipe operator.</p>
 <pre class="r"><code>nyt_state_data_mi = filter(nyt_state_data, state == &quot;Michigan&quot;)
 
 nyt_state_data_mi_pipe = nyt_state_data %&gt;% 
   filter(state == &quot;Michigan&quot;)</code></pre>
-<p>A double equals sign, <code>==</code>, is like asking the question <em>is this equal to?</em>. <code>filter()</code> evaluates where the statement, <code>state == "Michigan"</code>, is true and returns rows with those values.</p>
-<p>The number of observations decreased, as we’d expect. There are now 402 observations (at this writing).</p>
+<p>A double equals sign, <code>==</code>, is like asking the question
+<em>is this equal to?</em>. <code>filter()</code> evaluates where the
+statement, <code>state == "Michigan"</code>, is true and returns rows
+with those values.</p>
+<p>The number of observations decreased, as we’d expect. There are now
+402 observations (at this writing).</p>
 <pre class="r"><code>nrow(nyt_state_data_mi)</code></pre>
 <pre><code>## [1] 814</code></pre>
 <pre class="r"><code>nrow(nyt_state_data_mi_pipe)</code></pre>
 <pre><code>## [1] 814</code></pre>
 </div>
-<div id="select" class="section level2" number="4.4">
-<h2><span class="header-section-number">4.4</span> select</h2>
-<p>Let’s use <code>select()</code> to grab only the <em>date</em> variable. The syntax is to simply state the columns we want.</p>
-<p>Side-note: <code>select()</code> is used by some other packages. To tell R that we want to use the <code>select()</code> function from <strong>dplyr</strong>, specifically, we write <code>dplyr::select()</code>. We can use this syntax for any dplyr verb, e.g. <code>dplyr::mutate()</code> or <code>dplyr::filter()</code>, but <code>select()</code> is the only one where I’ve run into trouble with ambiguity, so I usually leave it off the other ones. The non-piped version:</p>
+<div id="select" class="section level2">
+<h2>select</h2>
+<p>Let’s use <code>select()</code> to grab only the <em>date</em>
+variable. The syntax is to simply state the columns we want.</p>
+<p>Side-note: <code>select()</code> is used by some other packages. To
+tell R that we want to use the <code>select()</code> function from
+<strong>dplyr</strong>, specifically, we write
+<code>dplyr::select()</code>. We can use this syntax for any dplyr verb,
+e.g. <code>dplyr::mutate()</code> or <code>dplyr::filter()</code>, but
+<code>select()</code> is the only one where I’ve run into trouble with
+ambiguity, so I usually leave it off the other ones. The non-piped
+version:</p>
 <pre class="r"><code>date = dplyr::select(nyt_state_data, date)</code></pre>
 <p>And the piped version:</p>
 <pre class="r"><code>date_pipe = nyt_state_data %&gt;% dplyr::select(date)</code></pre>
-<p>Confirm that there’s just one variable using <code>dim(date_pipe)</code>.</p>
+<p>Confirm that there’s just one variable using
+<code>dim(date_pipe)</code>.</p>
 <pre class="r"><code>dim(date_pipe)</code></pre>
 <pre><code>## [1] 45422     1</code></pre>
-<p>There are several <a href="https://dplyr.tidyverse.org/reference/select.html">helpers</a> that make <code>select()</code> easy to work with. Maybe we want all variables except for the number of deaths:</p>
+<p>There are several <a
+href="https://dplyr.tidyverse.org/reference/select.html">helpers</a>
+that make <code>select()</code> easy to work with. Maybe we want all
+variables except for the number of deaths:</p>
 <pre class="r"><code>nyt_state_data_nodeaths = nyt_state_data %&gt;% dplyr::select(everything(), -deaths)
 names(nyt_state_data)</code></pre>
 <pre><code>## [1] &quot;date&quot;   &quot;state&quot;  &quot;fips&quot;   &quot;cases&quot;  &quot;deaths&quot;</code></pre>
 <pre class="r"><code>names(nyt_state_data_nodeaths)</code></pre>
 <pre><code>## [1] &quot;date&quot;  &quot;state&quot; &quot;fips&quot;  &quot;cases&quot;</code></pre>
 </div>
-<div id="arrange" class="section level2" number="4.5">
-<h2><span class="header-section-number">4.5</span> arrange</h2>
-<p>Arrange does not change values of the dataset. It just sorts the data. As a reminder, the NYT data include <em>cumulative</em> cases and <em>cumulative</em> deaths on that day in that state. We might also be interested in <em>incident</em> (i.e., new) cases or deaths by state. Let’s use arrange to help calculate daily cases and deaths using the <code>lag()</code> function.</p>
-<p>In this code chunk, we’ll combine a few operations sequentially using the pipe, foregoing the nested parentheses approach. Hopefully by now I’ve convinced you that the pipe operator is the way to go. (Please see <a href="https://r4ds.had.co.nz/pipes.html">here</a> if not.)</p>
+<div id="arrange" class="section level2">
+<h2>arrange</h2>
+<p>Arrange does not change values of the dataset. It just sorts the
+data. As a reminder, the NYT data include <em>cumulative</em> cases and
+<em>cumulative</em> deaths on that day in that state. We might also be
+interested in <em>incident</em> (i.e., new) cases or deaths by state.
+Let’s use arrange to help calculate daily cases and deaths using the
+<code>lag()</code> function.</p>
+<p>In this code chunk, we’ll combine a few operations sequentially using
+the pipe, foregoing the nested parentheses approach. Hopefully by now
+I’ve convinced you that the pipe operator is the way to go. (Please see
+<a href="https://r4ds.had.co.nz/pipes.html">here</a> if not.)</p>
 </div>
-<div id="group_by" class="section level2" number="4.6">
-<h2><span class="header-section-number">4.6</span> group_by</h2>
-<p>This code also uses <code>group_by()</code>, which does not sort the data, but it tells R to do any subsequent calculations “by group.”</p>
-<p>Bonus question: for this calculation, why is it better to <code>group_by(state)</code> and then arrange by date (i.e.: <code>group_by(state) %&gt;% arrange(date)</code>) before the <code>mutate()</code> rather than an alternative method which could be to forego the grouping and simply arrange by state and then by state (<code>arrange(state, date)</code>)? Try testing both ways and see what the value of the <code>cases_cumul_day_before</code> variable is on the first day of the data for a particular state. It’s missing (correctly) when we first <code>group_by()</code>. In contrast, when we use <code>arrange(state, date)</code> without grouping, on the first day of data for a given state, <code>cases_cumul_day_before</code> takes the last day of data for its neighboring state in the alphabet. The <code>lag()</code> function doesn’t know that it shouldn’t take values from a different state. When we use <code>group_by</code>, the subsequent <code>mutate()</code> operates on each state as its own silo, which is what we want in this calculation.</p>
-<p>Note, I’m creating a new dataset called <code>nyt_state_wrangle</code>. I tend to add a <code>_wrangle</code> to the name of datasets I’ve made significant changes to. (Tangent: <a href="https://en.wikipedia.org/wiki/Data_wrangling">Wikipedia page</a> on origins of the term data wrangling).</p>
+<div id="group_by" class="section level2">
+<h2>group_by</h2>
+<p>This code also uses <code>group_by()</code>, which does not sort the
+data, but it tells R to do any subsequent calculations “by group.”</p>
+<p>Bonus question: for this calculation, why is it better to
+<code>group_by(state)</code> and then arrange by date (i.e.:
+<code>group_by(state) %&gt;% arrange(date)</code>) before the
+<code>mutate()</code> rather than an alternative method which could be
+to forego the grouping and simply arrange by state and then by state
+(<code>arrange(state, date)</code>)? Try testing both ways and see what
+the value of the <code>cases_cumul_day_before</code> variable is on the
+first day of the data for a particular state. It’s missing (correctly)
+when we first <code>group_by()</code>. In contrast, when we use
+<code>arrange(state, date)</code> without grouping, on the first day of
+data for a given state, <code>cases_cumul_day_before</code> takes the
+last day of data for its neighboring state in the alphabet. The
+<code>lag()</code> function doesn’t know that it shouldn’t take values
+from a different state. When we use <code>group_by</code>, the
+subsequent <code>mutate()</code> operates on each state as its own silo,
+which is what we want in this calculation.</p>
+<p>Note, I’m creating a new dataset called
+<code>nyt_state_wrangle</code>. I tend to add a <code>_wrangle</code> to
+the name of datasets I’ve made significant changes to. (Tangent: <a
+href="https://en.wikipedia.org/wiki/Data_wrangling">Wikipedia page</a>
+on origins of the term data wrangling).</p>
 <pre class="r"><code>nyt_state_wrangle = nyt_state_data %&gt;% 
   #To calculate incident deaths, we will subtract the number of cumulative deaths on one day from the day before.
   #So let&#39;s group the data by state and then sort by date. Note it will default sort to ascending, meaning the earliest days will be on top.
@@ -670,10 +945,18 @@ nyt_state_wrangle</code></pre>
 ## 10 2020-03-22 Alabama 01            157            0                    131
 ## # … with 45,412 more rows, and 3 more variables: cases_incident &lt;dbl&gt;,
 ## #   deaths_cumul_day_before &lt;dbl&gt;, deaths_incident &lt;dbl&gt;</code></pre>
-<div id="group_by-continued" class="section level3" number="4.6.1">
-<h3><span class="header-section-number">4.6.1</span> group_by (continued)</h3>
-<p><code>group_by()</code> is often but not always used in combination with <code>summarise()</code>. We can use <code>group_by()</code> without <code>summarise()</code> to extract the total number of cases and deaths for each state, as the last day of data for each state contains the cumulative total.In the next code chunk, we’ll calculate the same cumulative total using the incident totals calculated above.</p>
-<p>To incorporate our changes to the data modified above, first set the new dataset (<code>nyt_last_day_by_state</code>) equal to <code>nyt_state_wrangle</code>.</p>
+<div id="group_by-continued" class="section level3">
+<h3>group_by (continued)</h3>
+<p><code>group_by()</code> is often but not always used in combination
+with <code>summarise()</code>. We can use <code>group_by()</code>
+without <code>summarise()</code> to extract the total number of cases
+and deaths for each state, as the last day of data for each state
+contains the cumulative total.In the next code chunk, we’ll calculate
+the same cumulative total using the incident totals calculated
+above.</p>
+<p>To incorporate our changes to the data modified above, first set the
+new dataset (<code>nyt_last_day_by_state</code>) equal to
+<code>nyt_state_wrangle</code>.</p>
 <pre class="r"><code>nyt_last_day_by_state = nyt_state_wrangle %&gt;% 
   arrange(desc(date)) %&gt;% #Use desc() to sort it by date descending, meaning the most recent day will be on the top of the dataset.
   group_by(state) %&gt;% 
@@ -699,7 +982,9 @@ nyt_last_day_by_state</code></pre>
 <pre class="r"><code>#How many rows does the data have? The data should contain one row for each state or territory, since we grouped by state.
 nrow(nyt_last_day_by_state)</code></pre>
 <pre><code>## [1] 56</code></pre>
-<p>To see the difference between using and not using <code>group_by()</code>, try this code chunk. It will just grab the top row.</p>
+<p>To see the difference between using and not using
+<code>group_by()</code>, try this code chunk. It will just grab the top
+row.</p>
 <pre class="r"><code>nyt_last_day  = nyt_state_wrangle %&gt;% 
   arrange(desc(date)) %&gt;% 
 #  group_by(state) %&gt;% #This comments out the code so this part doesn&#39;t run.
@@ -707,17 +992,32 @@ nrow(nyt_last_day_by_state)</code></pre>
 
 nrow(nyt_last_day)</code></pre>
 </div>
-<div id="group_by-and-summarise" class="section level3" number="4.6.2">
-<h3><span class="header-section-number">4.6.2</span> group_by and summarise</h3>
-<p>Now, let’s use <code>group_by()</code> and <code>summarise()</code> together. The syntax of <code>summarise()</code> is similar to <code>mutate()</code> in that it creates a new variable with each equals sign. As with <code>mutate()</code>, several new variables can be created in a single <code>summarise()</code>, with each equality separated by a comma.</p>
+<div id="group_by-and-summarise" class="section level3">
+<h3>group_by and summarise</h3>
+<p>Now, let’s use <code>group_by()</code> and <code>summarise()</code>
+together. The syntax of <code>summarise()</code> is similar to
+<code>mutate()</code> in that it creates a new variable with each equals
+sign. As with <code>mutate()</code>, several new variables can be
+created in a single <code>summarise()</code>, with each equality
+separated by a comma.</p>
 <p>Let’s calculate three group-by summaries:</p>
 <ul>
 <li>the average number of incident cases per day by state,</li>
-<li>the cumulative number of cases by state (way 1) by summing incident cases,</li>
-<li>the cumulative number of cases by state (way 2) by taking the maximum value of the number of cumulative cases.</li>
+<li>the cumulative number of cases by state (way 1) by summing incident
+cases,</li>
+<li>the cumulative number of cases by state (way 2) by taking the
+maximum value of the number of cumulative cases.</li>
 </ul>
-<p>Note that we have already found the cumulative number of cases above using <code>arrange()</code>, <code>group_by()</code>, and <code>slice()</code>. So here are two more options.</p>
-<p><code>sum()</code>, <code>mean()</code>, and <code>max()</code> are arithmetic functions in base R. In these functions, it’s good practice state <code>na.rm=TRUE</code> unless there’s a good reason not to. This argument stands for “remove missings equals true”. The default behavior of these arithmetic functions is to include missings (<code>na.rm = FALSE</code>), which means the arithmetic summary will also return a missing, probably not a desirable outcome.</p>
+<p>Note that we have already found the cumulative number of cases above
+using <code>arrange()</code>, <code>group_by()</code>, and
+<code>slice()</code>. So here are two more options.</p>
+<p><code>sum()</code>, <code>mean()</code>, and <code>max()</code> are
+arithmetic functions in base R. In these functions, it’s good practice
+state <code>na.rm=TRUE</code> unless there’s a good reason not to. This
+argument stands for “remove missings equals true”. The default behavior
+of these arithmetic functions is to include missings
+(<code>na.rm = FALSE</code>), which means the arithmetic summary will
+also return a missing, probably not a desirable outcome.</p>
 <pre class="r"><code>names(nyt_state_wrangle) #To remember the variable names.</code></pre>
 <pre><code>## [1] &quot;date&quot;                    &quot;state&quot;                  
 ## [3] &quot;fips&quot;                    &quot;cases_cumul&quot;            
@@ -749,13 +1049,34 @@ dim(nyt_cases_summary)</code></pre>
 ##  9 Delaware                              341.            276770           276771
 ## 10 District of Columbia                  184.            150302           150303
 ## # … with 46 more rows</code></pre>
-<p>The number of rows is equal to the number of groups (55; some territories are included). The data used to include date, but we have collapsed over date here. When <code>group_by()</code> and <code>summarise()</code> are used together, the number of rows in the data will be equal to the number of groups.</p>
-<p>The number of variables is four: the grouping variable (state) and each of the summary measures we calculated for each state.</p>
-<p>Note that the two cumulative values differ slightly for some of the states. This discrepancy could be explained by the <a href="https://github.com/nytimes/covid-19-data/blob/master/PROBABLE-CASES-NOTE.md">nuances of the NYT’s reporting system</a>, which contains a mix of both probable and confirmed cases. The most trustworthy value is probably cases_cumul_way2, which takes the most recent reported cumulative value.</p>
+<p>The number of rows is equal to the number of groups (55; some
+territories are included). The data used to include date, but we have
+collapsed over date here. When <code>group_by()</code> and
+<code>summarise()</code> are used together, the number of rows in the
+data will be equal to the number of groups.</p>
+<p>The number of variables is four: the grouping variable (state) and
+each of the summary measures we calculated for each state.</p>
+<p>Note that the two cumulative values differ slightly for some of the
+states. This discrepancy could be explained by the <a
+href="https://github.com/nytimes/covid-19-data/blob/master/PROBABLE-CASES-NOTE.md">nuances
+of the NYT’s reporting system</a>, which contains a mix of both probable
+and confirmed cases. The most trustworthy value is probably
+cases_cumul_way2, which takes the most recent reported cumulative
+value.</p>
 </div>
-<div id="group_by-and-summarise-continued" class="section level3" number="4.6.3">
-<h3><span class="header-section-number">4.6.3</span> group_by and summarise (continued)</h3>
-<p>Another application of the group-by-summarise syntax is if one wants to calculate overall summary estimates of the whole dataset. For example, as a double check, we can check to confirm the data we’re using lines up with what the NYT is reporting on their website for the total number of cumulative cases to date. At this writing (4/15/21), NYT reports 31.4 million cases (<a href="https://www.nytimes.com/interactive/2021/us/covid-cases.html" class="uri">https://www.nytimes.com/interactive/2021/us/covid-cases.html</a>). Can we reproduce that? To summarize over the whole dataset, create a dummy variable with the same value for every observation and them sum over that variable.</p>
+<div id="group_by-and-summarise-continued" class="section level3">
+<h3>group_by and summarise (continued)</h3>
+<p>Another application of the group-by-summarise syntax is if one wants
+to calculate overall summary estimates of the whole dataset. For
+example, as a double check, we can check to confirm the data we’re using
+lines up with what the NYT is reporting on their website for the total
+number of cumulative cases to date. At this writing (4/15/21), NYT
+reports 31.4 million cases (<a
+href="https://www.nytimes.com/interactive/2021/us/covid-cases.html"
+class="uri">https://www.nytimes.com/interactive/2021/us/covid-cases.html</a>).
+Can we reproduce that? To summarize over the whole dataset, create a
+dummy variable with the same value for every observation and them sum
+over that variable.</p>
 <pre class="r"><code>nyt_cases_overall = nyt_state_wrangle %&gt;% 
   group_by(state) %&gt;% 
   summarise(cases_cumul = max(cases_cumul, na.rm=TRUE)) %&gt;% 
@@ -770,12 +1091,23 @@ nyt_cases_overall</code></pre>
 ##   dummy cases_cumul
 ##   &lt;dbl&gt;       &lt;dbl&gt;
 ## 1     1    84364836</code></pre>
-<p>Confirmed. The total cumulative number of cases at this writing is 31,444,696, which is about what they’re reporting on their website today (31.4 million+). Note this total includes the cases from Guam, Northern Mariana Islands, Puerto Rico, and the Virgin Islands.</p>
+<p>Confirmed. The total cumulative number of cases at this writing is
+31,444,696, which is about what they’re reporting on their website today
+(31.4 million+). Note this total includes the cases from Guam, Northern
+Mariana Islands, Puerto Rico, and the Virgin Islands.</p>
 </div>
 </div>
-<div id="all-together-now-in-a-simple-example-using-case_when" class="section level2" number="4.7">
-<h2><span class="header-section-number">4.7</span> All together now in a simple example using <code>case_when()</code></h2>
-<p>Goal: calculate the total number of deaths in each state in the <a href="https://en.wikipedia.org/wiki/Great_Lakes_region">Great Lakes Region</a>: Illinois, Indiana, Michigan, Minnesota, New York, Ohio, Pennsylvania, and Wisconsin. Do it all in one sequential pipe. In this code, I’ll introduce the <code>case_when()</code> function, which is a useful way to create new variables conditional on values of other variables.</p>
+<div id="all-together-now-in-a-simple-example-using-case_when"
+class="section level2">
+<h2>All together now in a simple example using
+<code>case_when()</code></h2>
+<p>Goal: calculate the total number of deaths in each state in the <a
+href="https://en.wikipedia.org/wiki/Great_Lakes_region">Great Lakes
+Region</a>: Illinois, Indiana, Michigan, Minnesota, New York, Ohio,
+Pennsylvania, and Wisconsin. Do it all in one sequential pipe. In this
+code, I’ll introduce the <code>case_when()</code> function, which is a
+useful way to create new variables conditional on values of other
+variables.</p>
 <p>Also note the use of the “or” operator, <code>|</code>.</p>
 <pre class="r"><code>deaths_cumul_by_state_greatlakes = nyt_state_wrangle %&gt;% 
   
@@ -814,7 +1146,8 @@ nyt_cases_overall</code></pre>
   summarise(
     deaths_cumul = max(deaths_cumul, na.rm=TRUE)
   )</code></pre>
-<p>We expect it to be a pretty small dataset (8x2), so let’s print the whole thing</p>
+<p>We expect it to be a pretty small dataset (8x2), so let’s print the
+whole thing</p>
 <pre class="r"><code>deaths_cumul_by_state_greatlakes</code></pre>
 <pre><code>## # A tibble: 8 × 2
 ##   state        deaths_cumul
@@ -827,13 +1160,16 @@ nyt_cases_overall</code></pre>
 ## 6 Ohio                38628
 ## 7 Pennsylvania        45254
 ## 8 Wisconsin           14620</code></pre>
-<p>That concludes this tutorial. In our next tutorial (<a href="https://michaeldgarber.github.io/teach-r/2-dplyr-mapview-tidycensus.html" class="uri">https://michaeldgarber.github.io/teach-r/2-dplyr-mapview-tidycensus.html</a>), we’ll continue using dplyr and we’ll introduce <strong>tidycensus</strong>, <strong>mapview</strong>, and <strong>ggplot</strong> to use census data to visualize incidence per population.</p>
+<p>That concludes this tutorial. In our next tutorial (<a
+href="https://michaeldgarber.github.io/teach-r/2-dplyr-mapview-tidycensus.html"
+class="uri">https://michaeldgarber.github.io/teach-r/2-dplyr-mapview-tidycensus.html</a>),
+we’ll continue using dplyr and we’ll introduce
+<strong>tidycensus</strong>, <strong>mapview</strong>, and
+<strong>ggplot</strong> to use census data to visualize incidence per
+population.</p>
 </div>
 </div>
 
-<br>
-<br>
-<p>Copyright &copy; 2022 Michael D. Garber </p>
 
 
 </div>
@@ -883,7 +1219,7 @@ $(document).ready(function ()  {
 
     // establish options
     var options = {
-      selectors: "h1,h2,h3,h4",
+      selectors: "h1,h2,h3",
       theme: "bootstrap3",
       context: '.toc-content',
       hashGenerator: function (text) {

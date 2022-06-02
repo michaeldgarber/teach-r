@@ -31,7 +31,7 @@ The purpose of this tutorial is to learn the basics of dplyr in the context of a
 
 The target audience for this demo is someone with little to no experience using R. I will also assume no experience with any statistical programming language, although some experience with SAS or STATA would certainly not hurt. I imagine the target audience will have familiarity with the basics of data management in a spreadsheet-based program like Excel and may want to try out using a programming-oriented tool for data management. For an excellent overview of why it can be preferable to analyze and manage data with a programming language rather than spreadsheet tools, see here: <https://www.jessesadler.com/post/excel-vs-r/>
 
-*Author's ote: this material is an updated version of an earlier demo available here (<https://rpubs.com/michaeldgarber/dplyr_1>). I have left that link live, but this version is more current.*
+*Author's note: this material is an updated version of an earlier demo available here (<https://rpubs.com/michaeldgarber/dplyr_1>). I have left that link live, but this version is more current.*
 
 ## What is dplyr?
 
