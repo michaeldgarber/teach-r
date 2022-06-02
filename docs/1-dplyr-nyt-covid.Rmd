@@ -2,10 +2,9 @@
 title: "R for data wrangling 1: learning the ground rules of dplyr with publicly available COVID-19 data"
 author: "Michael D. Garber, PhD MPH"
 date: "Updated May 22, 2021"
-output: 
-  html_document: 
-    theme: readable
+output: html_document
 ---
+
 
 ```{r "setup", include=FALSE, eval=TRUE, echo=FALSE}
 require("knitr")

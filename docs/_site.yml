@@ -1,0 +1,9 @@
+name: "teach-r"
+output_dir: "."
+navbar:
+  left:
+    - icon: fa-home
+      href: https://michaeldgarber.github.io/
+      text: "MDG"
+    - text: "teach-r"
+      href: index.html
