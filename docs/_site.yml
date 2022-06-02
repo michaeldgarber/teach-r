@@ -5,5 +5,12 @@ navbar:
     - icon: fa-home
       href: https://michaeldgarber.github.io/
       text: "MDG"
-    - text: "teach-r"
+    - text: "R course"
       href: index.html
+output:
+  bookdown::html_document2:
+    toc: true 
+    toc_float: true
+    toc_depth: 4
+    include: 
+      after_body: footer.html

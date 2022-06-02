@@ -1,8 +1,11 @@
 ---
 title: "R for data wrangling 1: learning the ground rules of dplyr with publicly available COVID-19 data"
 author: "Michael D. Garber, PhD MPH"
-date: "Updated May 22, 2021"
-output: html_document
+date: "Revised June 2, 2022"
+output:
+  html_document:
+    toc: true
+    toc_float: true
 ---
 
 
@@ -12,25 +15,25 @@ require("knitr")
 library(here)
 ```
 
-### Outline
+# Outline
 
 1.  Introduction and pre-requisites
 2.  Install packages and download the data
 3.  Explore the NYT state COVID-19 data using dplyr
 
-# 1. Introduction and pre-requisites
+# Introduction and pre-requisites
 
-### Purpose
+## Purpose
 
 The purpose of this tutorial is to learn the basics of dplyr in the context of an applied example with publicly available COVID-19 data from The New York Times.
 
-### Target audience
+## Target audience
 
 The target audience for this demo is someone with little to no experience using R. I will also assume no experience with any statistical programming language, although some experience with SAS or STATA would certainly not hurt. I imagine the target audience will have familiarity with the basics of data management in a spreadsheet-based program like Excel and may want to try out using a programming-oriented tool for data management. For an excellent overview of why it can be preferable to analyze and manage data with a programming language rather than spreadsheet tools, see here: <https://www.jessesadler.com/post/excel-vs-r/>
 
 *Author's ote: this material is an updated version of an earlier demo available here (<https://rpubs.com/michaeldgarber/dplyr_1>). I have left that link live, but this version is more current.*
 
-### What is dplyr?
+## What is dplyr?
 
 [Dplyr](https://dplyr.tidyverse.org/) is a set of functions for managing and manipulating data in R. As stated on the webpage:
 
@@ -38,11 +41,11 @@ The target audience for this demo is someone with little to no experience using 
 
 There are several ways to manage data in R, including [base R](https://stat.ethz.ch/R-manual/R-devel/library/base/html/00Index.html). I focus here on dplyr because it's widely used and, I think, intuitive. Dplyr is part of the larger collection of packages called the [tidyverse](https://www.tidyverse.org/), which includes other popular packages like ggplot2. One advantage of dplyr is that, when combined with the pipe operator (explained below), it is quite human readable. Like good writing , it emphasizes the verbs (Zinsser, On Writing Well, Chapter 10).
 
-### The goal of this tutorial
+## The goal of this tutorial
 
 The goal of this tutorial is to illustrate the basics of dplyr using publicly available data on COVID-19 incidence posted by [The New York Times](https://github.com/nytimes/covid-19-data). We plan for this tutorial to eventually be a part of a series of short tutorials focused on using R for geospatial data management and analyses.
 
-### Prerequisites
+## Prerequisites
 
 1.  **Install R and RStudio.** Both R and RStudio are needed, but worry not: they are both free and easy to download.
 
@@ -64,7 +67,7 @@ knitr::include_graphics(here("docs", "images", "script-screenshot.png"))
 -   <https://dplyr.tidyverse.org/articles/dplyr.html> - The vignette expands upon the main landing page with some examples.
 -   <https://r4ds.had.co.nz/transform.html> - Chapter 5 of the online book, [R for Data Science](https://r4ds.had.co.nz/), by Wickham and Grolemund, is another intro to *dplyr*. This book is the go-to resource for programming in the *tidyverse* in general.
 
-# 2. Install packages and download the data
+# Install packages and download the data
 
 ## Install packages
 
@@ -169,7 +172,7 @@ names(nyt_state_data) #Return the names of the variables.
 str(nyt_state_data) #Returns information about each variable's type (i.e., character vs numeric)
 ```
 
-# 3. Explore the NYT COVID-19 data using dplyr
+# Explore the NYT COVID-19 data using dplyr
 
 In this section, I'll introduce common dplyr verbs. We'll first go through each verb one by one. Then, we'll put them together in a sequence.
 
@@ -187,7 +190,7 @@ The seven dplyr verbs I use the most are `mutate()`, `filter()`, `select()`, `ar
 
 There are [several other](https://github.com/rstudio/cheatsheets/blob/master/data-transformation.pdf) verbs within dplyr, but many, perhaps most, data-wrangling tasks can be done with just these seven tools.
 
-### mutate
+## mutate
 
 For a demo of `mutate()`, let's create a new variable called `cases_plus_1`, which is simply the number of cases plus 1. The first argument inside the `mutate()` call is the object to be operated on. And the second argument creates the new variable as a function of the old variable and, in this example, the number 1. Adding the number 1 to the *cases* variable works because *cases* is a numeric variable. If *cases* were a character variable, it would not work.
 
@@ -220,7 +223,7 @@ nyt_state_data_2vars  = nyt_state_data %>%
 nyt_state_data_2vars
 ```
 
-### filter
+## filter
 
 What if we only care about one state? Use `filter()` to subset values to Michigan. Again, we'll do this with and without the pipe operator.
 
@@ -240,7 +243,7 @@ nrow(nyt_state_data_mi)
 nrow(nyt_state_data_mi_pipe)
 ```
 
-### select
+## select
 
 Let's use `select()` to grab only the *date* variable. The syntax is to simply state the columns we want.
 
@@ -270,13 +273,13 @@ names(nyt_state_data)
 names(nyt_state_data_nodeaths)
 ```
 
-### arrange
+## arrange
 
 Arrange does not change values of the dataset. It just sorts the data. As a reminder, the NYT data include *cumulative* cases and *cumulative* deaths on that day in that state. We might also be interested in *incident* (i.e., new) cases or deaths by state. Let's use arrange to help calculate daily cases and deaths using the `lag()` function.
 
 In this code chunk, we'll combine a few operations sequentially using the pipe, foregoing the nested parentheses approach. Hopefully by now I've convinced you that the pipe operator is the way to go. (Please see [here](https://r4ds.had.co.nz/pipes.html) if not.)
 
-### group_by
+## group_by
 
 This code also uses `group_by()`, which does not sort the data, but it tells R to do any subsequent calculations "by group."
 
@@ -394,7 +397,7 @@ nyt_cases_overall
 
 Confirmed. The total cumulative number of cases at this writing is 31,444,696, which is about what they're reporting on their website today (31.4 million+). Note this total includes the cases from Guam, Northern Mariana Islands, Puerto Rico, and the Virgin Islands.
 
-### All together now in a simple example using `case_when()`
+## All together now in a simple example using `case_when()`
 
 Goal: calculate the total number of deaths in each state in the [Great Lakes Region](https://en.wikipedia.org/wiki/Great_Lakes_region): Illinois, Indiana, Michigan, Minnesota, New York, Ohio, Pennsylvania, and Wisconsin. Do it all in one sequential pipe. In this code, I'll introduce the `case_when()` function, which is a useful way to create new variables conditional on values of other variables.
 

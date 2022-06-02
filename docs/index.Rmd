@@ -1,3 +1,11 @@
 ---
 title: "R course"
+output: 
+  bookdown::html_document2:
+    toc: FALSE #overwrite the _yml
+    include: 
+      after_body: footer.html
 ---
+
+Session 1:
+https://michaeldgarber.github.io/teach-r/1-dplyr-nyt-covid.html

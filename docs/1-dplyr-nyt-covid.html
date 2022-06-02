@@ -30,6 +30,9 @@
        h6 {font-size: 12px;}
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
@@ -225,6 +228,69 @@ $(document).ready(function () {
 
 
 
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
 
 </head>
 
@@ -232,6 +298,16 @@ $(document).ready(function () {
 
 
 <div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -256,7 +332,7 @@ $(document).ready(function () {
   </a>
 </li>
 <li>
-  <a href="index.html">teach-r</a>
+  <a href="index.html">R course</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -273,13 +349,13 @@ $(document).ready(function () {
 <h1 class="title toc-ignore">R for data wrangling 1: learning the ground
 rules of dplyr with publicly available COVID-19 data</h1>
 <h4 class="author">Michael D. Garber, PhD MPH</h4>
-<h4 class="date">Updated May 22, 2021</h4>
+<h4 class="date">Revised June 2, 2022</h4>
 
 </div>
 
 
-<div id="outline" class="section level3">
-<h3>Outline</h3>
+<div id="outline" class="section level1">
+<h1>Outline</h1>
 <ol style="list-style-type: decimal">
 <li>Introduction and pre-requisites</li>
 <li>Install packages and download the data</li>
@@ -287,15 +363,15 @@ rules of dplyr with publicly available COVID-19 data</h1>
 </ol>
 </div>
 <div id="introduction-and-pre-requisites" class="section level1">
-<h1>1. Introduction and pre-requisites</h1>
-<div id="purpose" class="section level3">
-<h3>Purpose</h3>
+<h1>Introduction and pre-requisites</h1>
+<div id="purpose" class="section level2">
+<h2>Purpose</h2>
 <p>The purpose of this tutorial is to learn the basics of dplyr in the
 context of an applied example with publicly available COVID-19 data from
 The New York Times.</p>
 </div>
-<div id="target-audience" class="section level3">
-<h3>Target audience</h3>
+<div id="target-audience" class="section level2">
+<h2>Target audience</h2>
 <p>The target audience for this demo is someone with little to no
 experience using R. I will also assume no experience with any
 statistical programming language, although some experience with SAS or
@@ -312,8 +388,8 @@ demo available here (<a href="https://rpubs.com/michaeldgarber/dplyr_1"
 class="uri">https://rpubs.com/michaeldgarber/dplyr_1</a>). I have left
 that link live, but this version is more current.</em></p>
 </div>
-<div id="what-is-dplyr" class="section level3">
-<h3>What is dplyr?</h3>
+<div id="what-is-dplyr" class="section level2">
+<h2>What is dplyr?</h2>
 <p><a href="https://dplyr.tidyverse.org/">Dplyr</a> is a set of
 functions for managing and manipulating data in R. As stated on the
 webpage:</p>
@@ -332,8 +408,8 @@ combined with the pipe operator (explained below), it is quite human
 readable. Like good writing , it emphasizes the verbs (Zinsser, On
 Writing Well, Chapter 10).</p>
 </div>
-<div id="the-goal-of-this-tutorial" class="section level3">
-<h3>The goal of this tutorial</h3>
+<div id="the-goal-of-this-tutorial" class="section level2">
+<h2>The goal of this tutorial</h2>
 <p>The goal of this tutorial is to illustrate the basics of dplyr using
 publicly available data on COVID-19 incidence posted by <a
 href="https://github.com/nytimes/covid-19-data">The New York Times</a>.
@@ -341,8 +417,8 @@ We plan for this tutorial to eventually be a part of a series of short
 tutorials focused on using R for geospatial data management and
 analyses.</p>
 </div>
-<div id="prerequisites" class="section level3">
-<h3>Prerequisites</h3>
+<div id="prerequisites" class="section level2">
+<h2>Prerequisites</h2>
 <ol style="list-style-type: decimal">
 <li><strong>Install R and RStudio.</strong> Both R and RStudio are
 needed, but worry not: they are both free and easy to download.</li>
@@ -397,7 +473,7 @@ general.</li>
 </div>
 </div>
 <div id="install-packages-and-download-the-data" class="section level1">
-<h1>2. Install packages and download the data</h1>
+<h1>Install packages and download the data</h1>
 <div id="install-packages" class="section level2">
 <h2>Install packages</h2>
 <p>Now that we have RStudio installed and up and running, our first step
@@ -618,7 +694,7 @@ of the data.</p>
 </div>
 <div id="explore-the-nyt-covid-19-data-using-dplyr"
 class="section level1">
-<h1>3. Explore the NYT COVID-19 data using dplyr</h1>
+<h1>Explore the NYT COVID-19 data using dplyr</h1>
 <p>In this section, I’ll introduce common dplyr verbs. We’ll first go
 through each verb one by one. Then, we’ll put them together in a
 sequence.</p>
@@ -665,8 +741,9 @@ tutorial</a>, though.</li>
 href="https://github.com/rstudio/cheatsheets/blob/master/data-transformation.pdf">several
 other</a> verbs within dplyr, but many, perhaps most, data-wrangling
 tasks can be done with just these seven tools.</p>
-<div id="mutate" class="section level3">
-<h3>mutate</h3>
+</div>
+<div id="mutate" class="section level2">
+<h2>mutate</h2>
 <p>For a demo of <code>mutate()</code>, let’s create a new variable
 called <code>cases_plus_1</code>, which is simply the number of cases
 plus 1. The first argument inside the <code>mutate()</code> call is the
@@ -741,8 +818,8 @@ nyt_state_data_2vars</code></pre>
 ## 10 2020-01-26 California 06        2      0            3            4
 ## # … with 45,412 more rows</code></pre>
 </div>
-<div id="filter" class="section level3">
-<h3>filter</h3>
+<div id="filter" class="section level2">
+<h2>filter</h2>
 <p>What if we only care about one state? Use <code>filter()</code> to
 subset values to Michigan. Again, we’ll do this with and without the
 pipe operator.</p>
@@ -761,8 +838,8 @@ with those values.</p>
 <pre class="r"><code>nrow(nyt_state_data_mi_pipe)</code></pre>
 <pre><code>## [1] 814</code></pre>
 </div>
-<div id="select" class="section level3">
-<h3>select</h3>
+<div id="select" class="section level2">
+<h2>select</h2>
 <p>Let’s use <code>select()</code> to grab only the <em>date</em>
 variable. The syntax is to simply state the columns we want.</p>
 <p>Side-note: <code>select()</code> is used by some other packages. To
@@ -790,8 +867,8 @@ names(nyt_state_data)</code></pre>
 <pre class="r"><code>names(nyt_state_data_nodeaths)</code></pre>
 <pre><code>## [1] &quot;date&quot;  &quot;state&quot; &quot;fips&quot;  &quot;cases&quot;</code></pre>
 </div>
-<div id="arrange" class="section level3">
-<h3>arrange</h3>
+<div id="arrange" class="section level2">
+<h2>arrange</h2>
 <p>Arrange does not change values of the dataset. It just sorts the
 data. As a reminder, the NYT data include <em>cumulative</em> cases and
 <em>cumulative</em> deaths on that day in that state. We might also be
@@ -803,8 +880,8 @@ the pipe, foregoing the nested parentheses approach. Hopefully by now
 I’ve convinced you that the pipe operator is the way to go. (Please see
 <a href="https://r4ds.had.co.nz/pipes.html">here</a> if not.)</p>
 </div>
-<div id="group_by" class="section level3">
-<h3>group_by</h3>
+<div id="group_by" class="section level2">
+<h2>group_by</h2>
 <p>This code also uses <code>group_by()</code>, which does not sort the
 data, but it tells R to do any subsequent calculations “by group.”</p>
 <p>Bonus question: for this calculation, why is it better to
@@ -868,7 +945,6 @@ nyt_state_wrangle</code></pre>
 ## 10 2020-03-22 Alabama 01            157            0                    131
 ## # … with 45,412 more rows, and 3 more variables: cases_incident &lt;dbl&gt;,
 ## #   deaths_cumul_day_before &lt;dbl&gt;, deaths_incident &lt;dbl&gt;</code></pre>
-</div>
 <div id="group_by-continued" class="section level3">
 <h3>group_by (continued)</h3>
 <p><code>group_by()</code> is often but not always used in combination
@@ -1020,10 +1096,11 @@ nyt_cases_overall</code></pre>
 (31.4 million+). Note this total includes the cases from Guam, Northern
 Mariana Islands, Puerto Rico, and the Virgin Islands.</p>
 </div>
+</div>
 <div id="all-together-now-in-a-simple-example-using-case_when"
-class="section level3">
-<h3>All together now in a simple example using
-<code>case_when()</code></h3>
+class="section level2">
+<h2>All together now in a simple example using
+<code>case_when()</code></h2>
 <p>Goal: calculate the total number of deaths in each state in the <a
 href="https://en.wikipedia.org/wiki/Great_Lakes_region">Great Lakes
 Region</a>: Illinois, Indiana, Michigan, Minnesota, New York, Ohio,
@@ -1092,10 +1169,11 @@ we’ll continue using dplyr and we’ll introduce
 population.</p>
 </div>
 </div>
+
+
+
 </div>
-
-
-
+</div>
 
 </div>
 
@@ -1128,6 +1206,35 @@ $(document).ready(function () {
 
 <!-- code folding -->
 
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>
