@@ -1,0 +1,317 @@
+---
+title: "R for data wrangling 2: more dplyr and some tidycensus, mapview, and ggplot"
+author: "Michael Garber, PhD MPH"
+date: "Revised June 2, 2022"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+In the last tutorial (https://michaeldgarber.github.io/teach-r/1-dplyr-nyt-covid.html), we learned the basics of using **dplyr** to wrangle a state-level dataset on COVID-19 cases and deaths. In this tutorial, we will build on that work to calculate cumulative and daily incidence per population. To grab population data, we'll load census data using **tidycensus**. We also introduce **sf**, which is the workhorse library for wrangling spatial data in R. We'll join the census data with our COVID-19 dataset and do some interactive mapping with **mapview** and finish with some **ggplot2** graphs. 
+To that end, let's make sure we have the following packages installed:
+```{r "mapviewspecial", eval=FALSE, include=FALSE, eval=TRUE, echo=FALSE}
+#install.packages("remotes")
+library(remotes)
+#Only run if haven't run previou
+#remotes::install_github("r-spatial/mapview") #I install the github version to get this demo to work, but the CRAN version otherwise. https://github.com/r-spatial/mapview/issues/312
+#library(mapview)
+#mapviewOptions(fgb = FALSE) #because https://github.com/r-spatial/mapview/issues/321
+```
+```{r installpackages, eval=FALSE, echo=FALSE, warning=FALSE, message=FALSE}
+install.packages("tidyverse")
+install.packages("tidycensus")
+install.packages("mapview")
+install.packages("viridis")
+install.packages("scales")
+```
+
+```{r loadpackages, eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(tidycensus)
+library(mapview)
+library(sf)
+library(viridis) #used to change color palettes
+library(scales) #Used to help with the ggplot date axis below.
+```
+```{r "mapviewspecial2", eval=FALSE, include=FALSE, eval=TRUE, echo=FALSE}
+#install.packages("remotes")
+mapviewOptions(fgb = FALSE) #because https://github.com/r-spatial/mapview/issues/321
+```
+
+
+# Re-generate the NYT COVID-19 dataset we were working with before.
+
+This simply repeats the code that we used in the previous tutorial to give us the same dataset we were working with.
+
+Load the state-level data from the NYTimes GitHub repository the same way we did before.
+```{r load NYT data, eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
+nyt_state_url = "https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv"
+nyt_state_data = nyt_state_url %>% 
+  url() %>% 
+  read_csv()
+```
+
+And this code reproduces our previous data wrangling where we calculated the daily number of incident cases.
+```{r generatedata, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
+nyt_state_wrangle = nyt_state_data %>% 
+  group_by(state) %>% 
+  arrange(date) %>% 
+  rename(
+    cases_cumul = cases,
+    deaths_cumul = deaths
+  ) %>% 
+  mutate(
+    cases_cumul_day_before = lag(cases_cumul),
+    cases_incident = cases_cumul - cases_cumul_day_before,
+    
+    deaths_cumul_day_before = lag(deaths_cumul),
+    deaths_incident = deaths_cumul - deaths_cumul_day_before
+  ) %>% 
+  ungroup() %>% 
+  arrange(state, date)
+```
+
+# Load state-level census data using tidycensus
+
+**Tidycensus** is a convenience package that allows census data to be downloaded into R. The online material on tidycensus has great examples: https://walker-data.com/tidycensus/index.html. 
+
+Use of tidycensus requires a key to access the U.S. Census API, which can be obtained for free here: http://api.census.gov/data/key_signup.html. The first time you use the key on your computer, enter this line of code.
+```{r censuskey, eval=FALSE, echo=TRUE, warning=FALSE, message=TRUE}
+census_api_key("your_census_key_here", install=TRUE)
+```
+Tidycensus lets the user specify
+
+* the survey (American Community Survey or U.S. Census), 
+* the corresponding time period for that survey, the target geographic resolution and extent, 
+* the census variables to be downloaded, and 
+* whether or not the returned file will include the corresponding spatial data for the geographic units.
+
+By specifying `geometry=TRUE`, an **sf object** will be returned representing the object for the chosen geography. If `geometry=FALSE`, then only the aspatial data will be returned. sf (or [simple feature](https://r-spatial.github.io/sf/articles/sf1.html)) objects have become the standard data structure for managing spatial data in R. We will cover sf objects more in a separate tutorial (link TBD). This chapter by Lovelace, Nowosad, and Muenchow is a great place to start to learn more about sf: https://geocompr.robinlovelace.net/spatial-class.html
+
+One great aspect of `sf` objects--as compared with the sp package, the previous standard--is that spatial data can be handled as you would any other rectangular dataframe. An `sf` object is like a `data.frame` or `tibble` with an added column representing the geometry for that observation. The data structure of sf makes it straightforward to integrate spatial data into a typical data-wrangling workflow, during which you might add new variables, filter on a variable, or merge with additional data.
+
+## Load state-level population data
+
+Without further adieu, let's run the tidycensus function `get_acs()` to return state-level population data from ACS:
+```{r get states, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
+
+#Run this to save the data locally for speed.
+options(tigris_use_cache = TRUE) 
+
+#One way I keep track of whether an object has geometry associated with it to add a _geo suffix to the name.
+pop_by_state_geo =get_acs(
+  year=2019,
+  variables = "B01001_001", #total population
+  geography = "state",
+  geometry = TRUE #to grab geometry
+)
+```
+A convenient way to search through the census variables is to use the `load_variables` function, as described here: https://walker-data.com/tidycensus/articles/basic-usage.html.
+```{r loadcensusvars, eval=FALSE, echo=TRUE, warning=FALSE, message=TRUE}
+vars_acs_2019 <- load_variables(2019, "acs5", cache = TRUE)
+View(vars_acs_2019)
+```
+
+Confirm the data are an sf object (simple feature) and explore the variable names.
+```{r confirmstatus, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
+class(pop_by_state_geo)
+pop_by_state_geo
+```
+
+## A quick mapview
+Another essential package in the **sf** workflow is **mapview** (https://r-spatial.github.io/mapview/index.html), which creates quick interactive maps. In just one line, we can interactively map the ACS state-level population data we just loaded. 
+```{r mapview, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
+mapview(pop_by_state_geo)
+```
+
+## Wrangle the census data further to prep for the join with the NYT state-level COVID-19 data.
+
+Let's clean up the output from tidycensus to make it easier to link with the state-level COVID-19 data. 
+```{r nameconfirm1, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
+names(pop_by_state_geo)
+```
+The variable corresponding to the state name is called 'NAME' in the tidycensus output. Rename it to 'state' so it can be more easily joined with the NYT data. Also note that there is a column with the variable name ('variable') and another column for its 'estimate'. It's formatted this way because the default output from tidycensus is long-form data. That is, we could have downloaded several variables for each state, and each variable-state combination would receive its own row. We can consolidate these fields by dropping the variable column and renaming 'estimate' to 'population'. Finally, because GEOID may vary depending on the geographic unit, let's explicitly remember it's a two-digit FIPS code and call it 'fips_2digit.'
+```{r nameconfirm2, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
+names(nyt_state_wrangle)
+```
+We can wrangle this **sf** object the same way we would a tibble. For example, here we use a pipe (`%>%`) and the **dplyr** verbs `rename()`, `select()`, and `mutate()`.
+```{r wranglepop, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
+pop_by_state_wrangle_geo = pop_by_state_geo %>%
+  rename(
+    fips_2digit = GEOID,
+    state = NAME,
+    population = estimate
+  ) %>% 
+  dplyr::select(-moe, -variable) %>% 
+  #To simplify some of the maps below, create an indicator variable corresponding to the Continental 48.
+  #Do the same type of operation using two different types of syntax, the  %in% operator and the or operator.
+  mutate(
+    continental_48 = case_when(
+      state %in% c("Alaska", "Hawaii", "Northern Mariana Islands", "Guam", "Virgin Islands", "Puerto Rico") ~ 0,
+      TRUE ~ 1)    
+    ) 
+
+names(pop_by_state_wrangle_geo)
+```
+## Use mapview to visualize population.
+To confirm the population data are as we expect, let's map the state's populations using **mapview**. The pipe operator, `%>%`, can also be used before a `mapview()` call. In this code, the sf object, `pop_by_state_geo`, and all subsequent changes we make it to it, e.g., after having used `filter()` here, are "piped" into the `mapview()` function. The `zcol` argument specifies which variable to be visualized. As you may notice, [mapview defaults](https://r-spatial.github.io/mapview/articles/articles/mapview_02-advanced.html) to the viridis palette.
+```{r mapview1, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
+pop_by_state_wrangle_geo %>%
+  filter(continental_48==1) %>%   #Limit to continental 48 so the default zoom is more zoomed in.
+  mapview(zcol = "population" ) #Note the object argument is implied by the pipe operator.
+```
+
+# Link the NYT COVID-19 data with the census data
+
+Let's link the NYTimes COVID-19 data with the census data two ways.
+
+We will first map an overall summary of cumulative incidence per state population. To do that, we will re-run some of our summary estimates from the [previous tutorial](https://rpubs.com/michaeldgarber/dplyr_1) to calculate the total number of cumulative cases. We will then link the census population data to the NYTimes data by state using `left_join`. We will calculate a rate (cumulative cases per population) and visualize it using mapview.
+
+## Summarize NYT COVID-19 data and link with census data.
+
+Recall, we went through several ways to calculate the cumulative number of cases by state in our previous code. Let's group by state and take the max value using `summarise()`. Using the pipe, we can do these steps without having to create intermediate datasets.
+
+`left_join()` takes three arguments: the data frame (or tibble) on the left side (piped through here), the data frame it's merging with on the right side (`pop_by_state_wrangle_geo`), and the key variable on which the two tibbles will be merged, which is state. Note `left_join()` can also join on a vector of variables: `by = c("var1", "var2")`. Here we need just one key variable.
+
+We use `st_as_sf()` to force the dataframe to be an sf object. We finally use `mutate()` to create new variables which calcualte the cumulative incidence of both cases and deaths per population.
+```{r wranglenytlink, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
+nyt_by_state_w_pop_geo = nyt_state_wrangle %>% 
+  group_by(state) %>% 
+  summarise(
+    cases_cumul = max(cases_cumul, na.rm=TRUE),
+    deaths_cumul = max(deaths_cumul, na.rm=TRUE)
+    ) %>% 
+  #Recall, after we use group_by and summarise, the data go from a very big dataset 
+  #with a row for each day-state combination to a smaller dataset with just a row for every state.
+  left_join(pop_by_state_wrangle_geo, by = "state") %>% 
+  st_as_sf() %>% 
+  mutate(
+    cases_cumul_per_pop = cases_cumul/population,
+    deaths_cumul_per_pop = deaths_cumul/population
+  )
+
+```
+
+### Visualize cumulative incidence per population using mapview
+Use mapview to visualize.
+```{r mapview_cases_perpop, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
+nyt_by_state_w_pop_geo %>%
+  #Limit to continental 48 so the default zoom is more zoomed in.
+  filter(continental_48==1) %>% 
+  mapview(
+    zcol = "cases_cumul_per_pop")
+```
+Based on an overall number of cases of about 31 million (https://www.nytimes.com/interactive/2020/us/coronavirus-us-cases.html), state-level proportions of about 10% make sense. As has been reported, the Dakotas have a particularly high cumulative incidence per population.
+
+### Tinker with mapview's defaults.
+
+Mapview's main raison d'etre is as a quick workflow check, but it can also be used to make more refined maps. One can, for example, change the label of the visualized variable in the legend (`layer.name=`) or change the color palette (`col.regions=`). See options here: https://r-spatial.github.io/mapview/articles/articles/mapview_02-advanced.html.  In the below map, I made those changes and flipped the direction of the viridis color palette using the `direction` argument so that dark purple is high incidence and yellow is low. Check out the viridis color palettes here: https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html. B corresponds to the inferno palette: https://rdrr.io/cran/scales/man/viridis_pal.html.
+
+The output is not bad, but for publication-ready maps, [**tmap**](https://cran.r-project.org/web/packages/tmap/vignettes/tmap-getstarted.html) may still be a better option: https://rpubs.com/lancerowen/ElegantCartography_1 .
+```{r mapview_cases_perpop2, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
+nyt_by_state_w_pop_geo %>%
+  filter(continental_48==1) %>%   #Limit to continental 48 so the default zoom is more zoomed in.
+  mapview(
+    zcol = "cases_cumul_per_pop",
+    layer.name = "Cumulative incidence per pop",
+    #The palette function is from the viridis package.
+    col.regions = viridis_pal(alpha = 1, begin = 0, end = 1, direction = -1, option = "B")
+  )
+```
+
+### Visualize using a ggplot2 histogram
+In addition to this geographic visualization, we may also want a simple aspatial figure summarizing cumulative incidence per population using **ggplot2**. Guidance on ggplot is extensive throughout the internet, for example, http://www.cookbook-r.com/Graphs/, and https://ggplot2.tidyverse.org/. A detailed discussion of ggplot2 is outside of the current scope. Let's make a quick histogram accepting the ggplot2 defaults to get a sense of the distribution of the cumulative incidence variable.
+
+```{r gghisto, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
+nyt_by_state_w_pop_geo %>%
+  filter(continental_48==1) %>%   #Limit to continental 48 so the default zoom is more zoomed in.
+  ggplot(aes(cases_cumul_per_pop))+
+  geom_histogram() 
+```
+
+## Link the daily NYT COVID-19 data with the population data to analyze temporal trends in incidence by state
+In the above analysis, we collapsed over time. We might also be interested in time trends. In this section, we'll keep the data in its daily format and link in the population data again.
+
+Sometimes, there can be computer-processing benefits to dropping the geometry column, as the geometry column can make the file size quite a bit bigger. Since the daily data are thousands of observations, linking each day's data with a corresponding geometry might be slow to work with. Let's create a new state-population dataset without the geometry column before we link the population data to the daily COVID-19 data. Drop the geometry using the `st_set_geometry(NULL)` argument from **sf**.
+```{r dropgeo, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
+pop_by_state_wrangle_nogeo = pop_by_state_wrangle_geo %>% 
+  st_set_geometry(NULL)
+```
+
+Now, link the state-level population data to the daily COVID-19 data. Recall, the key variable for our `left_jon()` is 'state'. Calculate daily cumulative incidence of each outcome per population and the daily incidence rate of each outcome.
+```{r dailycovidpop, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
+nyt_state_pop_wrangle = nyt_state_wrangle %>% 
+  left_join(pop_by_state_wrangle_nogeo, by = "state") %>% 
+  mutate(
+    cases_cumul_per_pop = cases_cumul/population,
+    deaths_cumul_per_pop = deaths_cumul/population,
+    cases_incident_per_pop = cases_incident/population,
+    deaths_incident_per_pop = deaths_incident/population 
+  )
+```
+
+### Visualize daily cumulative incidence per population  for the continental 48 states using ggplot2.
+
+```{r statelinegraphs, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
+nyt_state_pop_wrangle %>% 
+  filter(continental_48==1) %>%   
+  ggplot( aes(x=date, y=cases_cumul_per_pop))+
+  geom_line(aes(color = state)) +
+  ylab("Cumulative COVID-19\n incidence\n per person") +
+  xlab("Date")  +
+  theme_bw() +
+  theme(legend.position="bottom") +
+  scale_x_date(date_breaks = "months" , date_labels = "%b-%y") +
+  theme(legend.position="bottom") +
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+### Visualize daily incidence rate cases for the continental 48 states.
+```{r statelinegraphs2, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
+nyt_state_pop_wrangle %>% 
+  filter(continental_48==1) %>%   
+  #To  make it easier
+  ggplot( aes(x=date, y=cases_incident_per_pop))+
+  geom_line(aes(color = state)) +
+  scale_x_date(date_breaks = "months" , date_labels = "%b-%y") +
+  ylab("COVID-19\n incidence rate\n per person") +
+  xlab("Date")  +
+  theme_bw() +
+  theme(legend.position="bottom") +
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+Welp, we could clearly make those prettier and easier to read, but graphing the two makes clear the distinction between the two outcome measures (cumulative incidence vs incidence rate). Cumulative incidence only goes up, as expected, while incidence rate goes up and down.
+
+In April 2021, there was a spike in cases in Michigan. Let's explore that by subsetting to the Great Lakes region, as we did [previously](https://michaeldgarber.github.io/teach-r/1-dplyr-nyt-covid.html). Note that, as we did above before our `mapview()` function, it can sometimes be preferable to pipe all of the data wrangling steps into the ggplot2 function instead of creating a new tibble, especially if you don't think you'll use that tibble for anything else. We do that below.
+
+The spike in Michigan is indeed visible. This figure also illustrates how unstable and noisy daily values are. A weekly average could be easier to visualize, which we won't do here. 
+```{r greatlakes1, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
+nyt_state_pop_wrangle %>% 
+  mutate(
+    great_lakes = case_when(
+      state == "Illinois" |
+      state == "Indiana" |
+      state == "Michigan" |
+      state == "Minnesota" |
+      state == "New York" |
+      state == "Ohio" |
+      state == "Pennsylvania" |
+      state == "Wisconsin" ~ 1,
+      TRUE ~ 0)) %>% 
+  filter(great_lakes==1) %>% 
+  #Pipe the tibble into the ggplot function:
+  ggplot( aes(x=date, y=cases_incident_per_pop))+
+  geom_line(aes(color = state)) +
+  ylab("COVID-19\n incidence rate\n per person") +
+  xlab("Date")  +
+  theme_bw() +
+  scale_x_date(date_breaks = "months" , date_labels = "%b-%y") +
+  theme(legend.position="bottom") +
+  theme(axis.text.x = element_text(angle = 90))
+```

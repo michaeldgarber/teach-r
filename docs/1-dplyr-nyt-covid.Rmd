@@ -450,4 +450,4 @@ We expect it to be a pretty small dataset (8x2), so let's print the whole thing
 deaths_cumul_by_state_greatlakes
 ```
 
-That concludes this tutorial. In our next tutorial (<https://rpubs.com/michaeldgarber/dplyr_2_tidycensus_mapview>), we'll continue using dplyr and we'll introduce **tidycensus**, **mapview**, and **ggplot** to use census data to visualize incidence per population.
+That concludes this tutorial. In our next tutorial (<https://michaeldgarber.github.io/teach-r/2-dplyr-mapview-tidycensus.html>), we'll continue using dplyr and we'll introduce **tidycensus**, **mapview**, and **ggplot** to use census data to visualize incidence per population.
