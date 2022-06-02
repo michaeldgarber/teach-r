@@ -354,24 +354,26 @@ rules of dplyr with publicly available COVID-19 data</h1>
 </div>
 
 
-<div id="outline" class="section level1">
-<h1>Outline</h1>
+<div id="outline" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> Outline</h1>
 <ol style="list-style-type: decimal">
 <li>Introduction and pre-requisites</li>
 <li>Install packages and download the data</li>
 <li>Explore the NYT state COVID-19 data using dplyr</li>
 </ol>
 </div>
-<div id="introduction-and-pre-requisites" class="section level1">
-<h1>Introduction and pre-requisites</h1>
-<div id="purpose" class="section level2">
-<h2>Purpose</h2>
+<div id="introduction-and-pre-requisites" class="section level1"
+number="2">
+<h1><span class="header-section-number">2</span> Introduction and
+pre-requisites</h1>
+<div id="purpose" class="section level2" number="2.1">
+<h2><span class="header-section-number">2.1</span> Purpose</h2>
 <p>The purpose of this tutorial is to learn the basics of dplyr in the
 context of an applied example with publicly available COVID-19 data from
 The New York Times.</p>
 </div>
-<div id="target-audience" class="section level2">
-<h2>Target audience</h2>
+<div id="target-audience" class="section level2" number="2.2">
+<h2><span class="header-section-number">2.2</span> Target audience</h2>
 <p>The target audience for this demo is someone with little to no
 experience using R. I will also assume no experience with any
 statistical programming language, although some experience with SAS or
@@ -388,8 +390,8 @@ demo available here (<a href="https://rpubs.com/michaeldgarber/dplyr_1"
 class="uri">https://rpubs.com/michaeldgarber/dplyr_1</a>). I have left
 that link live, but this version is more current.</em></p>
 </div>
-<div id="what-is-dplyr" class="section level2">
-<h2>What is dplyr?</h2>
+<div id="what-is-dplyr" class="section level2" number="2.3">
+<h2><span class="header-section-number">2.3</span> What is dplyr?</h2>
 <p><a href="https://dplyr.tidyverse.org/">Dplyr</a> is a set of
 functions for managing and manipulating data in R. As stated on the
 webpage:</p>
@@ -408,8 +410,9 @@ combined with the pipe operator (explained below), it is quite human
 readable. Like good writing , it emphasizes the verbs (Zinsser, On
 Writing Well, Chapter 10).</p>
 </div>
-<div id="the-goal-of-this-tutorial" class="section level2">
-<h2>The goal of this tutorial</h2>
+<div id="the-goal-of-this-tutorial" class="section level2" number="2.4">
+<h2><span class="header-section-number">2.4</span> The goal of this
+tutorial</h2>
 <p>The goal of this tutorial is to illustrate the basics of dplyr using
 publicly available data on COVID-19 incidence posted by <a
 href="https://github.com/nytimes/covid-19-data">The New York Times</a>.
@@ -417,8 +420,8 @@ We plan for this tutorial to eventually be a part of a series of short
 tutorials focused on using R for geospatial data management and
 analyses.</p>
 </div>
-<div id="prerequisites" class="section level2">
-<h2>Prerequisites</h2>
+<div id="prerequisites" class="section level2" number="2.5">
+<h2><span class="header-section-number">2.5</span> Prerequisites</h2>
 <ol style="list-style-type: decimal">
 <li><strong>Install R and RStudio.</strong> Both R and RStudio are
 needed, but worry not: they are both free and easy to download.</li>
@@ -472,10 +475,12 @@ general.</li>
 </ul>
 </div>
 </div>
-<div id="install-packages-and-download-the-data" class="section level1">
-<h1>Install packages and download the data</h1>
-<div id="install-packages" class="section level2">
-<h2>Install packages</h2>
+<div id="install-packages-and-download-the-data" class="section level1"
+number="3">
+<h1><span class="header-section-number">3</span> Install packages and
+download the data</h1>
+<div id="install-packages" class="section level2" number="3.1">
+<h2><span class="header-section-number">3.1</span> Install packages</h2>
 <p>Now that we have RStudio installed and up and running, our first step
 is to install packages. Grolemund defines packages in the above-linked
 <a
@@ -522,8 +527,9 @@ wished to install <em>dplyr</em> without the rest of the
 <code>library(dplyr)</code>.</p>
 </div>
 <div id="load-the-covid-19-data-from-the-new-york-times"
-class="section level2">
-<h2>Load the COVID-19 data from <em>The New York Times</em></h2>
+class="section level2" number="3.2">
+<h2><span class="header-section-number">3.2</span> Load the COVID-19
+data from <em>The New York Times</em></h2>
 <p>For this example, we will use COVID-19 data from <a
 href="https://github.com/nytimes/covid-19-data">The New York Times’
 GitHub repository</a>. There are a few datasets available at varying
@@ -533,8 +539,9 @@ state by day, beginning January 21, 2020.</p>
 <p>We’ll load the data two ways, with hopes that at least one of them
 works.</p>
 <div id="load-the-data-directly-from-their-github-repo"
-class="section level3">
-<h3>Load the data directly from their Github repo</h3>
+class="section level3" number="3.2.1">
+<h3><span class="header-section-number">3.2.1</span> Load the data
+directly from their Github repo</h3>
 <p>First, let’s try the fancy way, loading it directly from GitHub.
 Below, the first line of code defines an object,
 <code>nyt_state_url</code> to be the URL where the NYT data are located.
@@ -624,9 +631,9 @@ to grab the type for a single column.</p>
 <pre><code>## [1] &quot;character&quot;</code></pre>
 </div>
 <div id="download-the-data-i-saved-and-load-using-read_csv"
-class="section level3">
-<h3>Download the data I saved and load using
-<code>read_csv()</code></h3>
+class="section level3" number="3.2.2">
+<h3><span class="header-section-number">3.2.2</span> Download the data I
+saved and load using <code>read_csv()</code></h3>
 <p>If the direct call to NYT GitHub didn’t work, here’s a back-up way
 that should work to read the data into R. On February 9th, 2021, I
 downloaded the data as a CSV. They’re available in this Dropbox folder:
@@ -650,9 +657,9 @@ nyt_state_data = read_csv(&quot;nyt-covid-19-state-2021-02-09.csv&quot;)</code><
 </div>
 <div
 id="explore-the-data-a-bit-more-before-further-manipulation-using-dplyr-verbs."
-class="section level3">
-<h3>Explore the data a bit more before further manipulation using dplyr
-verbs.</h3>
+class="section level3" number="3.2.3">
+<h3><span class="header-section-number">3.2.3</span> Explore the data a
+bit more before further manipulation using dplyr verbs.</h3>
 <p>Aside from printing the tibble by simply typing its name
 (<code>nyt_state_data</code>) we can use <code>View</code> (note the
 capital <em>V</em>) to view the data in a new window and interact with
@@ -693,13 +700,15 @@ of the data.</p>
 </div>
 </div>
 <div id="explore-the-nyt-covid-19-data-using-dplyr"
-class="section level1">
-<h1>Explore the NYT COVID-19 data using dplyr</h1>
+class="section level1" number="4">
+<h1><span class="header-section-number">4</span> Explore the NYT
+COVID-19 data using dplyr</h1>
 <p>In this section, I’ll introduce common dplyr verbs. We’ll first go
 through each verb one by one. Then, we’ll put them together in a
 sequence.</p>
-<div id="essential-dplyr-verbs" class="section level2">
-<h2>Essential dplyr verbs</h2>
+<div id="essential-dplyr-verbs" class="section level2" number="4.1">
+<h2><span class="header-section-number">4.1</span> Essential dplyr
+verbs</h2>
 <p>The seven dplyr verbs I use the most are <code>mutate()</code>,
 <code>filter()</code>, <code>select()</code>, <code>arrange()</code>,
 <code>group_by()</code>, <code>summarise()</code>, and
@@ -742,8 +751,8 @@ href="https://github.com/rstudio/cheatsheets/blob/master/data-transformation.pdf
 other</a> verbs within dplyr, but many, perhaps most, data-wrangling
 tasks can be done with just these seven tools.</p>
 </div>
-<div id="mutate" class="section level2">
-<h2>mutate</h2>
+<div id="mutate" class="section level2" number="4.2">
+<h2><span class="header-section-number">4.2</span> mutate</h2>
 <p>For a demo of <code>mutate()</code>, let’s create a new variable
 called <code>cases_plus_1</code>, which is simply the number of cases
 plus 1. The first argument inside the <code>mutate()</code> call is the
@@ -818,8 +827,8 @@ nyt_state_data_2vars</code></pre>
 ## 10 2020-01-26 California 06        2      0            3            4
 ## # … with 45,412 more rows</code></pre>
 </div>
-<div id="filter" class="section level2">
-<h2>filter</h2>
+<div id="filter" class="section level2" number="4.3">
+<h2><span class="header-section-number">4.3</span> filter</h2>
 <p>What if we only care about one state? Use <code>filter()</code> to
 subset values to Michigan. Again, we’ll do this with and without the
 pipe operator.</p>
@@ -838,8 +847,8 @@ with those values.</p>
 <pre class="r"><code>nrow(nyt_state_data_mi_pipe)</code></pre>
 <pre><code>## [1] 814</code></pre>
 </div>
-<div id="select" class="section level2">
-<h2>select</h2>
+<div id="select" class="section level2" number="4.4">
+<h2><span class="header-section-number">4.4</span> select</h2>
 <p>Let’s use <code>select()</code> to grab only the <em>date</em>
 variable. The syntax is to simply state the columns we want.</p>
 <p>Side-note: <code>select()</code> is used by some other packages. To
@@ -867,8 +876,8 @@ names(nyt_state_data)</code></pre>
 <pre class="r"><code>names(nyt_state_data_nodeaths)</code></pre>
 <pre><code>## [1] &quot;date&quot;  &quot;state&quot; &quot;fips&quot;  &quot;cases&quot;</code></pre>
 </div>
-<div id="arrange" class="section level2">
-<h2>arrange</h2>
+<div id="arrange" class="section level2" number="4.5">
+<h2><span class="header-section-number">4.5</span> arrange</h2>
 <p>Arrange does not change values of the dataset. It just sorts the
 data. As a reminder, the NYT data include <em>cumulative</em> cases and
 <em>cumulative</em> deaths on that day in that state. We might also be
@@ -880,8 +889,8 @@ the pipe, foregoing the nested parentheses approach. Hopefully by now
 I’ve convinced you that the pipe operator is the way to go. (Please see
 <a href="https://r4ds.had.co.nz/pipes.html">here</a> if not.)</p>
 </div>
-<div id="group_by" class="section level2">
-<h2>group_by</h2>
+<div id="group_by" class="section level2" number="4.6">
+<h2><span class="header-section-number">4.6</span> group_by</h2>
 <p>This code also uses <code>group_by()</code>, which does not sort the
 data, but it tells R to do any subsequent calculations “by group.”</p>
 <p>Bonus question: for this calculation, why is it better to
@@ -945,8 +954,9 @@ nyt_state_wrangle</code></pre>
 ## 10 2020-03-22 Alabama 01            157            0                    131
 ## # … with 45,412 more rows, and 3 more variables: cases_incident &lt;dbl&gt;,
 ## #   deaths_cumul_day_before &lt;dbl&gt;, deaths_incident &lt;dbl&gt;</code></pre>
-<div id="group_by-continued" class="section level3">
-<h3>group_by (continued)</h3>
+<div id="group_by-continued" class="section level3" number="4.6.1">
+<h3><span class="header-section-number">4.6.1</span> group_by
+(continued)</h3>
 <p><code>group_by()</code> is often but not always used in combination
 with <code>summarise()</code>. We can use <code>group_by()</code>
 without <code>summarise()</code> to extract the total number of cases
@@ -992,8 +1002,9 @@ row.</p>
 
 nrow(nyt_last_day)</code></pre>
 </div>
-<div id="group_by-and-summarise" class="section level3">
-<h3>group_by and summarise</h3>
+<div id="group_by-and-summarise" class="section level3" number="4.6.2">
+<h3><span class="header-section-number">4.6.2</span> group_by and
+summarise</h3>
 <p>Now, let’s use <code>group_by()</code> and <code>summarise()</code>
 together. The syntax of <code>summarise()</code> is similar to
 <code>mutate()</code> in that it creates a new variable with each equals
@@ -1064,8 +1075,10 @@ and confirmed cases. The most trustworthy value is probably
 cases_cumul_way2, which takes the most recent reported cumulative
 value.</p>
 </div>
-<div id="group_by-and-summarise-continued" class="section level3">
-<h3>group_by and summarise (continued)</h3>
+<div id="group_by-and-summarise-continued" class="section level3"
+number="4.6.3">
+<h3><span class="header-section-number">4.6.3</span> group_by and
+summarise (continued)</h3>
 <p>Another application of the group-by-summarise syntax is if one wants
 to calculate overall summary estimates of the whole dataset. For
 example, as a double check, we can check to confirm the data we’re using
@@ -1098,9 +1111,9 @@ Mariana Islands, Puerto Rico, and the Virgin Islands.</p>
 </div>
 </div>
 <div id="all-together-now-in-a-simple-example-using-case_when"
-class="section level2">
-<h2>All together now in a simple example using
-<code>case_when()</code></h2>
+class="section level2" number="4.7">
+<h2><span class="header-section-number">4.7</span> All together now in a
+simple example using <code>case_when()</code></h2>
 <p>Goal: calculate the total number of deaths in each state in the <a
 href="https://en.wikipedia.org/wiki/Great_Lakes_region">Great Lakes
 Region</a>: Illinois, Indiana, Michigan, Minnesota, New York, Ohio,
