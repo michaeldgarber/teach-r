@@ -114,7 +114,7 @@ pop_by_state_geo =get_acs(
 ```
 A convenient way to search through the census variables is to use the `load_variables` function, as described here: https://walker-data.com/tidycensus/articles/basic-usage.html.
 ```{r loadcensusvars, eval=FALSE, echo=TRUE, warning=FALSE, message=TRUE}
-vars_acs_2019 <- load_variables(2019, "acs5", cache = TRUE)
+vars_acs_2019 = load_variables(2019, "acs5", cache = TRUE)
 View(vars_acs_2019)
 ```
 
@@ -126,8 +126,10 @@ pop_by_state_geo
 
 ## A quick mapview
 Another essential package in the **sf** workflow is **mapview** (https://r-spatial.github.io/mapview/index.html), which creates quick interactive maps. In just one line, we can interactively map the ACS state-level population data we just loaded. 
+
+The `zcol` argument colors the polygons (states, here) based on the value of the variable, "estimate", which corresponds to the state's population, as obtained from tidycensus. The default color palette for the visualization is [viridis](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html).
 ```{r mapview, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
-mapview(pop_by_state_geo)
+mapview(pop_by_state_geo, zcol = "estimate")
 ```
 
 ## Wrangle the census data further to prep for the join with the NYT state-level COVID-19 data.
