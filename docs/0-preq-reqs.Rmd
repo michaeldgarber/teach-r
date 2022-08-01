@@ -1,0 +1,140 @@
+---
+title: "R  for data wrangling prerequisites"
+author: "Michael D. Garber, PhD MPH"
+date: "Revised June 2, 2022"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+---
+
+This page motivates the use of R and describes some prerequisites before we begin with the sessions on data wrangling and visualization.
+
+# Why R?
+
+First, why should we R in the first place?
+
+## R vs point-and-click data-anaalysis tools like Excel and ArcGIS
+
+This [post](https://www.jessesadler.com/post/excel-vs-r/) by Jesse Adler (a digital historian) is an insightful overview of the advantages of using a programming to manipulate and analyze data rather than spreadsheet tools like Excel. I also agree with these nine reasons on [programming vs. Excel](https://www.dataquest.io/blog/9-reasons-excel-users-should-consider-learning-programming/). Summarizing their posts, here are the top four reasons advantages of programming, I think:
+
+-   **Every step is written down**, so it's easier to find and fix errors.
+
+-   **Easier to repeat analysis steps**: suppose you realize you want to make a change upstream in your analysis that affects everything downstream of it. In R, this is straightforward: simply make the change, and rerun all of the code that relies upon it (and possibly make some changes to the downstream code to accommodate that change as needed). In a point-and-click interface like Excel or ArcGIS, you may have to repeat several point-and-click steps, which would take longer and be more prone to error.
+
+-   There is a **clear division between data entry and data manipulation and analysis**: it's easier to avoid the temptation of editing the raw data. Although you can certainly make a copy of raw data in Excel, it can be tempting to edit the raw data.
+
+-   **Easier to automate similar tasks**. The ability to automate analysis steps becomes especially important for bootstrapping where we effectively repeat the analysis steps hundreds of time while allowing some of the steps to randomly vary. This would be much more challenging in Excel.
+
+To be clear, I think Excel's great, too. I use it all the time for simple analyses or for data entry. But I don't use it as much as I once did for more involved analyses.
+
+## Why R vs SAS, STATA, and Python?
+
+Okay, but there are other programming tools for data analysis (e.g., SAS, STATA, Python). Why R, specifically?
+
+1.  It's free. SAS and STATA cost money.
+2.  It has an active, in-the-open development community. In my experience, the online community is very helpful and up-to-date, for example on [stackoverflow](https://stackoverflow.com/questions/tagged/r) or GitHub.
+3.  It can manipulate spatial data and make maps. No need to switch software for that.
+4.  Having used SAS for years, I personally think R is simply more fun.
+5.  R can do a lot of cool stuff. It's much more than just #rstats. For example with RMarkdown, you can make websites like this [one](https://michaeldgarber.github.io/), create [interactive dashboards](https://rmarkdown.rstudio.com/gallery.html), and do lots more (amazing [talk](https://www.youtube.com/watch?v=qLEkUjxk7e8) by RMarkdown creator).
+
+I don't have much Python experience. Every now and then, I encounter a situation where I wish I had some Python experience (e.g., to use this [package](https://github.com/gboeing/osmnx) to compute measures on street networks from OpenStreetMap), but those situations are rare.
+
+For an excellent overview of why it can be preferable to analyze and manage data with a programming language rather than spreadsheet tools,see here: <https://www.jessesadler.com/post/excel-vs-r/>
+
+First, it's a worthwhile question. Why should we use R?
+
+Download some packages.
+
+We'll download these packages in each session as well as a reminder, but, because these are always used. Let's go ahead and download these.
+
+There is an entire corner of the internet devoted to the tidyverse. See here and here and here.
+
+Before we begin with data wrangling, let's make sure R and RStudio are installed. I'll also discuss some of my preferred ways to manage files via a project directory.
+
+R does have basic tools that will work upon start-up. But, in my opinion, the full power of R is
+
+#Install R and RStudio and get familiar with the user interface.
+
+1. **Install R and RStudio.** Both R and RStudio are needed, but worry not: they are both free and easy to download.
+
+-   To download R, go to CRAN and download R from the location nearest you: <https://cran.r-project.org/mirrors.html>.
+-   Then, install RStudio Desktop (the free version) at this link: <https://rstudio.com/products/rstudio/download> .
+
+The [Appendix](https://rstudio-education.github.io/hopr/starting.html#how-to-download-and-install-r) of this free online book - [Hands-On Programming with R](https://rstudio-education.github.io/hopr/), by Garrett Grolemund - explains why both R and RStudio should be downloaded.
+
+2.  **Familiarize yourself with the RStudio interface.** There are two ways to write code in R. You can use the *console* or you can create a [*script*](https://rstudio-education.github.io/hopr/basics.html#scripts) that can be saved and edited as you would save a Word document. I almost always use scripts. The book linked above also provides an overview of [RStudio's user interface](https://rstudio-education.github.io/hopr/basics.html#the-r-user-interface). Here's a screenshot of what the script window might look like: 
+
+```{r, echo=FALSE}
+library(here)
+knitr::include_graphics(here("docs", "images", "script-screenshot.png"))
+```
+
+# Install and use some packages
+
+Now that we have RStudio installed and up and running, our first step is to install packages. Grolemund defines packages in the above-linked [book](https://rstudio-education.github.io/hopr/packages2.html):
+
+> "Many of R's most useful functions do not come preloaded when you start R, but reside in packages that can be installed on top of R. R packages are similar to libraries in C, C++, and Javascript, packages in Python, and gems in Ruby. An R package bundles together useful functions, help files, and data sets."
+
+Using a package requires first installing it with the `install.packages("package_name")` function and then loading it using the `library(package_name)` function. (Note the absence of quotes when loading a package (`library(package_name)`). Some stackoverflow [discussion](https://stackoverflow.com/questions/36802132/the-use-of-quotation-marks-when-loading-a-package-in-r) exists on whether or not to use quotes when loading packages. In my experience, it works better to *not* use quotes when loading packages but to use them when installing packages.
+
+For this exercise, let's install the full *tidyverse*, which will install all of its component packages, including *dplyr*. So here is our first code chunk to run:
+
+```{r install tidyverse, eval=FALSE, echo=TRUE}
+install.packages("tidyverse")
+```
+
+To run the code, put your cursor on that line or highlight that line of code, and then click the **Run** button in the top-right part of the scripts window (screenshot [here](https://rstudio-education.github.io/hopr/basics.html#scripts)). A keyboard shortcut for **Run** is **control+enter**. On a Mac, it's **command+enter**.
+
+Now that the package is installed, load it:
+
+```{r load tidyverse, eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
+library(tidyverse)
+```
+
+In my experience, it's usually fine to let R pick where it installs the packages on your computer. Whether or not this is okay may depend on whether you're on your own PC or a network with limited access to certain drives. If needed, you can specify where you want the package to land by adding the `lib= "file path"` argument in the `install.packages()` function. For example: `install.packages("tidyverse", lib = "file-path")`. Note: if we wanted to install *dplyr* without the rest of the *tidyverse*, we could instead use `install.packages("dplyr")` and then `library(dplyr)`.
+
+Use some packages
+
+and download some packages
+
+# Use here::here() and a word on projects
+
+The folder in which R reads (loads) and writes (saves) files is called the working directory. For years, I had set the working directory by typing the entire file path. This is problematic for a couple of reasons:
+
+1.  It takes a long time to type a long file path.
+2.  It's error prone.
+3.  It's hard-coded: If you were to change computers or share your code with someone, those working directories won't work.
+
+Fortunately, there's a very simple solution to these issues: Use the here package.
+
+Example:
+
+Install the here package
+```{r,eval=FALSE}
+install.packages("here")
+```
+
+
+```{r }
+library(here) #load package.
+```
+
+Use a (base R) function to
+
+```{r}
+getwd()
+```
+
+Fortunately,
+
+I used R for several years without using here() and I wish I had learned about this package earlier. It's fantastic.
+
+The problems it solves:
+
+1\. Typing the full working directory of your having to type the full file path every time you 2. If you were to change computers or share your code with someone, those file paths would almost certainly not work anymore. The Here makes the working directory relative to the project, so it will work wherever the project is.
+
+It's a simple function that calls your file
+
+Jenny Bryan, educator at RStudio, [loves](https://github.com/jennybc/here_here) the here package as well. Her explanation for why is worth a read.
