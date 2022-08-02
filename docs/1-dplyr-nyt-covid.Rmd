@@ -1,7 +1,7 @@
 ---
 title: "R for data wrangling 1: learning the ground rules of dplyr with publicly available COVID-19 data"
 author: "Michael D. Garber, PhD MPH"
-date: "Revised June 2, 2022"
+date: "Revised August 1, 2022"
 output:
   html_document:
     toc: true
