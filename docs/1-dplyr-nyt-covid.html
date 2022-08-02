@@ -380,7 +380,7 @@ div.tocify {
 </div>
 <div id="the-goal-of-this-tutorial" class="section level2" number="2.4">
 <h2><span class="header-section-number">2.4</span> The goal of this tutorial</h2>
-<p>The goal of this tutorial is to illustrate the basics of dplyr using publicly available data on COVID-19 incidence posted by <a href="https://github.com/nytimes/covid-19-data">The New York Times</a>. We plan for this tutorial to eventually be a part of a series of short tutorials focused on using R for geospatial data management and analyses.</p>
+<p>The goal of this tutorial is to illustrate the basics of dplyr using publicly available data on COVID-19 incidence posted by <a href="https://github.com/nytimes/covid-19-data">The New York Times</a>.</p>
 </div>
 <div id="prerequisites" class="section level2" number="2.5">
 <h2><span class="header-section-number">2.5</span> Prerequisites</h2>
@@ -402,14 +402,14 @@ div.tocify {
 <ul>
 <li><a href="https://dplyr.tidyverse.org/" class="uri">https://dplyr.tidyverse.org/</a> - The main webpage contains a short overview of the package and describes the key functions, aka verbs, as we will also do here.</li>
 <li><a href="https://dplyr.tidyverse.org/articles/dplyr.html" class="uri">https://dplyr.tidyverse.org/articles/dplyr.html</a> - The vignette expands upon the main landing page with some examples.</li>
-<li><a href="https://r4ds.had.co.nz/transform.html" class="uri">https://r4ds.had.co.nz/transform.html</a> - Chapter 5 of the online book, <a href="https://r4ds.had.co.nz/">R for Data Science</a>, by Wickham and Grolemund, is another intro to <em>dplyr</em>. This book is the go-to resource for programming in the <em>tidyverse</em> in general.</li>
+<li><a href="https://r4ds.had.co.nz/transform.html" class="uri">https://r4ds.had.co.nz/transform.html</a> - Chapter 5 of the online book, <a href="https://r4ds.had.co.nz/">R for Data Science</a>, by Wickham and Grolemund, is another intro to dplyr. This book is the go-to resource for programming in the tidyverse in general.</li>
 </ul>
 </div>
 </div>
 <div id="install-packages-and-download-the-data" class="section level1" number="3">
 <h1><span class="header-section-number">3</span> Install packages and download the data</h1>
-<div id="install-packages" class="section level2" number="3.1">
-<h2><span class="header-section-number">3.1</span> Install packages</h2>
+<div id="install-and-load-packages" class="section level2" number="3.1">
+<h2><span class="header-section-number">3.1</span> Install and load packages</h2>
 <p>Now that we have RStudio installed and up and running, our first step is to install packages, the basics of which we described in the <a href="https://michaeldgarber.github.io/teach-r/0-pre-reqs">previous module</a>.</p>
 <pre class="r"><code>install.packages(&quot;tidyverse&quot;)</code></pre>
 <pre class="r"><code>library(tidyverse)</code></pre>
@@ -426,17 +426,17 @@ div.tocify {
 <h2><span class="header-section-number">3.2</span> Load the COVID-19 data from <em>The New York Times</em></h2>
 <p>For this example, we will use COVID-19 data from <a href="https://github.com/nytimes/covid-19-data">The New York Times’ GitHub repository</a>. There are a few datasets available at varying geographic scales. Let’s use their state-level dataset. The data include the number of cumulative cases and the number of cumulative deaths by state by day, beginning January 21, 2020.</p>
 <p>We’ll load the data two ways, with hopes that at least one of them works.</p>
-<div id="load-the-data-directly-from-their-github-repo" class="section level3" number="3.2.1">
-<h3><span class="header-section-number">3.2.1</span> Load the data directly from their Github repo</h3>
-<p>First, let’s try the fancy way, loading it directly from GitHub. Below, the first line of code defines an object, <code>nyt_state_url</code> to be the URL where the NYT data are located. The second line of code uses a base R function, <code>url()</code>, to parse that URL as a CSV. We then convert it from a CSV to an R object using <code>read_csv()</code>. <code>read_csv()</code> is a function in <em>readr</em>, another package in the <em>tidyverse</em>. Accordingly, the resulting output of these few lines of code will be a <a href="https://r4ds.had.co.nz/tibbles.html"><em>tibble</em></a>, <em>tidyverse</em> speak for a “tidy table.” Basically, a tibble is a table, or data frame, with some formatting advantages that make it easy to work with.</p>
-<p>Of note, the last three lines of include our first use of the <code>%&gt;%</code> (read: <a href="https://magrittr.tidyverse.org/reference/pipe.html">pipe</a>) operator. The pipe operator is part of the <em>magrittr</em> package, which is also a part of the <em>tidyverse</em>. The pipe separates the action-oriented functions, <code>read_csv()</code> and <code>url</code> from the object, <code>nyt_state_url</code>. In my opinion, this separation makes it easier to read, as I’ll discuss more in the next section.</p>
-<p>One other side-note: I use the equals sign, <code>=</code>, when assigning new objects, because for me it’s easier to read and type than R’s traditional assignment operator, <code>&lt;-</code>. I’ve heard <code>&lt;-</code> has advantages, but I’ve never had an issue using <code>=</code>.</p>
+<div id="load-the-data-directly-from-their-github-repository" class="section level3" number="3.2.1">
+<h3><span class="header-section-number">3.2.1</span> Load the data directly from their Github repository</h3>
+<p>First, let’s try the fancy way, loading it directly from GitHub. Below, the first line of code defines an object, <code>nyt_state_url</code> to be the URL where the NYT data are located. The second line of code uses a base R function, <code>url()</code>, to parse that URL as a CSV. We then convert it from a CSV to an R object using <code>read_csv()</code>. <code>read_csv()</code> is a function in <em>readr</em>, another package in the <strong>tidyverse.</strong> Accordingly, the resulting output of these few lines of code will be a <a href="https://r4ds.had.co.nz/tibbles.html"><strong>tibble</strong></a>, tidyverse speak for a “tidy table.” Basically, a tibble is a table, or data frame, with some opinionated formatting advantages that make it easy to work with.</p>
+<p>Of note, the last three lines of include our first use of the <code>%&gt;%</code> (read: <a href="https://magrittr.tidyverse.org/reference/pipe.html">pipe</a>) operator. The pipe operator is part of the <strong>magrittr</strong> package and is a key element of the tidyverse. The pipe separates the action-oriented functions, <code>read_csv()</code> and <code>url</code> from the object, <code>nyt_state_url</code>. In my opinion, this separation makes it easier to read, as I’ll discuss more in the next section.</p>
+<p>One other side-note: I use the equals sign, <code>=</code>, when assigning new objects, because I think it’s easier to read type than R’s <a href="https://stat.ethz.ch/R-manual/R-devel/library/base/html/assignOps.html">traditional assignment operator</a>, <code>&lt;-</code>. I’ve heard <code>&lt;-</code> has advantages, but I’ve never had an issue using <code>=</code>.</p>
 <pre class="r"><code>nyt_state_url = &quot;https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv&quot;
 
 nyt_state_data = nyt_state_url %&gt;% 
   url() %&gt;% 
   read_csv()</code></pre>
-<pre><code>## Rows: 45422 Columns: 5
+<pre><code>## Rows: 48838 Columns: 5
 ## ── Column specification ────────────────────────────────────────────────────────
 ## Delimiter: &quot;,&quot;
 ## chr  (2): state, fips
@@ -445,18 +445,18 @@ nyt_state_data = nyt_state_url %&gt;%
 ## 
 ## ℹ Use `spec()` to retrieve the full column specification for this data.
 ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-<p>An alternative, equivalent, way to write it would be to use the traditional nested parentheses. The nested parentheses aren’t so bad when just a few functions are used, but as the number of functions increases, the nested parentheses become difficult to read.</p>
+<p>An alternative, equivalent, way to write that code is use the traditional nested parentheses. The nested parentheses aren’t so bad when just a few functions are used, but as the number of functions increases, the nested parentheses become difficult to read. In general, I’m taking the teach-the-tidyverse-first approach when teaching this course, so will focus on</p>
 <pre class="r"><code>nyt_state_url = &quot;https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv&quot;
 nyt_state_data = read_csv(url(nyt_state_url))</code></pre>
-<p>Either way we write it, we get a resulting dataset, <code>nyt_state_data</code>, which should be visible in the top-right corner of RStudio’s interface. It tells us that the data have 18,934 observations and 5 variables. (The number of observations may be higher when you run it.)</p>
-<p><img src="images/nyt-state-data-image.PNG" width="274" /></p>
-<p>As noted above, <code>read_csv()</code> is part of the <strong>readr</strong> package. Accordingly, its default behavior is to read in data as a “<a href="https://r4ds.had.co.nz/tibbles.html">tibble</a>”, tidyverse speak for “tidy table”. One benefit of using tibbles, as noted <a href="https://r4ds.had.co.nz/tibbles.html">here</a>, is that they can be printed without overwhelming the console. (This is not necessarily true of data frames more generally).</p>
-<p>Let’s first confirm that <code>nyt_state_data</code> is a tibble using the base-R <code>class()</code> function, which returns the object’s class. The tibble object class is denoted by <code>tbl_df</code>. And then we can print the data to get a sense of its dimensions (rows and columns) and what the variables look like.</p>
-<p>At this writing, there are 22,509 observations and 5 columns. The variable type is denoted below the variable names. We can also use class to grab the type for a single column.</p>
-<pre class="r"><code>class(nyt_state_data)</code></pre>
+<p>Either way we write it, we get a resulting dataset, <code>nyt_state_data</code>, which should be visible in the “Environment” pane of RStudio. It tells us that the data have 48,838 observations and 5 variables. (The number of observations may be higher when you run it.)</p>
+<p><img src="images/module-1-nyt-data-environment-screenshot.png" width="500" /></p>
+<p>As noted above, <code>read_csv()</code> is part of the <strong>readr</strong> package and returns a “<a href="https://r4ds.had.co.nz/tibbles.html">tibble</a>”. One benefit of using tibbles, as noted <a href="https://r4ds.had.co.nz/tibbles.html">here</a>, is that they can be printed without overwhelming the console. (This is not necessarily true of data frames more generally).</p>
+<p>Let’s first confirm that <code>nyt_state_data</code> is a tibble using the base-R <code>class()</code> function, which returns the object’s class. The tibble object class is indicated by <code>tbl_df</code>. And then we can print the tibble by typing its name to get a sense of its dimensions (rows and columns) and what the variables look like.</p>
+<p>At this writing, there are 48,838 observations and 5 columns. The variable type is denoted below the variable names. We can also use the <code>class()</code> function from base R to return the type for a single column.</p>
+<pre class="r"><code>class(nyt_state_data) #what type of object is it?</code></pre>
 <pre><code>## [1] &quot;spec_tbl_df&quot; &quot;tbl_df&quot;      &quot;tbl&quot;         &quot;data.frame&quot;</code></pre>
-<pre class="r"><code>nyt_state_data</code></pre>
-<pre><code>## # A tibble: 45,422 × 5
+<pre class="r"><code>nyt_state_data #print the tibble</code></pre>
+<pre><code>## # A tibble: 48,838 × 5
 ##    date       state      fips  cases deaths
 ##    &lt;date&gt;     &lt;chr&gt;      &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
 ##  1 2020-01-21 Washington 53        1      0
@@ -469,36 +469,39 @@ nyt_state_data = read_csv(url(nyt_state_url))</code></pre>
 ##  8 2020-01-25 Washington 53        1      0
 ##  9 2020-01-26 Arizona    04        1      0
 ## 10 2020-01-26 California 06        2      0
-## # … with 45,412 more rows</code></pre>
+## # … with 48,828 more rows</code></pre>
 <pre class="r"><code>class(nyt_state_data$state) #character</code></pre>
 <pre><code>## [1] &quot;character&quot;</code></pre>
 </div>
-<div id="download-the-data-i-saved-and-load-using-read_csv" class="section level3" number="3.2.2">
-<h3><span class="header-section-number">3.2.2</span> Download the data I saved and load using <code>read_csv()</code></h3>
-<p>If the direct call to NYT GitHub didn’t work, here’s a back-up way that should work to read the data into R. On February 9th, 2021, I downloaded the data as a CSV. They’re available in this Dropbox folder: <a href="https://www.dropbox.com/sh/crauwqsy64r33k7/AAAGuyfNQlSzws3Ey-uj012fa?dl=0" class="uri">https://www.dropbox.com/sh/crauwqsy64r33k7/AAAGuyfNQlSzws3Ey-uj012fa?dl=0</a>. If needed, download the CSV, save locally to your computer, and then use <code>read_csv()</code> to <a href="https://r4ds.had.co.nz/data-import.html">import</a> the csv into R. <code>setwd()</code> function used to set the working directory, and <code>file.path()</code> is a convenient way to make your file path to be <a href="https://stackoverflow.com/questions/51533664/file-path-function-in-r">operating-system independent</a>. <code>read_csv()</code> loads the data relative to the working directory. That is, if you assign your working directory to be <code>C:\hi\how\are</code>, but the data are in <code>C:\hi\how\are\you</code>, then in the <code>read_csv()</code> call, you’d write <code>("you\filename.csv")</code>.</p>
-<pre class="r"><code>setwd(file.path(&quot;C:&quot;, &quot;Users&quot;, &quot;maybe your name&quot;, &quot;a subfolder&quot;, &quot;maybe another subfolder&quot;, &quot;the folder with the csv&quot;))
-nyt_state_data = read_csv(&quot;nyt-covid-19-state-2021-02-09.csv&quot;)</code></pre>
+<div id="download-the-data-i-saved-and-read-into-r-using-read_csv" class="section level3" number="3.2.2">
+<h3><span class="header-section-number">3.2.2</span> Download the data I saved and read into R using <code>read_csv()</code></h3>
+<p>If the direct call to NYT GitHub didn’t work, here’s a back-up way that should work to read the data into R. On August 2, 2022, I downloaded the data as a CSV. The file is called <code>nyt_state_data_downloaded.csv</code> in this Dropbox <a href="https://www.dropbox.com/sh/ff85l058vl82wwy/AABKygH3PhQkausaxOcIgO0Sa?dl=0">folder</a>.</p>
+<p>If needed, download the CSV and save locally to your computer. I would suggest saving to a sub-folder of this project, e.g., called “data-input”.</p>
+<p>Then, use <code>read_csv()</code> to <a href="https://r4ds.had.co.nz/data-import.html">import</a> the csv into R. As discussed in the last module, we can use the here package for this. So, if the .csv is in a folder in this project directory called, “data-input”, then this code should work to read it in:</p>
+<pre class="r"><code>library(here)
+setwd(here(&quot;data-input&quot;))
+nyt_state_data = read_csv(&quot;nyt_state_data_downloaded.csv&quot;)</code></pre>
 </div>
-<div id="explore-the-data-a-bit-more-before-further-manipulation-using-dplyr-verbs." class="section level3" number="3.2.3">
-<h3><span class="header-section-number">3.2.3</span> Explore the data a bit more before further manipulation using dplyr verbs.</h3>
+<div id="further-explore-the-data-using-view-before-manipulation-with-dplyr-verbs." class="section level3" number="3.2.3">
+<h3><span class="header-section-number">3.2.3</span> Further explore the data using View() before manipulation with dplyr verbs.</h3>
 <p>Aside from printing the tibble by simply typing its name (<code>nyt_state_data</code>) we can use <code>View</code> (note the capital <em>V</em>) to view the data in a new window and interact with it in a more hands-on way. <code>View()</code> can be slow as the number of observations rises, but 20,000-ish shouldn’t be too bad. <code>View()</code> allows you to sort the data by values in the columns. We can sort the data by state in the <code>View()</code> window to confirm that the data are, in fact, cumulative: cases and deaths only increase.</p>
 <pre class="r"><code>View(nyt_state_data)</code></pre>
 <p>Here are some useful base-R commands for describing the basic aspects of the data.</p>
 <pre class="r"><code>nrow(nyt_state_data) #How many rows?</code></pre>
-<pre><code>## [1] 45422</code></pre>
+<pre><code>## [1] 48838</code></pre>
 <pre class="r"><code>ncol(nyt_state_data) #How many columns?</code></pre>
 <pre><code>## [1] 5</code></pre>
 <pre class="r"><code>dim(nyt_state_data) #Get the table&#39;s dimensions, i.e., number of rows and columns.</code></pre>
-<pre><code>## [1] 45422     5</code></pre>
+<pre><code>## [1] 48838     5</code></pre>
 <pre class="r"><code>names(nyt_state_data) #Return the names of the variables.</code></pre>
 <pre><code>## [1] &quot;date&quot;   &quot;state&quot;  &quot;fips&quot;   &quot;cases&quot;  &quot;deaths&quot;</code></pre>
 <pre class="r"><code>str(nyt_state_data) #Returns information about each variable&#39;s type (i.e., character vs numeric)</code></pre>
-<pre><code>## spec_tbl_df [45,422 × 5] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
-##  $ date  : Date[1:45422], format: &quot;2020-01-21&quot; &quot;2020-01-22&quot; ...
-##  $ state : chr [1:45422] &quot;Washington&quot; &quot;Washington&quot; &quot;Washington&quot; &quot;Illinois&quot; ...
-##  $ fips  : chr [1:45422] &quot;53&quot; &quot;53&quot; &quot;53&quot; &quot;17&quot; ...
-##  $ cases : num [1:45422] 1 1 1 1 1 1 1 1 1 2 ...
-##  $ deaths: num [1:45422] 0 0 0 0 0 0 0 0 0 0 ...
+<pre><code>## spec_tbl_df [48,838 × 5] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
+##  $ date  : Date[1:48838], format: &quot;2020-01-21&quot; &quot;2020-01-22&quot; ...
+##  $ state : chr [1:48838] &quot;Washington&quot; &quot;Washington&quot; &quot;Washington&quot; &quot;Illinois&quot; ...
+##  $ fips  : chr [1:48838] &quot;53&quot; &quot;53&quot; &quot;53&quot; &quot;17&quot; ...
+##  $ cases : num [1:48838] 1 1 1 1 1 1 1 1 1 2 ...
+##  $ deaths: num [1:48838] 0 0 0 0 0 0 0 0 0 0 ...
 ##  - attr(*, &quot;spec&quot;)=
 ##   .. cols(
 ##   ..   date = col_date(format = &quot;&quot;),
@@ -521,23 +524,24 @@ nyt_state_data = read_csv(&quot;nyt-covid-19-state-2021-02-09.csv&quot;)</code><
 <li><code>mutate()</code> adds new variables (or columns) that can be functions of existing variables.</li>
 <li><code>filter()</code> is essentially a subset operator. It picks rows based on their values.</li>
 <li><code>select()</code> selects variables (or columns) based on their names. It can also be thought of as a subset operator by column rather than by row.</li>
-<li><code>arrange()</code> sorts data. It orders the rows of a data frame by the values of selected columns. The default behavior is to sort ascending, meaning the lowest value will be on top. Use <code>desc()</code> within the <code>arrange()</code> function to sort descending.</li>
+<li><code>arrange()</code> sorts data. It orders the rows of a data frame by the values of selected columns. The default behavior is to sort ascending, meaning the lowest value will be on top. Use <code>desc()</code> within the <code>arrange()</code> function to sort descending. Importantly, <code>arrange()</code> will sort by group if data are grouped (below).</li>
 <li><code>group_by()</code> groups the table by a variable. <code>group_by()</code> is often but not always used with <code>summarise()</code>. When the two are used together, the result is akin to a pivot table in Excel.</li>
-<li><code>summarise()</code> creates a new data frame, with rows corresponding to combinations of the grouping variables. <code>summarise()</code> is like a summary operator in an Excel pivot table.</li>
-<li><code>left_join()</code> joins two tables together. It’s like a vlookup in Excel or, as the name implies, a JOIN in SQL. It’s distinct from the other verbs in this list in that it is a <a href="https://dplyr.tidyverse.org/articles/two-table.html">two-table verb</a>. There are <a href="https://dplyr.tidyverse.org/reference/join.html">other types of joins</a>, but I almost exclusively use <code>left_join()</code>. In the below set of examples, <code>left_join</code> isn’t used. It is used in our <a href="https://rpubs.com/michaeldgarber/dplyr_2_tidycensus_mapview">next tutorial</a>, though.</li>
+<li><code>summarise()</code> creates a new data frame, with rows corresponding to combinations of the grouping variables. <code>summarise()</code> is like a summary operator in an Excel pivot table. (Note the British spelling. The package author is from New Zealand.)</li>
+<li><code>left_join()</code> joins two tables together. It’s like a vlookup in Excel or, as the name implies, a JOIN in SQL. It’s distinct from the other verbs in this list in that it is a <a href="https://dplyr.tidyverse.org/articles/two-table.html">two-table verb</a>. There are <a href="https://dplyr.tidyverse.org/reference/join.html">other types of joins</a>, but I almost always use <code>left_join()</code>. In the below set of examples, <code>left_join</code> isn’t used. It is used in our <a href="https://rpubs.com/michaeldgarber/dplyr_2_tidycensus_mapview">next tutorial</a>, though.</li>
 </ul>
 <p>There are <a href="https://github.com/rstudio/cheatsheets/blob/master/data-transformation.pdf">several other</a> verbs within dplyr, but many, perhaps most, data-wrangling tasks can be done with just these seven tools.</p>
+<p>(For the record, <code>filter()</code>, <code>arrange()</code>, <code>select()</code>, <code>mutate()</code>, and <code>summarise()</code> are considered to be the <a href="https://r4ds.had.co.nz/transform.html#introduction-2">five key dplyr functions</a>. I’ve added <code>group_by()</code> and <code>left_join()</code> because I use them so often.)</p>
 </div>
 <div id="mutate" class="section level2" number="4.2">
 <h2><span class="header-section-number">4.2</span> mutate</h2>
 <p>For a demo of <code>mutate()</code>, let’s create a new variable called <code>cases_plus_1</code>, which is simply the number of cases plus 1. The first argument inside the <code>mutate()</code> call is the object to be operated on. And the second argument creates the new variable as a function of the old variable and, in this example, the number 1. Adding the number 1 to the <em>cases</em> variable works because <em>cases</em> is a numeric variable. If <em>cases</em> were a character variable, it would not work.</p>
 <pre class="r"><code>nyt_state_data_2 = mutate(nyt_state_data, cases_plus_1 = cases+1)</code></pre>
-<p>Now let’s try the same thing but written with the pipe (<code>%&gt;%</code>) operator. As mentioned above, the pipe brings the object out of the parentheses to focus on the action-oriented part of the function, making it easier to read.</p>
+<p>Now let’s try the same thing but written with the pipe (<code>%&gt;%</code>) operator. As mentioned above, the <a href="https://r4ds.had.co.nz/pipes.html">pipe</a> brings the object out of the parentheses to focus on the action-oriented part of the function, making it easier to read.</p>
 <pre class="r"><code>nyt_state_data_2_pipe = nyt_state_data %&gt;% 
   mutate(cases_plus_1 = cases+1)</code></pre>
 <p>Check our work by printing each one. They should be the same. Note the new column, <code>cases_plus_1</code>, in the objects <code>nyt_state_data_2</code> and <code>nyt_state_data_2_pipe</code>.</p>
 <pre class="r"><code>nyt_state_data_2</code></pre>
-<pre><code>## # A tibble: 45,422 × 6
+<pre><code>## # A tibble: 48,838 × 6
 ##    date       state      fips  cases deaths cases_plus_1
 ##    &lt;date&gt;     &lt;chr&gt;      &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;        &lt;dbl&gt;
 ##  1 2020-01-21 Washington 53        1      0            2
@@ -550,9 +554,9 @@ nyt_state_data = read_csv(&quot;nyt-covid-19-state-2021-02-09.csv&quot;)</code><
 ##  8 2020-01-25 Washington 53        1      0            2
 ##  9 2020-01-26 Arizona    04        1      0            2
 ## 10 2020-01-26 California 06        2      0            3
-## # … with 45,412 more rows</code></pre>
+## # … with 48,828 more rows</code></pre>
 <pre class="r"><code>nyt_state_data_2_pipe</code></pre>
-<pre><code>## # A tibble: 45,422 × 6
+<pre><code>## # A tibble: 48,838 × 6
 ##    date       state      fips  cases deaths cases_plus_1
 ##    &lt;date&gt;     &lt;chr&gt;      &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;        &lt;dbl&gt;
 ##  1 2020-01-21 Washington 53        1      0            2
@@ -565,7 +569,7 @@ nyt_state_data = read_csv(&quot;nyt-covid-19-state-2021-02-09.csv&quot;)</code><
 ##  8 2020-01-25 Washington 53        1      0            2
 ##  9 2020-01-26 Arizona    04        1      0            2
 ## 10 2020-01-26 California 06        2      0            3
-## # … with 45,412 more rows</code></pre>
+## # … with 48,828 more rows</code></pre>
 <p>Note, also that two new variables can be created in the same <code>mutate()</code> call. Each new variable is separated by a comma. For those familiar with SAS, this begins to look like a SAS data step.</p>
 <pre class="r"><code>nyt_state_data_2vars  = nyt_state_data %&gt;% 
   mutate(
@@ -573,7 +577,7 @@ nyt_state_data = read_csv(&quot;nyt-covid-19-state-2021-02-09.csv&quot;)</code><
     cases_plus_2 = cases+2
     )
 nyt_state_data_2vars</code></pre>
-<pre><code>## # A tibble: 45,422 × 7
+<pre><code>## # A tibble: 48,838 × 7
 ##    date       state      fips  cases deaths cases_plus_1 cases_plus_2
 ##    &lt;date&gt;     &lt;chr&gt;      &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;
 ##  1 2020-01-21 Washington 53        1      0            2            3
@@ -586,7 +590,7 @@ nyt_state_data_2vars</code></pre>
 ##  8 2020-01-25 Washington 53        1      0            2            3
 ##  9 2020-01-26 Arizona    04        1      0            2            3
 ## 10 2020-01-26 California 06        2      0            3            4
-## # … with 45,412 more rows</code></pre>
+## # … with 48,828 more rows</code></pre>
 </div>
 <div id="filter" class="section level2" number="4.3">
 <h2><span class="header-section-number">4.3</span> filter</h2>
@@ -598,9 +602,9 @@ nyt_state_data_mi_pipe = nyt_state_data %&gt;%
 <p>A double equals sign, <code>==</code>, is like asking the question <em>is this equal to?</em>. <code>filter()</code> evaluates where the statement, <code>state == "Michigan"</code>, is true and returns rows with those values.</p>
 <p>The number of observations decreased, as we’d expect. There are now 402 observations (at this writing).</p>
 <pre class="r"><code>nrow(nyt_state_data_mi)</code></pre>
-<pre><code>## [1] 814</code></pre>
+<pre><code>## [1] 875</code></pre>
 <pre class="r"><code>nrow(nyt_state_data_mi_pipe)</code></pre>
-<pre><code>## [1] 814</code></pre>
+<pre><code>## [1] 875</code></pre>
 </div>
 <div id="select" class="section level2" number="4.4">
 <h2><span class="header-section-number">4.4</span> select</h2>
@@ -611,7 +615,7 @@ nyt_state_data_mi_pipe = nyt_state_data %&gt;%
 <pre class="r"><code>date_pipe = nyt_state_data %&gt;% dplyr::select(date)</code></pre>
 <p>Confirm that there’s just one variable using <code>dim(date_pipe)</code>.</p>
 <pre class="r"><code>dim(date_pipe)</code></pre>
-<pre><code>## [1] 45422     1</code></pre>
+<pre><code>## [1] 48838     1</code></pre>
 <p>There are several <a href="https://dplyr.tidyverse.org/reference/select.html">helpers</a> that make <code>select()</code> easy to work with. Maybe we want all variables except for the number of deaths:</p>
 <pre class="r"><code>nyt_state_data_nodeaths = nyt_state_data %&gt;% dplyr::select(everything(), -deaths)
 names(nyt_state_data)</code></pre>
@@ -622,7 +626,7 @@ names(nyt_state_data)</code></pre>
 <div id="arrange" class="section level2" number="4.5">
 <h2><span class="header-section-number">4.5</span> arrange</h2>
 <p>Arrange does not change values of the dataset. It just sorts the data. As a reminder, the NYT data include <em>cumulative</em> cases and <em>cumulative</em> deaths on that day in that state. We might also be interested in <em>incident</em> (i.e., new) cases or deaths by state. Let’s use arrange to help calculate daily cases and deaths using the <code>lag()</code> function.</p>
-<p>In this code chunk, we’ll combine a few operations sequentially using the pipe, foregoing the nested parentheses approach. Hopefully by now I’ve convinced you that the pipe operator is the way to go. (Please see <a href="https://r4ds.had.co.nz/pipes.html">here</a> if not.)</p>
+<p>In this code chunk, we’ll combine a few operations sequentially using the pipe, foregoing the nested parentheses approach. When many data-manipulation tasks are chained together, the value of the pipe becomes especially evident. From now on, I’ll adopt the <a href="http://varianceexplained.org/r/teach-tidyverse/">teach-the-tidyverse-first</a> philosophy and stick to its conventions, including the pipe.</p>
 </div>
 <div id="group_by" class="section level2" number="4.6">
 <h2><span class="header-section-number">4.6</span> group_by</h2>
@@ -654,7 +658,7 @@ names(nyt_state_data)</code></pre>
   arrange(state, date)
 
 nyt_state_wrangle</code></pre>
-<pre><code>## # A tibble: 45,422 × 9
+<pre><code>## # A tibble: 48,838 × 9
 ##    date       state   fips  cases_cumul deaths_cumul cases_cumul_day_before
 ##    &lt;date&gt;     &lt;chr&gt;   &lt;chr&gt;       &lt;dbl&gt;        &lt;dbl&gt;                  &lt;dbl&gt;
 ##  1 2020-03-13 Alabama 01              6            0                     NA
@@ -667,7 +671,7 @@ nyt_state_wrangle</code></pre>
 ##  8 2020-03-20 Alabama 01            106            0                     78
 ##  9 2020-03-21 Alabama 01            131            0                    106
 ## 10 2020-03-22 Alabama 01            157            0                    131
-## # … with 45,412 more rows, and 3 more variables: cases_incident &lt;dbl&gt;,
+## # … with 48,828 more rows, and 3 more variables: cases_incident &lt;dbl&gt;,
 ## #   deaths_cumul_day_before &lt;dbl&gt;, deaths_incident &lt;dbl&gt;</code></pre>
 <div id="group_by-continued" class="section level3" number="4.6.1">
 <h3><span class="header-section-number">4.6.1</span> group_by (continued)</h3>
@@ -683,16 +687,16 @@ nyt_last_day_by_state</code></pre>
 ## # Groups:   state [56]
 ##    date       state              fips  cases_cumul deaths_cumul cases_cumul_day…
 ##    &lt;date&gt;     &lt;chr&gt;              &lt;chr&gt;       &lt;dbl&gt;        &lt;dbl&gt;            &lt;dbl&gt;
-##  1 2022-06-01 Alabama            01        1315934        19664          1314963
-##  2 2022-06-01 Alaska             02         261117         1246           258867
-##  3 2022-06-01 American Samoa     60           6053           31             6053
-##  4 2022-06-01 Arizona            04        2062669        30332          2049627
-##  5 2022-06-01 Arkansas           05         843828        11488           843362
-##  6 2022-06-01 California         06        9618290        91552          9572842
-##  7 2022-06-01 Colorado           08        1456370        12751          1455066
-##  8 2022-06-01 Connecticut        09         810190        10973           809194
-##  9 2022-06-01 Delaware           10         276771         2958           276639
-## 10 2022-06-01 District of Colum… 11         150303         1343           149638
+##  1 2022-08-01 Alabama            01        1424411        19891          1424411
+##  2 2022-08-01 Alaska             02         286793         1270           286793
+##  3 2022-08-01 American Samoa     60           7471           33             7471
+##  4 2022-08-01 Arizona            04        2196429        30768          2196429
+##  5 2022-08-01 Arkansas           05         904513        11719           903931
+##  6 2022-08-01 California         06       10713333        93651         10700053
+##  7 2022-08-01 Colorado           08        1605858        13198          1603625
+##  8 2022-08-01 Connecticut        09         854934        11102           854582
+##  9 2022-08-01 Delaware           10         294908         3024           294041
+## 10 2022-08-01 District of Colum… 11         162692         1364           162519
 ## # … with 46 more rows, and 3 more variables: cases_incident &lt;dbl&gt;,
 ## #   deaths_cumul_day_before &lt;dbl&gt;, deaths_incident &lt;dbl&gt;</code></pre>
 <pre class="r"><code>#How many rows does the data have? The data should contain one row for each state or territory, since we grouped by state.
@@ -737,16 +741,16 @@ dim(nyt_cases_summary)</code></pre>
 <pre><code>## # A tibble: 56 × 4
 ##    state                cases_incident_average cases_cumul_way1 cases_cumul_way2
 ##    &lt;chr&gt;                                 &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
-##  1 Alabama                              1625.           1315928          1315934
-##  2 Alaska                                322.            261116           261117
-##  3 American Samoa                         24.0             6052             6053
-##  4 Arizona                              2407.           2062668          2062669
-##  5 Arkansas                             1039.            843827           843828
-##  6 California                          11210.           9618289          9618290
-##  7 Colorado                             1780.           1456368          1456370
-##  8 Connecticut                           994.            810189           810190
-##  9 Delaware                              341.            276770           276771
-## 10 District of Columbia                  184.            150302           150303
+##  1 Alabama                              1635.           1424405          1424411
+##  2 Alaska                                329.            286792           286793
+##  3 American Samoa                         23.9             7470             7471
+##  4 Arizona                              2393.           2196428          2196429
+##  5 Arkansas                             1036.            904512           904513
+##  6 California                          11658.          10713332         10713333
+##  7 Colorado                             1827.           1605856          1605858
+##  8 Connecticut                           976.            854933           854934
+##  9 Delaware                              338.            294907           294908
+## 10 District of Columbia                  186.            162691           162692
 ## # … with 46 more rows</code></pre>
 <p>The number of rows is equal to the number of groups (55; some territories are included). The data used to include date, but we have collapsed over date here. When <code>group_by()</code> and <code>summarise()</code> are used together, the number of rows in the data will be equal to the number of groups.</p>
 <p>The number of variables is four: the grouping variable (state) and each of the summary measures we calculated for each state.</p>
@@ -754,7 +758,7 @@ dim(nyt_cases_summary)</code></pre>
 </div>
 <div id="group_by-and-summarise-continued" class="section level3" number="4.6.3">
 <h3><span class="header-section-number">4.6.3</span> group_by and summarise (continued)</h3>
-<p>Another application of the group-by-summarise syntax is if one wants to calculate overall summary estimates of the whole dataset. For example, as a double check, we can check to confirm the data we’re using lines up with what the NYT is reporting on their website for the total number of cumulative cases to date. At this writing (4/15/21), NYT reports 31.4 million cases (<a href="https://www.nytimes.com/interactive/2021/us/covid-cases.html" class="uri">https://www.nytimes.com/interactive/2021/us/covid-cases.html</a>). Can we reproduce that? To summarize over the whole dataset, create a dummy variable with the same value for every observation and them sum over that variable.</p>
+<p>Another application of the group-by-summarise syntax is if one wants to calculate overall summary estimates of the whole dataset. For example, as a double check, we can check to confirm the data we’re using lines up with what the NYT is reporting on their website for the total number of cumulative cases to date. At this writing (8/2/22), NYT reports a total of ~91.3 million cases (<a href="https://www.nytimes.com/interactive/2021/us/covid-cases.html" class="uri">https://www.nytimes.com/interactive/2021/us/covid-cases.html</a>). Can we reproduce that? To summarize over the whole dataset, create a dummy variable with the same value for every observation and them sum over that variable.</p>
 <pre class="r"><code>nyt_cases_overall = nyt_state_wrangle %&gt;% 
   group_by(state) %&gt;% 
   summarise(cases_cumul = max(cases_cumul, na.rm=TRUE)) %&gt;% 
@@ -768,7 +772,7 @@ nyt_cases_overall</code></pre>
 <pre><code>## # A tibble: 1 × 2
 ##   dummy cases_cumul
 ##   &lt;dbl&gt;       &lt;dbl&gt;
-## 1     1    84364836</code></pre>
+## 1     1    91296149</code></pre>
 <p>Confirmed. The total cumulative number of cases at this writing is 31,444,696, which is about what they’re reporting on their website today (31.4 million+). Note this total includes the cases from Guam, Northern Mariana Islands, Puerto Rico, and the Virgin Islands.</p>
 </div>
 </div>
@@ -818,14 +822,14 @@ nyt_cases_overall</code></pre>
 <pre><code>## # A tibble: 8 × 2
 ##   state        deaths_cumul
 ##   &lt;chr&gt;               &lt;dbl&gt;
-## 1 Illinois            38161
-## 2 Indiana             23700
-## 3 Michigan            36365
-## 4 Minnesota           12948
-## 5 New York            68383
-## 6 Ohio                38628
-## 7 Pennsylvania        45254
-## 8 Wisconsin           14620</code></pre>
+## 1 Illinois            38888
+## 2 Indiana             24106
+## 3 Michigan            37428
+## 4 Minnesota           13293
+## 5 New York            69628
+## 6 Ohio                39035
+## 7 Pennsylvania        46205
+## 8 Wisconsin           14936</code></pre>
 <p>That concludes this tutorial. In our next tutorial (<a href="https://michaeldgarber.github.io/teach-r/2-dplyr-mapview-tidycensus.html" class="uri">https://michaeldgarber.github.io/teach-r/2-dplyr-mapview-tidycensus.html</a>), we’ll continue using dplyr and we’ll introduce <strong>tidycensus</strong>, <strong>mapview</strong>, and <strong>ggplot</strong> to use census data to visualize incidence per population.</p>
 </div>
 </div>
