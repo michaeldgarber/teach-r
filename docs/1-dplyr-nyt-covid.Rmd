@@ -230,7 +230,7 @@ nyt_state_data_mi_pipe = nyt_state_data %>%
 
 A double equals sign, `==`, is like asking the question *is this equal to?*. `filter()` evaluates where the statement, `state == "Michigan"`, is true and returns rows with those values.
 
-The number of observations decreased, as we'd expect. There are now 402 observations (at this writing).
+The number of observations decreased, as we'd expect. There are now 875 observations (at this writing).
 
 ```{r filter 1 check, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
 nrow(nyt_state_data_mi)
@@ -250,19 +250,22 @@ date = dplyr::select(nyt_state_data, date)
 And the piped version:
 
 ```{r select 2, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
-date_pipe = nyt_state_data %>% dplyr::select(date)
+date_pipe = nyt_state_data %>% 
+  dplyr::select(date)
 ```
 
-Confirm that there's just one variable using `dim(date_pipe)`.
+Confirm that there's just one variable using `dim(date_pipe)` or `ncol()`.
 
 ```{r select 1dim, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
-dim(date_pipe)
+dim(date_pipe) #dimensions
+ncol(date_pipe) #number of columns
 ```
 
 There are several [helpers](https://dplyr.tidyverse.org/reference/select.html) that make `select()` easy to work with. Maybe we want all variables except for the number of deaths:
 
 ```{r select 4, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
-nyt_state_data_nodeaths = nyt_state_data %>% dplyr::select(everything(), -deaths)
+nyt_state_data_nodeaths = nyt_state_data %>% 
+  dplyr::select(everything(), -deaths)
 names(nyt_state_data)
 names(nyt_state_data_nodeaths)
 ```

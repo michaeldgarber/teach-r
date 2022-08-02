@@ -13,7 +13,7 @@ Please allow me to introduce myself :). I am a post-doctoral fellow and epidemio
 
 The focus of my research at Emory was studying the [impact of bicycle infrastructure](https://journals.lww.com/epidem/Citation/2022/07000/Have_Paved_Trails_and_Protected_Bike_Lanes_Led_to.7.aspx) on bicycling in Atlanta and on bicycle safety. I also did [methodological research](https://journals.lww.com/epidem/Fulltext/2021/01000/At_risk_measure_Sampling_in_Case_Control_Studies.14.aspx) focusing on study designs to make epidemiologic use of data generated from smartphones, which is often aggregated by location.
 
-I've been using R as my main software to manipulate, analyze, and visualize data since some time in 2017. Before then, I had been mainly using SAS to manage and analyze aspatial data and Esri ArcGIS for managing spatial data and mapping.
+I've been using R as my main software to manipulate, analyze, and visualize data since some time in 2017. Before then, I had been mainly using SAS to manage and analyze aspatial (i.e., usual) data and Esri ArcGIS for managing spatial data and mapping.
 
 Upon entering the world of R, I was amazed to learn that both of these analysis workflows (aspatial and spatial) could be accomplished using R. And I was hooked.
 

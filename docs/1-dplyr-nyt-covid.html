@@ -604,7 +604,7 @@ nyt_state_data_2vars</code></pre>
 nyt_state_data_mi_pipe = nyt_state_data %&gt;% 
   filter(state == &quot;Michigan&quot;)</code></pre>
 <p>A double equals sign, <code>==</code>, is like asking the question <em>is this equal to?</em>. <code>filter()</code> evaluates where the statement, <code>state == "Michigan"</code>, is true and returns rows with those values.</p>
-<p>The number of observations decreased, as we’d expect. There are now 402 observations (at this writing).</p>
+<p>The number of observations decreased, as we’d expect. There are now 875 observations (at this writing).</p>
 <pre class="r"><code>nrow(nyt_state_data_mi)</code></pre>
 <pre><code>## [1] 875</code></pre>
 <pre class="r"><code>nrow(nyt_state_data_mi_pipe)</code></pre>
@@ -616,12 +616,16 @@ nyt_state_data_mi_pipe = nyt_state_data %&gt;%
 <p>Side-note: <code>select()</code> is used by some other packages. To tell R that we want to use the <code>select()</code> function from <strong>dplyr</strong>, specifically, we write <code>dplyr::select()</code>. We can use this syntax for any dplyr verb, e.g. <code>dplyr::mutate()</code> or <code>dplyr::filter()</code>, but <code>select()</code> is the only one where I’ve run into trouble with ambiguity, so I usually leave it off the other ones. The non-piped version:</p>
 <pre class="r"><code>date = dplyr::select(nyt_state_data, date)</code></pre>
 <p>And the piped version:</p>
-<pre class="r"><code>date_pipe = nyt_state_data %&gt;% dplyr::select(date)</code></pre>
-<p>Confirm that there’s just one variable using <code>dim(date_pipe)</code>.</p>
-<pre class="r"><code>dim(date_pipe)</code></pre>
+<pre class="r"><code>date_pipe = nyt_state_data %&gt;% 
+  dplyr::select(date)</code></pre>
+<p>Confirm that there’s just one variable using <code>dim(date_pipe)</code> or <code>ncol()</code>.</p>
+<pre class="r"><code>dim(date_pipe) #dimensions</code></pre>
 <pre><code>## [1] 48838     1</code></pre>
+<pre class="r"><code>ncol(date_pipe) #number of columns</code></pre>
+<pre><code>## [1] 1</code></pre>
 <p>There are several <a href="https://dplyr.tidyverse.org/reference/select.html">helpers</a> that make <code>select()</code> easy to work with. Maybe we want all variables except for the number of deaths:</p>
-<pre class="r"><code>nyt_state_data_nodeaths = nyt_state_data %&gt;% dplyr::select(everything(), -deaths)
+<pre class="r"><code>nyt_state_data_nodeaths = nyt_state_data %&gt;% 
+  dplyr::select(everything(), -deaths)
 names(nyt_state_data)</code></pre>
 <pre><code>## [1] &quot;date&quot;   &quot;state&quot;  &quot;fips&quot;   &quot;cases&quot;  &quot;deaths&quot;</code></pre>
 <pre class="r"><code>names(nyt_state_data_nodeaths)</code></pre>
@@ -729,7 +733,7 @@ nrow(nyt_last_day)</code></pre>
 <li>the cumulative number of cases by state (way 2) by taking the maximum value of the number of cumulative cases.</li>
 </ul>
 <p>Note that we have already found the cumulative number of cases above using <code>arrange()</code>, <code>group_by()</code>, and <code>slice()</code>. So here are two more options.</p>
-<p><code>sum()</code>, <code>mean()</code>, and <code>max()</code> are arithmetic functions in base R. In these functions, it’s good practice state <code>na.rm=TRUE</code> unless there’s a good reason not to. This argument stands for “remove missings equals true”. The default behavior of these arithmetic functions is to include missings (<code>na.rm = FALSE</code>), which means the arithmetic summary will also return a missing, probably not a desirable outcome.</p>
+<p><code>sum()</code>, <code>mean()</code>, and <code>max()</code> are arithmetic functions in base R. In these functions, it’s good practice state <code>na.rm=TRUE</code> unless there’s a good reason not to. This argument stands for “remove missings equals true”. The default behavior of these arithmetic functions is to include missing values in the calculation (<code>na.rm = FALSE</code>), which means the arithmetic summary will also return a missing (2+missing=missing), and that is typically not the desired outcome.</p>
 <pre class="r"><code>names(nyt_state_wrangle) #To remember the variable names.</code></pre>
 <pre><code>## [1] &quot;date&quot;                    &quot;state&quot;                  
 ## [3] &quot;fips&quot;                    &quot;cases_cumul&quot;            
