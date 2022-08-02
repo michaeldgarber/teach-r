@@ -9,7 +9,6 @@ output:
     number_sections: true
 ---
 
-
 ```{r "setup", include=FALSE, eval=TRUE, echo=FALSE}
 require("knitr")
 #Revised 6/2/22 to use here package
@@ -30,9 +29,7 @@ The purpose of this tutorial is to learn the basics of dplyr in the context of a
 
 ## Target audience
 
-The target audience for this demo is someone with little to no experience using R. I will also assume no experience with any statistical programming language, although some experience with SAS or STATA would certainly not hurt. I imagine the target audience will have familiarity with the basics of data management in a spreadsheet-based program like Excel and may want to try out using a programming-oriented tool for data management. For an excellent overview of why it can be preferable to analyze and manage data with a programming language rather than spreadsheet tools, see here: <https://www.jessesadler.com/post/excel-vs-r/>
-
-*Author's note: this material is an updated version of an earlier demo available here (<https://rpubs.com/michaeldgarber/dplyr_1>). I have left that link live, but this version is more current.*
+The target audience for this demo is someone with little to no experience using R. I will also assume no experience with any statistical programming language, although some experience with SAS or STATA would certainly not hurt. I imagine the target audience will have familiarity with the basics of data management in a spreadsheet-based program like Excel and may want to try out using a programming-oriented tool for data management. For an excellent overview of why it can be preferable to analyze and manage data with a programming language rather than spreadsheet tools, see here the preliminary module of this series (<https://michaeldgarber.github.io/teach-r/0-pre-reqs>) or this great [blog post](https://www.jessesadler.com/post/excel-vs-r/) by Jesse Adler.
 
 ## What is dplyr?
 
@@ -48,16 +45,14 @@ The goal of this tutorial is to illustrate the basics of dplyr using publicly av
 
 ## Prerequisites
 
-1. R and RStudio are installed.
-2. You're familiar with how to use the RStudio interface
-**Install R and RStudio.** Both R and RStudio are needed, but worry not: they are both free and easy to download.
+1.  R and RStudio are installed.
+
+As a [reminder](https://michaeldgarber.github.io/teach-r/0-pre-reqs):
 
 -   To download R, go to CRAN and download R from the location nearest you: <https://cran.r-project.org/mirrors.html>.
 -   Then, install RStudio Desktop (the free version) at this link: <https://rstudio.com/products/rstudio/download> .
 
-The [Appendix](https://rstudio-education.github.io/hopr/starting.html#how-to-download-and-install-r) of this free online book - [Hands-On Programming with R](https://rstudio-education.github.io/hopr/), by Garrett Grolemund - explains why both R and RStudio should be downloaded.
-
-2.  **Familiarize yourself with the RStudio interface.** There are two ways to write code in R. You can use the *console* or you can create a [*script*](https://rstudio-education.github.io/hopr/basics.html#scripts) that can be saved and edited as you would save a Word document. I almost always use scripts. The book linked above also provides an overview of [RStudio's user interface](https://rstudio-education.github.io/hopr/basics.html#the-r-user-interface). Here's a screenshot of what the script window might look like: 
+2.  You're familiar with how to use the RStudio interface
 
 ```{r, echo=FALSE}
 library(here)
@@ -74,27 +69,16 @@ knitr::include_graphics(here("docs", "images", "script-screenshot.png"))
 
 ## Install packages
 
-Now that we have RStudio installed and up and running, our first step is to install packages. Grolemund defines packages in the above-linked [book](https://rstudio-education.github.io/hopr/packages2.html):
+Now that we have RStudio installed and up and running, our first step is to install packages, the basics of which we described in the [previous module](https://michaeldgarber.github.io/teach-r/0-pre-reqs).
 
-> "Many of R's most useful functions do not come preloaded when you start R, but reside in packages that can be installed on top of R. R packages are similar to libraries in C, C++, and Javascript, packages in Python, and gems in Ruby. An R package bundles together useful functions, help files, and data sets."
-
-Using a package requires first installing it with the `install.packages("package_name")` function and then loading it using the `library(package_name)` function. (Note the absence of quotes when loading a package (`library(package_name)`). Some stackoverflow [discussion](https://stackoverflow.com/questions/36802132/the-use-of-quotation-marks-when-loading-a-package-in-r) exists on whether or not to use quotes when loading packages. In my experience, it works better to *not* use quotes when loading packages but to use them when installing packages.
-
-For this exercise, let's install the full *tidyverse*, which will install all of its component packages, including *dplyr*. So here is our first code chunk to run:
-
-```{r install tidyverse, eval=FALSE, echo=TRUE}
+```{r, eval=FALSE, echo=TRUE}
 install.packages("tidyverse")
 ```
 
-To run the code, put your cursor on that line or highlight that line of code, and then click the **Run** button in the top-right part of the scripts window (screenshot [here](https://rstudio-education.github.io/hopr/basics.html#scripts)). A keyboard shortcut for **Run** is **control+enter**. On a Mac, it's **command+enter**.
-
-Now that the package is installed, load it:
-
-```{r load tidyverse, eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
+```{r}
 library(tidyverse)
 ```
 
-In my experience, it's usually fine to let R pick where it installs the packages on your computer. Whether or not this is okay may depend on whether you're on your own PC or a network with limited access to certain drives. If needed, you can specify where you want the package to land by adding the `lib= "file path"` argument in the `install.packages()` function. For example: `install.packages("tidyverse", lib = "C:\")`. Note: if we wished to install *dplyr* without the rest of the *tidyverse*, we could instead use `install.packages("dplyr")` and then `library(dplyr)`.
 
 ## Load the COVID-19 data from *The New York Times*
 
@@ -134,7 +118,6 @@ library(here)
 #note you can do this in a code chunk to use the here package
 knitr::include_graphics(here("docs", "images", "nyt-state-data-image.png"))
 ```
-
 
 As noted above, `read_csv()` is part of the **readr** package. Accordingly, its default behavior is to read in data as a "[tibble](https://r4ds.had.co.nz/tibbles.html)", tidyverse speak for "tidy table". One benefit of using tibbles, as noted [here](https://r4ds.had.co.nz/tibbles.html), is that they can be printed without overwhelming the console. (This is not necessarily true of data frames more generally).
 

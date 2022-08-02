@@ -9,7 +9,9 @@ output:
       after_body: footer.html
 ---
 
-This is the main landing page for the course, Introduction to managing and visualizing data in R: a short course on spatial and non-spatial data.
+This is the main landing page for the course, *Introduction to managing and visualizing data in R: a short course on spatial and non-spatial data*.
+
+Page url: <https://michaeldgarber.github.io/teach-r/>
 
 [Course summary:]{.underline}
 
@@ -29,15 +31,15 @@ the purrr toolkit.
 
 [Module links:]{.underline}
 
-Module 0 (background and setup):<https://michaeldgarber.github.io/teach-r/0-pre-reqs>
+0.  Module 0 (background and setup):<https://michaeldgarber.github.io/teach-r/0-pre-reqs>
 
-Module 1 (dplyr 1): <https://michaeldgarber.github.io/teach-r/1-dplyr-nyt-covid.html>
+1.  Module 1 (dplyr 1): <https://michaeldgarber.github.io/teach-r/1-dplyr-nyt-covid.html>
 
-Module 2 (dplyr 2): <https://michaeldgarber.github.io/teach-r/2-dplyr-mapview-tidycensus.html>
+2.  Module 2 (dplyr 2): <https://michaeldgarber.github.io/teach-r/2-dplyr-mapview-tidycensus.html>
 
 More to come...
 
-[Module details:]{.underline}
+[Module descriptions:]{.underline}
 
 0.  **Background and set-up.**
 
@@ -50,7 +52,7 @@ More to come...
 ```
 1.  **Introduction to R and data wrangling: learning the basics of dplyr with publicly available COVID-19 data**
 
-    Dplyr, as stated on its documentation page, \"is a grammar of data manipulation providing a consistent set of verbs that help you solve the most common data manipulation challenges.\" In this module, we install R and RStudio and learn the fundamentals of dplyr in the context of an applied example with publicly available COVID-19 data from the *New York Times*.
+    Dplyr, as stated on its documentation page, \"is a grammar of data manipulation providing a consistent set of verbs that help you solve the most common data manipulation challenges.\" In this module, we learn the fundamentals of dplyr in the context of an applied example with publicly available COVID-19 data from the *New York Times*.
 
     Link: <https://michaeldgarber.github.io/teach-r/1-dplyr-nyt-covid.html>
 
