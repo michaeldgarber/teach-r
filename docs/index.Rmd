@@ -33,15 +33,17 @@ This course will introduce participants to popular tools in R for manipulating (
 
 -   Modules covered (described below): [0](https://michaeldgarber.github.io/teach-r/0-pre-reqs.html) and [1](https://michaeldgarber.github.io/teach-r/1-dplyr-nyt-covid.html)
 
+[Folder](https://www.dropbox.com/sh/rpqerzm0ukawhuk/AAAFN4FVfLsq9m4pBvdH83JCa?dl=0) with all session recordings
+
 [**Modules:**]{.underline}
 
-0.  **Background and set-up.**
+0.  **Background and set-up**
 
     This module briefly describes key terms, shows how to install R and RStudio, and offers some other setup tips, like using the here package.
 
     Link: <https://michaeldgarber.github.io/teach-r/0-pre-reqs>
 
-1.  **Introduction to R and data wrangling: learning the basics of dplyr with publicly available COVID-19 data**
+1.  **Introduction to R and data wrangling: learning the basics of dplyr with publicly available COVID-19 data.**
 
     Dplyr, as stated on its documentation page, "is a grammar of data manipulation providing a consistent set of verbs that help you solve the most common data manipulation challenges." In this module, we learn the fundamentals of dplyr in the context of an applied example with publicly available COVID-19 data from the *New York Times*.
 
