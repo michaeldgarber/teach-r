@@ -48,7 +48,9 @@ The goal of this tutorial is to illustrate the basics of dplyr using publicly av
 
 ## Prerequisites
 
-1.  **Install R and RStudio.** Both R and RStudio are needed, but worry not: they are both free and easy to download.
+1. R and RStudio are installed.
+2. You're familiar with how to use the RStudio interface
+**Install R and RStudio.** Both R and RStudio are needed, but worry not: they are both free and easy to download.
 
 -   To download R, go to CRAN and download R from the location nearest you: <https://cran.r-project.org/mirrors.html>.
 -   Then, install RStudio Desktop (the free version) at this link: <https://rstudio.com/products/rstudio/download> .

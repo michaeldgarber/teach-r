@@ -1,5 +1,5 @@
 ---
-title: "First things first: background and prereqs before dplyr"
+title: "First things first: background and setup before dplyr"
 author: "Michael Garber "
 date: "Revised August 1st, 2022"
 output:
