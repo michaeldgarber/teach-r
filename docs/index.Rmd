@@ -9,7 +9,7 @@ output:
       after_body: footer.html
 ---
 
-This is the main landing page for the course, *Introduction to managing and visualizing data in R: a short course on spatial and non-spatial data*.
+This is the main landing page for the course, ***Introduction to managing and visualizing data in R: a short course on spatial and non-spatial data***.
 
 Page url: <https://michaeldgarber.github.io/teach-r/>
 
