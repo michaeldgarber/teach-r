@@ -1,2 +1,2 @@
 # teach-r
-This repository contains work-in-progress course materials for managing and visualizing aspatial and spatial data in R. 
+This repository contains course materials for a course on managing and visualizing data in R, including spatial data.
