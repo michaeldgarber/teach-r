@@ -134,17 +134,17 @@ Fortunately, there's a very simple solution to these issues: Use the [here](http
 
 (Jenny Bryan's [ode](https://github.com/jennybc/here_here) to the here package is a great read.)
 
-**What is a project?** A project is an RStudio file associated with a working directory that makes it easy to keep all code, data, and other documents in one place on your computer. To write this course, I created a project called teach-r.
+**What is a Project?** A [Project](https://support.rstudio.com/hc/en-us/articles/200526207-Using-RStudio-Projects) is an RStudio file associated with a working directory that facilitates organization of files (code, data, other documents) and particular settings relevant for one, well, project. For example, to create this course, I created a project called teach-r.
 
 ![](images/project-teach-r-screenshot.png)
 
 Note that all of folders in the same folder as the .Rproj file will conveniently appear in the "Files" tab.
 
-It's worth giving some thought to the project's folder structure. There are no hard-and-fast rules, but I, minimally, have taken [this advice](https://chrisvoncsefalvay.com/2018/08/09/structuring-r-projects/) and typically create separate folders for code, input data that should never be modified, and processed data that is a result of code.
+It's worth giving some thought to the project's folder structure. There are no hard-and-fast rules, but I have taken [this advice](https://chrisvoncsefalvay.com/2018/08/09/structuring-r-projects/) and, minimally, create separate folders for code, input data that should never be modified, and processed data that is a result of code.
 
 ![](images/teach-r-files.png){width="500"}
 
-You don't have to use projects to use R or RStudio, but I think it's a good idea, in part because of how well projects pair with the **here** package.
+You don't have to use projects to use R or RStudio, but I've [been convinced](https://www.tidyverse.org/blog/2017/12/workflow-vs-script/) that it's a good idea, in part because of how well projects pair with the **here** package.
 
 ## Example: change working directory using here()
 
