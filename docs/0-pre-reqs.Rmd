@@ -21,7 +21,7 @@ Aside: I don't view the manipulation and analysis of data (creating variables, c
 
 # Why R?
 
-Why should we use R for manipulating and analyzing data?
+Why is R a good tool for manipulating and analyzing data?
 
 ## R vs point-and-click data-analysis tools like Excel and ArcGIS
 
