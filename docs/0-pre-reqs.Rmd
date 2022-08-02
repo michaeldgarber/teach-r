@@ -184,7 +184,7 @@ lake_huron_raw = datasets::LakeHuron #define new object called lake_huron_raw
 lake_huron_raw #Take a look
 ```
 
-I find that to be hard to read. Let's clean it up and save it.
+That's hard to read. Let's clean it up and save it.
 
 Don't sweat the dplyr code itself just yet (introduced next session), but, as an appetizer, we convert the dataset into an easier-to-work-with format ([a tibble](https://tibble.tidyverse.org/)) using `as_tibble()`, rename its one variable from `x` to `level_ft` using `rename()`, and create a new variable called `year` using `mutate()`, defined based on the row number (`row_number()` returns the row number). And we connect all these steps together using the [pipe operator](https://r4ds.had.co.nz/pipes.html) (%\>%).
 

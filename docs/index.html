@@ -9,6 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
+<meta name="author" content="Michael Garber, PhD MPH" />
 
 
 <title>R course</title>
@@ -269,12 +270,71 @@ $(document).ready(function () {
 
 
 <h1 class="title toc-ignore">R course</h1>
+<h4 class="author">Michael Garber, PhD MPH</h4>
+<h4 class="date">Revised June 2, 2022</h4>
 
 </div>
 
 
-<p>Session 1: <a href="https://michaeldgarber.github.io/teach-r/1-dplyr-nyt-covid.html" class="uri">https://michaeldgarber.github.io/teach-r/1-dplyr-nyt-covid.html</a></p>
-<p>Session 2: <a href="https://michaeldgarber.github.io/teach-r/2-dplyr-mapview-tidycensus.html" class="uri">https://michaeldgarber.github.io/teach-r/2-dplyr-mapview-tidycensus.html</a></p>
+<p>This is the main landing page for the course, Introduction to managing and visualizing data in R: a short course on spatial and non-spatial data.</p>
+<p><u>Course summary:</u></p>
+<p>This course will introduce participants to popular tools in R for manipulating
+(“wrangling”) and visualizing data through public-health-focused examples.
+Specifically, students will become familiar with ways to wrangle and visualize
+both aspatial (i.e., common spreadsheet-like) data and spatial data. The course
+will focus on tools that are a part of and that work well with the tidyverse, a
+set of packages with a common philosophy that, in my opinion, make R intuitive
+and fun. Packages covered will include dplyr and sf for manipulating data, and
+ggplot2, mapview, and tmap for visualizing data. Many examples will transition
+back and forth between data with and without a spatial component, showing that
+working with spatial data need not require separate specialized geographic
+information systems (GIS) software. The course will conclude with a somewhat
+advanced but important topic, creating functions and iterating over them using
+the purrr toolkit.</p>
+<p><u>Module links:</u></p>
+<p>Module 0 (background and setup):<a href="https://michaeldgarber.github.io/teach-r/0-pre-reqs" class="uri">https://michaeldgarber.github.io/teach-r/0-pre-reqs</a></p>
+<p>Module 1 (dplyr 1): <a href="https://michaeldgarber.github.io/teach-r/1-dplyr-nyt-covid.html" class="uri">https://michaeldgarber.github.io/teach-r/1-dplyr-nyt-covid.html</a></p>
+<p>Module 2 (dplyr 2): <a href="https://michaeldgarber.github.io/teach-r/2-dplyr-mapview-tidycensus.html" class="uri">https://michaeldgarber.github.io/teach-r/2-dplyr-mapview-tidycensus.html</a></p>
+<p>More to come…</p>
+<p><u>Module details:</u></p>
+<ol start="0" style="list-style-type: decimal">
+<li><p><strong>Background and set-up.</strong></p>
+<p>This module briefly describes key terms, shows how to install R and RStudio, and offers some other setup tips, like using the here package.</p>
+<p>Link: <a href="https://michaeldgarber.github.io/teach-r/0-pre-reqs" class="uri">https://michaeldgarber.github.io/teach-r/0-pre-reqs</a></p></li>
+</ol>
+<!-- -->
+<ol style="list-style-type: decimal">
+<li><p><strong>Introduction to R and data wrangling: learning the basics of dplyr with publicly available COVID-19 data</strong></p>
+<p>Dplyr, as stated on its documentation page, "is a grammar of data manipulation providing a consistent set of verbs that help you solve the most common data manipulation challenges." In this module, we install R and RStudio and learn the fundamentals of dplyr in the context of an applied example with publicly available COVID-19 data from the <em>New York Times</em>.</p>
+<p>Link: <a href="https://michaeldgarber.github.io/teach-r/1-dplyr-nyt-covid.html" class="uri">https://michaeldgarber.github.io/teach-r/1-dplyr-nyt-covid.html</a></p></li>
+<li><p><strong>R for data wrangling 2: more dplyr with tidycensus, mapview, and ggplot2</strong></p>
+<p>In this module, we continue with the COVID-19 example from the first tutorial and
+introduce four additional packages throughout the example: tidycensus, mapview,
+sf, and ggplot2. Tidycensus allows you to conveniently download census data
+into R. Mapview lets you make an interactive map with one line of code, sf is a
+toolbox for managing and manipulating spatial data, and ggplot2 is a prominent package for making graphs and figures. The next sessions elaborate on sf and mapview.</p>
+<p>Link TBD</p></li>
+<li><p><strong>Working with spatial data in R: introduction to spatial operations with the sf package</strong></p>
+<p>The sf package and its corresponding object class have become standard tools for
+managing and representing (vector-based) spatial data in R. An appealing aspect
+of the sf object class is that it behaves like regular rectangular data and is
+thus amenable to common data manipulation techniques. In this module, we will
+describe operations in the sf ecosystem, including ways to merge spatial data,
+manipulate coordinate systems, and create buffers.</p>
+<p>Link TBD</p></li>
+<li><p><strong>Making static and interactive maps in R</strong></p>
+<p>This module will elaborate upon the capabilities of some of R's mapping tools covered in previous sessions. Specifically, it will illustrate tools for both static maps (as in an image) and interactive maps (as in zooming in and out like Google Maps).
+Mapview and ggplot2 will again be covered, and tmap will be introduced. This
+module will also cover color palettes available in R for visualizing continuous
+and categorical data.</p>
+<p>Link TBD</p></li>
+<li><p><strong>Making your own functions in R and bootstrapping with purrr</strong></p>
+<p>Creating your own functions can help reduce tedious and error-prone repetition in code. Functions can also be used to iteratively modify steps in the data analysis to estimate uncertainty of results via the statistical technique called bootstrapping. This
+module will introduce the basics of creating simple functions in R in a
+data-processing workflow. It will then illustrate how to use functions and the
+purrr toolkit to do basic bootstrapping.</p>
+<p>Link TBD</p></li>
+</ol>
 
 <br>
 <br>
