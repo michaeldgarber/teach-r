@@ -4,8 +4,8 @@
 #August 2, 2022
 
 # Install packages and download the data-------
-install.packages("tidyverse")
-install.packages("here")
+# install.packages("tidyverse") #I commented out because I already have them installed
+# install.packages("here") #commented out
 library(tidyverse)
 library(here)
 
@@ -164,6 +164,7 @@ nyt_cases_overall = nyt_state_wrangle %>%
 nyt_cases_overall
 
 ## All together now in an example using `case_when()`--------
+#aside: demo the %in% operator
 x=c(1,2,3,4,5)
 5%in%x
 6%in%x
