@@ -216,4 +216,4 @@ getwd() #check to confirm
 save(lake_huron_transformed, file = "lake_huron_transformed.RData")
 ```
 
-That concludes the background material. Now onto dplyr!
+That concludes the background material. Now onto our first dplyr module (<https://michaeldgarber.github.io/teach-r/1-dplyr-nyt-covid.html>)!

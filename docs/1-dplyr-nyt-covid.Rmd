@@ -81,17 +81,17 @@ library(tidyverse)
 
 ## Load the COVID-19 data from *The New York Times*
 
-For this example, we will use COVID-19 data from [The New York Times' GitHub repository](https://github.com/nytimes/covid-19-data). There are a few datasets available at varying geographic scales. Let's use their state-level dataset. The data include the number of cumulative cases and the number of cumulative deaths by state by day, beginning January 21, 2020.
+For this example, we will use COVID-19 data from [The New York Times' GitHub repository](https://github.com/nytimes/covid-19-data). There are a few datasets available at varying geographic scales. Let's use their state-level dataset. The data include the number of cumulative cases and the number of cumulative deaths by state and day, beginning January 21, 2020.
 
-We'll load the data two ways, with hopes that at least one of them works.
+We'll load the data two ways, hoping at least one of them works.
 
 ### Load the data directly from their Github repository
 
 First, let's try the fancy way, loading it directly from GitHub. Below, the first line of code defines an object, `nyt_state_url` to be the URL where the NYT data are located. The second line of code uses a base R function, `url()`, to parse that URL as a CSV. We then convert it from a CSV to an R object using `read_csv()`. `read_csv()` is a function in *readr*, another package in the **tidyverse.** Accordingly, the resulting output of these few lines of code will be a [**tibble**](https://r4ds.had.co.nz/tibbles.html), tidyverse speak for a "tidy table." Basically, a tibble is a table, or data frame, with some opinionated formatting advantages that make it easy to work with.
 
-Of note, the last three lines of include our first use of the `%>%` (read: [pipe](https://magrittr.tidyverse.org/reference/pipe.html)) operator. The pipe operator is part of the **magrittr** package and is a key element of the tidyverse. The pipe separates the action-oriented functions, `read_csv()` and `url` from the object, `nyt_state_url`. In my opinion, this separation makes it easier to read, as I'll discuss more in the next section.
+Of note, the code below includes our first use of the `%>%` (read: [pipe](https://magrittr.tidyverse.org/reference/pipe.html)) operator. The pipe operator is part of the **magrittr** package and is a key element of the tidyverse. The pipe separates the action-oriented functions, `read_csv()` and `url()` from the object, `nyt_state_url`. In my opinion, this separation makes it easier to read, as I'll discuss more in the next section.
 
-One other side-note: I use the equals sign, `=`, when assigning new objects, because I think it's easier to read type than R's [traditional assignment operator](https://stat.ethz.ch/R-manual/R-devel/library/base/html/assignOps.html), `<-`. I've heard `<-` has advantages, but I've never had an issue using `=`.
+Another side-note: I use the equals sign, `=`, when assigning new objects, because I think it's easier to read type than R's [traditional assignment operator](https://stat.ethz.ch/R-manual/R-devel/library/base/html/assignOps.html), `<-`. I've heard `<-` has advantages, but I've never had an issue using `=`.
 
 ```{r load NYT data, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE, cache=TRUE}
 nyt_state_url = "https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv"
@@ -101,14 +101,14 @@ nyt_state_data = nyt_state_url %>%
   read_csv()
 ```
 
-An alternative, equivalent, way to write that code is use the traditional nested parentheses. The nested parentheses aren't so bad when just a few functions are used, but as the number of functions increases, the nested parentheses become difficult to read. In general, I'm taking the teach-the-tidyverse-first approach when teaching this course, so will focus on
+An alternative, equivalent, way to write that code is use the traditional nested parentheses. The nested parentheses aren't so bad when just a few functions are used, but, as the number of functions increases, the nested parentheses become difficult to read.
 
 ```{r load NYT data alt, eval=FALSE, echo=TRUE, warning=FALSE, message=FALSE}
 nyt_state_url = "https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv"
 nyt_state_data = read_csv(url(nyt_state_url))
 ```
 
-Either way we write it, we get a resulting dataset, `nyt_state_data`, which should be visible in the "Environment" pane of RStudio. It tells us that the data have 48,838 observations and 5 variables. (The number of observations may be higher when you run it.)
+Either way we write it, we get a resulting dataset, `nyt_state_data`, which should be visible in the "Environment" pane of RStudio. It tells us that the data have 48,838 observations and 5 variables. (Again, I called this dataset on August 2, 2022; the number of observations will be higher in the future.)
 
 ![](images/module-1-nyt-data-environment-screenshot.png){width="500"}
 
@@ -116,7 +116,9 @@ As noted above, `read_csv()` is part of the **readr** package and returns a "[ti
 
 Let's first confirm that `nyt_state_data` is a tibble using the base-R `class()` function, which returns the object's class. The tibble object class is indicated by `tbl_df`. And then we can print the tibble by typing its name to get a sense of its dimensions (rows and columns) and what the variables look like.
 
-At this writing, there are 48,838 observations and 5 columns. The variable type is denoted below the variable names. We can also use the `class()` function from base R to return the type for a single column.
+At this writing, there are 48,838 observations and 5 columns. The variable type is denoted below the variable names.
+
+We can also use the `class()` function from base R to return the type for a single column. The `$` is a base-R function that [extracts](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/Extract) an element of an object by name.
 
 ```{r explore NYT 1, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
 class(nyt_state_data) #what type of object is it?
@@ -130,7 +132,7 @@ If the direct call to NYT GitHub didn't work, here's a back-up way that should w
 
 If needed, download the CSV and save locally to your computer. I would suggest saving to a sub-folder of this project, e.g., called "data-input".
 
-Then, use `read_csv()` to [import](https://r4ds.had.co.nz/data-import.html) the csv into R. As discussed in the last module, we can use the here package for this. So, if the .csv is in a folder in this project directory called, "data-input", then this code should work to read it in:
+Then, use `read_csv()` to [import](https://r4ds.had.co.nz/data-import.html) the csv into R. As discussed in the [last module](https://michaeldgarber.github.io/teach-r/0-pre-reqs), we can use the here package for this. So, if the .csv is in a folder in this project directory called, "data-input", then this code should work to read it in:
 
 ```{r Set working directory, eval=TRUE, echo=TRUE, message=FALSE}
 library(here)
@@ -140,7 +142,7 @@ nyt_state_data = read_csv("nyt_state_data_downloaded.csv")
 
 ### Further explore the data using View() before manipulation with dplyr verbs.
 
-Aside from printing the tibble by simply typing its name (`nyt_state_data`) we can use `View` (note the capital *V*) to view the data in a new window and interact with it in a more hands-on way. `View()` can be slow as the number of observations rises, but 20,000-ish shouldn't be too bad. `View()` allows you to sort the data by values in the columns. We can sort the data by state in the `View()` window to confirm that the data are, in fact, cumulative: cases and deaths only increase.
+Aside from printing the tibble by simply typing its name (`nyt_state_data`) we can use `View` (note the capital *V*) to view the data in a new window and interact with it in a more hands-on way. `View()` can be slow as the number of observations rises, but 40,000-ish shouldn't be too bad. `View()` allows you to sort the data by values in the columns. We can sort the data by state in the `View()` window to confirm that the data are, in fact, cumulative: cases and deaths only increase.
 
 ```{r explore NYT 2, eval=FALSE, echo=TRUE, warning=FALSE, message=TRUE}
 View(nyt_state_data)
@@ -178,10 +180,16 @@ There are [several other](https://github.com/rstudio/cheatsheets/blob/master/dat
 
 ## mutate
 
-For a demo of `mutate()`, let's create a new variable called `cases_plus_1`, which is simply the number of cases plus 1. The first argument inside the `mutate()` call is the object to be operated on. And the second argument creates the new variable as a function of the old variable and, in this example, the number 1. Adding the number 1 to the *cases* variable works because *cases* is a numeric variable. If *cases* were a character variable, it would not work.
+For a demo of `mutate()`, let's create a new variable called `cases_plus_1`, which is simply the number of cases plus 1. The first argument inside the `mutate()` call is the object to be operated on. And the second argument creates the new variable as a function of the old variable and, in this example, the number 1.
 
 ```{r mutate 1, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
 nyt_state_data_2 = mutate(nyt_state_data, cases_plus_1 = cases+1)
+```
+
+Adding the number 1 to the `cases` variable works because `cases` is a **numeric** variable. If `cases` were a **character** variable, it would not work.
+
+```{r}
+class(nyt_state_data$cases)
 ```
 
 Now let's try the same thing but written with the pipe (`%>%`) operator. As mentioned above, the [pipe](https://r4ds.had.co.nz/pipes.html) brings the object out of the parentheses to focus on the action-oriented part of the function, making it easier to read.
@@ -269,12 +277,17 @@ In this code chunk, we'll combine a few operations sequentially using the pipe, 
 
 This code also uses `group_by()`, which does not sort the data, but it tells R to do any subsequent calculations "by group."
 
-Bonus question: for this calculation, why is it better to `group_by(state)` and then arrange by date (i.e.: `group_by(state) %>% arrange(date)`) before the `mutate()` rather than an alternative method which could be to forego the grouping and simply arrange by state and then by state (`arrange(state, date)`)? Try testing both ways and see what the value of the `cases_cumul_day_before` variable is on the first day of the data for a particular state. It's missing (correctly) when we first `group_by()`. In contrast, when we use `arrange(state, date)` without grouping, on the first day of data for a given state, `cases_cumul_day_before` takes the last day of data for its neighboring state in the alphabet. The `lag()` function doesn't know that it shouldn't take values from a different state. When we use `group_by`, the subsequent `mutate()` operates on each state as its own silo, which is what we want in this calculation.
+[Bonus question]{.underline}:
+
+-   For this calculation, why is it better to `group_by(state)` and then arrange by date (i.e.: `group_by(state) %>% arrange(date)`) before the `mutate()` rather than an alternative method which could be to forego the grouping and simply arrange by state and then by state (`arrange(state, date)`)? Try testing both ways and see what the value of the `cases_cumul_day_before` variable is on the first day of the data for a particular state.
+
+-   It's missing (correctly) when we first `group_by()`. In contrast, when we use `arrange(state, date)` without grouping, on the first day of data for a given state, `cases_cumul_day_before` takes the last day of data for its neighboring state in the alphabet. The `lag()` function doesn't know that it shouldn't take values from a different state. When we use `group_by`, the subsequent `mutate()` operates on each state as its own silo, which is what we want in this calculation.
 
 Note, I'm creating a new dataset called `nyt_state_wrangle`. I tend to add a `_wrangle` to the name of datasets I've made significant changes to. (Tangent: [Wikipedia page](https://en.wikipedia.org/wiki/Data_wrangling) on origins of the term data wrangling).
 
 ```{r arrange, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
 nyt_state_wrangle = nyt_state_data %>% 
+
   #To calculate incident deaths, we will subtract the number of cumulative deaths on one day from the day before.
   #So let's group the data by state and then sort by date. Note it will default sort to ascending, meaning the earliest days will be on top.
   group_by(state) %>% 
@@ -342,7 +355,7 @@ Let's calculate three group-by summaries:
 
 Note that we have already found the cumulative number of cases above using `arrange()`, `group_by()`, and `slice()`. So here are two more options.
 
-`sum()`, `mean()`, and `max()` are arithmetic functions in base R. In these functions, it's good practice state `na.rm=TRUE` unless there's a good reason not to. This argument stands for "remove missings equals true". The default behavior of these arithmetic functions is to include missings (`na.rm = FALSE`), which means the arithmetic summary will also return a missing, probably not a desirable outcome.
+`sum()`, `mean()`, and `max()` are arithmetic functions in base R. In these functions, it's good practice state `na.rm=TRUE` unless there's a good reason not to. This argument stands for "remove missings equals true". The default behavior of these arithmetic functions is to include missing values in the calculation (`na.rm = FALSE`), which means the arithmetic summary will also return a missing (2+missing=missing), and that is typically not the desired outcome.
 
 ```{r group_by summarise, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
 names(nyt_state_wrangle) #To remember the variable names.
@@ -360,13 +373,15 @@ nyt_cases_summary
 
 The number of rows is equal to the number of groups (55; some territories are included). The data used to include date, but we have collapsed over date here. When `group_by()` and `summarise()` are used together, the number of rows in the data will be equal to the number of groups.
 
-The number of variables is four: the grouping variable (state) and each of the summary measures we calculated for each state.
+The number of variables is four: the grouping variable (`state`) and each of the summary measures we calculated for each state.
 
-Note that the two cumulative values differ slightly for some of the states. This discrepancy could be explained by the [nuances of the NYT's reporting system](https://github.com/nytimes/covid-19-data/blob/master/PROBABLE-CASES-NOTE.md), which contains a mix of both probable and confirmed cases. The most trustworthy value is probably cases_cumul_way2, which takes the most recent reported cumulative value.
+Note that the two cumulative values differ slightly for some of the states. This discrepancy could be explained by the [nuances of the NYT's reporting system](https://github.com/nytimes/covid-19-data/blob/master/PROBABLE-CASES-NOTE.md), which contains a mix of both probable and confirmed cases. The most trustworthy value is probably `cases_cumul_way2`, which takes the most recent reported cumulative value.
 
 ### group_by and summarise (continued)
 
-Another application of the group-by-summarise syntax is if one wants to calculate overall summary estimates of the whole dataset. For example, as a double check, we can check to confirm the data we're using lines up with what the NYT is reporting on their website for the total number of cumulative cases to date. At this writing (8/2/22), NYT reports a total of \~91.3 million cases (<https://www.nytimes.com/interactive/2021/us/covid-cases.html>). Can we reproduce that? To summarize over the whole dataset, create a dummy variable with the same value for every observation and them sum over that variable.
+Another application of the group-by-summarise syntax is if one wants to calculate overall summary estimates of the whole dataset. For example, as a double check, we can check to confirm the data we're using lines up with what the NYT is reporting on their website for the total number of cumulative cases to date.
+
+At this writing (8/2/22), NYT reports a total of \~91.3 million cases (<https://www.nytimes.com/interactive/2021/us/covid-cases.html>). Can we reproduce that? To summarize over the whole dataset, create a dummy variable with the same value for every observation and then sum over that variable.
 
 ```{r group_by overall, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
 nyt_cases_overall = nyt_state_wrangle %>% 
@@ -381,23 +396,31 @@ nyt_cases_overall = nyt_state_wrangle %>%
 nyt_cases_overall
 ```
 
-Confirmed. The total cumulative number of cases at this writing is 31,444,696, which is about what they're reporting on their website today (31.4 million+). Note this total includes the cases from Guam, Northern Mariana Islands, Puerto Rico, and the Virgin Islands.
+Confirmed. The total cumulative number of cases at this writing (8/2/22) is 91,296,149, which is about what they're reporting on their website today (\~91.3 million). Note this total includes the cases from Guam, Northern Mariana Islands, Puerto Rico, and the Virgin Islands.
 
-## All together now in a simple example using `case_when()`
+![](images/total-cases-nyt-aug-2-2022.png){width="500"}
 
-Goal: calculate the total number of deaths in each state in the [Great Lakes Region](https://en.wikipedia.org/wiki/Great_Lakes_region): Illinois, Indiana, Michigan, Minnesota, New York, Ohio, Pennsylvania, and Wisconsin. Do it all in one sequential pipe. In this code, I'll introduce the `case_when()` function, which is a useful way to create new variables conditional on values of other variables.
+## All together now in an example using `case_when()`
+
+**Goal**: calculate the total number of deaths in each state in the [Great Lakes Region](https://en.wikipedia.org/wiki/Great_Lakes_region): Illinois, Indiana, Michigan, Minnesota, New York, Ohio, Pennsylvania, and Wisconsin. Do it all in one sequential pipe. In this code, I'll introduce the [`case_when()`](https://dplyr.tidyverse.org/reference/case_when.html) function, which is a useful way to create new variables conditional on values of other variables.
 
 Also note the use of the "or" operator, `|`.
 
+Filtering the data to the subset of states in the Great Lakes Region could be done a few different ways. With complicated subsets, I prefer to create an indicator variable and then filter values based on that indicator variable, rather than putting all of the subset information into the `filter()` function.
+
+So the code below uses `mutate()` to create a variable called `great_lakes`, which is equal to 1 if the state is in the Great Lakes region and 0 if not.
+
+I also define this variable, `great_lakes_alt`, an alternative way, which is more concise but arguably less readable, using the [`%in%`](https://stat.ethz.ch/R-manual/R-devel/library/base/html/match.html) operator. That operator returns TRUE if an element belongs to a vector. A quick example to show this:
+
+```{r}
+x=c(1,2,3,4,5)
+5%in%x
+6%in%x
+```
+
 ```{r great lakes, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
 deaths_cumul_by_state_greatlakes = nyt_state_wrangle %>% 
-  
-  #Filtering to states in the Great Lakes Region could be done a few different ways.
-  #With complicated subsets, I prefer to create an indicator variable and then filter based on that indicator variable, 
-  #rather than putting all of the subset information into the filter() function. 
-  #But either way could work.
   mutate(
-    
     #If the condition is met, set the value to 1. If not -- confusingly expressed by TRUE -- set it to 0.
     great_lakes = case_when(
       state == "Illinois" |
@@ -411,13 +434,13 @@ deaths_cumul_by_state_greatlakes = nyt_state_wrangle %>%
       TRUE ~ 0),  #The parentheses closes this case_when function.
     #The comma outside the parentheses implies we have another variable to be created in the mutate function
     
-    #A more concise way to state that may arguably be less readable is to use %in%, 
-    #which is an operator used to assess whether an element belongs to a vector. 
-    #It returns a TRUE or FALSE for each row.
+    #Alternative way using the %in% operator:A more concise way to state that may arguably be less readable is to use %in%    
     #The case_when function assigns a 1 wherever it's true.
     great_lakes_alt = case_when(
       state %in% c(
-        "Illinois", "Indiana", "Michigan", "Minnesota", "New York", "Ohio", "Pennsylvania", "Wisconsin"
+        "Illinois", "Indiana", "Michigan", 
+        "Minnesota", "New York", "Ohio", 
+        "Pennsylvania", "Wisconsin"
         ) ~ 1,
     TRUE ~0)
   ) %>% 
@@ -430,10 +453,10 @@ deaths_cumul_by_state_greatlakes = nyt_state_wrangle %>%
   
 ```
 
-We expect it to be a pretty small dataset (8x2), so let's print the whole thing
+It should be a small dataset (8 rows (one for each state) by 2 columns (`state` and `deaths_cumul`)), so let's print it to check:
 
 ```{r great lakes check, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
 deaths_cumul_by_state_greatlakes
 ```
 
-That concludes this tutorial. In our next tutorial (<https://michaeldgarber.github.io/teach-r/2-dplyr-mapview-tidycensus.html>), we'll continue using dplyr and we'll introduce **tidycensus**, **mapview**, and **ggplot** to use census data to visualize incidence per population.
+That concludes this tutorial. In our next tutorial, we'll continue using dplyr and we'll introduce **tidycensus**, **mapview**, and **ggplot** to use census data to visualize Covid-19 incidence per population.
