@@ -352,24 +352,24 @@ div.tocify {
 </div>
 
 
-<p>This page motivates the use of R and describes some preliminary concepts and steps before we begin with the sessions on data wrangling and visualization.</p>
+<p>This module motivates the use of R and describes some preliminary concepts and steps before we begin with the sessions on data wrangling and visualization.</p>
 <div id="what-is-r" class="section level1" number="1">
 <h1><span class="header-section-number">1</span> What is R?</h1>
 <p>According to the R <a href="https://www.r-project.org/">website</a>, R is “a free software environment for statistical computing and graphics.” Its hashtag on Twitter is #RStats, but, as some have <a href="https://mobile.twitter.com/WeAreRLadies/status/1541914841199149057">alluded to</a>, R can do much more than statistics. For example, it can <a href="https://r-spatial.github.io/mapview/">make maps</a>, <a href="https://bookdown.org/yihui/rmarkdown/">create websites</a>, and, importantly, <a href="https://dplyr.tidyverse.org/">manipulate data</a>.</p>
-<p>Aside: I don’t view the manipulation and analysis of data (creating variables, counting things, putting things in groups, etc.) as necessarily within the realm of statistics per se, unless I intend to infer the results of that analysis to a larger or separate population.</p>
-<p><a href="https://www.yourdictionary.com/statistics">Definitions of statistics aside</a>, the point is that R is a programming language that allows you to perform most any data-manipulation, data-analysis, or data-visualization task (including statistics).</p>
+<p>Aside: I don’t view the manipulation and analysis of data (creating variables, counting things, putting things in groups, etc.) as necessarily within the realm of statistics, unless I intend to infer the results of that analysis to a larger or separate population.</p>
+<p><a href="https://www.yourdictionary.com/statistics">Definitions of statistics</a> aside, the point is that R is a programming language that allows you to perform most any data-manipulation, data-analysis, or data-visualization task (including statistics)!</p>
 </div>
 <div id="why-r" class="section level1" number="2">
 <h1><span class="header-section-number">2</span> Why R?</h1>
 <p>Why should we use R for manipulating and analyzing data?</p>
 <div id="r-vs-point-and-click-data-analysis-tools-like-excel-and-arcgis" class="section level2" number="2.1">
 <h2><span class="header-section-number">2.1</span> R vs point-and-click data-analysis tools like Excel and ArcGIS</h2>
-<p>This <a href="https://www.jessesadler.com/post/excel-vs-r/">post</a> by Jesse Adler (a digital historian) is a well-written overview of the advantages of using a programming language like R to manipulate and analyze data rather than spreadsheet tools like Excel. Summarizing their post with <a href="https://www.dataquest.io/blog/9-reasons-excel-users-should-consider-learning-programming/">another</a> on the topic, here are the top four advantages of programming:</p>
+<p>This <a href="https://www.jessesadler.com/post/excel-vs-r/">post</a> by Jesse Adler (a digital historian) is a well-written overview of the advantages of using a programming language like R to manipulate and analyze data rather than spreadsheet tools like Excel. Summarizing their post with <a href="https://www.dataquest.io/blog/9-reasons-excel-users-should-consider-learning-programming/">another</a> on the topic, here are my top four advantages of programming:</p>
 <ul>
 <li><p><strong>Every step is written down</strong>, so it’s easier to find and fix errors.</p></li>
-<li><p><strong>Easier to repeat analysis steps</strong>: suppose you realize you want to make a change upstream in your analysis that affects everything downstream of it. In R, this is straightforward: simply make the change, and rerun all of the code that relies upon it (and possibly make some changes to the downstream code to accommodate that change as needed). In a point-and-click interface like Excel or ArcGIS, you may have to repeat several point-and-click steps, which would take longer and be more prone to error.</p></li>
-<li><p>There is a <strong>clear division between data entry and data manipulation and analysis</strong>: it’s easier to avoid the temptation of editing the raw data. Although you can certainly make a copy of raw data in Excel, it can be tempting to edit the raw data.</p></li>
-<li><p><strong>Easier to automate similar tasks</strong>. The ability to automate analysis steps becomes especially important for bootstrapping where we effectively repeat the analysis steps hundreds of time while allowing some of the steps to randomly vary. This would be much more challenging in Excel.</p></li>
+<li><p><strong>Easier to repeat analysis steps</strong>: suppose you realize you want to make a change upstream in your analysis that affects everything downstream of it. In R, this is straightforward: simply make the change, and rerun all of the code that relies upon it (and possibly make some changes to the downstream code to accommodate that change as needed). In a point-and-click interface like Excel or ArcGIS, you may have to repeat several point-and-click steps, which would take longer and be more susceptible to error.</p></li>
+<li><p>There is a <strong>clear division between data entry and data manipulation and analysis</strong>: it’s easier to avoid the temptation of editing the raw data. Although you can certainly make a copy of raw data in Excel (e.g., copy to new sheet), it can be tempting to edit the raw data.</p></li>
+<li><p><strong>Easier to automate similar tasks</strong>. Frequently in data analysis, we’d like to repeat very similar steps, maybe just by changing one element. The ability to automate similar steps becomes especially important for bootstrapping where we effectively repeat the analysis hundreds of time while allowing some of the steps to randomly vary. This would be much more challenging in Excel.</p></li>
 </ul>
 <p>To be clear, I think Excel is great, too. I use it often for simple analyses or for data entry. But I don’t use it as much as I once did for more involved analyses.</p>
 </div>
@@ -379,15 +379,16 @@ div.tocify {
 <ol style="list-style-type: decimal">
 <li>It’s free. SAS and STATA cost money.</li>
 <li>It has an active, helpful, and friendly user community. Googling a topic along with “R” often leads to useful public discussion on forums like <a href="https://stackoverflow.com/questions/tagged/r">stackoverflow</a> or <a href="https://community.rstudio.com/">RStudio community</a>.</li>
-<li>It can manipulate spatial data and make maps. No need to switch software for GIS.</li>
-<li>Having used SAS for years, I personally think R is simply more fun.</li>
+<li>It can manipulate spatial data and make maps. No need to switch software for GIS. In an analysis with a spatial component, this is <strong>very</strong> important.</li>
 <li>As noted above, R can do a lot of cool stuff. For example, with RMarkdown, you can make websites like this <a href="https://michaeldgarber.github.io/">one</a>, create <a href="https://rmarkdown.rstudio.com/gallery.html">interactive dashboards</a>, and do lots more amazing <a href="https://www.youtube.com/watch?v=qLEkUjxk7e8">talk</a> by RMarkdown creator).</li>
+<li>For some of the reasons above, having used SAS for years, I personally think R is simply more fun.</li>
 </ol>
 <p>I know many people use and like Python, which is also free and shares many of R’s advantages. I don’t have much Python experience, so I can’t really comment on it. Every now and then, I encounter a situation where I wish I had some Python skills (e.g., to use this <a href="https://github.com/gboeing/osmnx">package</a> to compute measures on street networks from OpenStreetMap), but those situations are rare.</p>
 </div>
 </div>
 <div id="install-r-and-rstudio-and-become-familiar-with-the-user-interface." class="section level1" number="3">
 <h1><span class="header-section-number">3</span> Install R and RStudio and become familiar with the user interface.</h1>
+<p>Let’s get up and running with R now.</p>
 <ol style="list-style-type: decimal">
 <li><strong>Install R and RStudio.</strong> R can be used as a stand-alone program, but RStudio (an <a href="https://en.wikipedia.org/wiki/Integrated_development_environment">IDE</a>) adds several helpful features that make coding in R easier.</li>
 </ol>
@@ -395,16 +396,16 @@ div.tocify {
 <li>To download R, go to CRAN and download R from the location nearest you: <a href="https://cran.r-project.org/mirrors.html" class="uri">https://cran.r-project.org/mirrors.html</a>.</li>
 <li>Then, install RStudio Desktop (the free version) at this link: <a href="https://rstudio.com/products/rstudio/download" class="uri">https://rstudio.com/products/rstudio/download</a> .</li>
 </ul>
-<p>The <a href="https://rstudio-education.github.io/hopr/starting.html#how-to-download-and-install-r">Appendix</a> of this free online book - <a href="https://rstudio-education.github.io/hopr/">Hands-On Programming with R</a>, by Garrett Grolemund - explains why both R and RStudio should be downloaded.</p>
+<p>The <a href="https://rstudio-education.github.io/hopr/starting.html#how-to-download-and-install-r">Appendix</a> of this free online book, <a href="https://rstudio-education.github.io/hopr/">Hands-On Programming with R</a>, by Garrett Grolemund, describes the installation process in more detail.</p>
 <ol start="2" style="list-style-type: decimal">
-<li><strong>Familiarize yourself with the RStudio interface.</strong> There are a few ways to write code in R, including.</li>
+<li><strong>Familiarize yourself with the RStudio interface.</strong> There are a few ways to write code in R, including:</li>
 </ol>
 <ul>
-<li><p><strong>Using a <a href="https://rstudio-education.github.io/hopr/basics.html#scripts">script</a></strong>. I almost always write code using a <a href="https://rstudio-education.github.io/hopr/basics.html#scripts">script</a>, which is essentially a text file that can be saved and edited as you would a Word document.</p></li>
-<li><p><strong>Using <a href="https://bookdown.org/yihui/rmarkdown/">RMarkdown</a></strong> is another option. I made this web page using RMarkdown. It allows the author to include free text, code, and the code’s results in one streamlined document. RMarkdown is well-suited for something that will be presented (to someone besides yourself) and in my opinion is not the best choice for a typical data-analysis workflow, where I prefer scripts for their simplicity.</p></li>
-<li><p><strong>Using the console</strong>. Finally, if you just want to do a very basic task or calculation without creating a new file, you can type code in the console. I almost never do that.</p></li>
+<li><p><strong>Using a <a href="https://rstudio-education.github.io/hopr/basics.html#scripts">script</a></strong>. I almost always write code using a script, which is essentially a special text file that can be saved and edited as you would a Word document.</p></li>
+<li><p><strong>Using <a href="https://bookdown.org/yihui/rmarkdown/">RMarkdown</a></strong> is another option. I made this web page using RMarkdown. It allows the author to include narrative text, code, and the code’s results in one streamlined document. RMarkdown is well-suited for something that will be presented (to someone besides yourself) and in my opinion is not the best choice for a typical data-analysis workflow, where I prefer scripts for their simplicity.</p></li>
+<li><p><strong>Using the console</strong>. Finally, if you just want to do a very basic task or calculation without creating a new file, you can type code in the console. I almost never use the console.</p></li>
 </ul>
-<p>The book by Grolemund provides an overview of <a href="https://rstudio-education.github.io/hopr/basics.html#the-r-user-interface">RStudio’s user interface</a>.</p>
+<p>The book by Grolemund also provides an overview of <a href="https://rstudio-education.github.io/hopr/basics.html#the-r-user-interface">RStudio’s user interface</a>.</p>
 <p>Here’s a screenshot of what the script window might look like:</p>
 <p><img src="images/script-screenshot.PNG" width="500" /></p>
 </div>
@@ -424,7 +425,7 @@ div.tocify {
 </div>
 <div id="install-a-package" class="section level2" number="4.2">
 <h2><span class="header-section-number">4.2</span> Install a package</h2>
-<p>Using a package requires first installing it with the <code>install.packages("package_name")</code> function and then loading it using the <code>library(package_name)</code> function. Note the absence of quotes when loading a package (<code>library(package_name)</code>. There is some stackoverflow <a href="https://stackoverflow.com/questions/36802132/the-use-of-quotation-marks-when-loading-a-package-in-r">discussion</a> on whether to use quotes when loading packages. In my experience, it works better to <em>not</em> use quotes when loading packages but to use them when installing packages.</p>
+<p>Using a package requires first installing it with the <code>install.packages("package_name")</code> function and then loading it using the <code>library(package_name)</code> function. Note the absence of quotes inside the parentheses of the <code>library()</code> function. There is some stackoverflow <a href="https://stackoverflow.com/questions/36802132/the-use-of-quotation-marks-when-loading-a-package-in-r">discussion</a> on whether to use quotes when loading packages. In my experience, it works better to <em>not</em> use quotes when loading packages but to use them when installing packages.</p>
 <p>For this exercise, let’s install the full <strong>tidyverse</strong>. The <a href="https://www.tidyverse.org/">tidyverse</a> is a unique package in that it is a collection of packages, one of which is <strong>dplyr</strong>.</p>
 <p>So here is our first code chunk to run:</p>
 <pre class="r"><code>install.packages(&quot;tidyverse&quot;)</code></pre>
@@ -446,14 +447,15 @@ div.tocify {
 <p>The folder in which R reads (loads) and writes (saves) files is called the working directory. For years, I had set the working directory by typing the entire file path. This is not ideal practice for a few of reasons:</p>
 <ol style="list-style-type: decimal">
 <li>It takes a long time to type a long file path.</li>
-<li>Typing file paths is prone to error.</li>
+<li>Typing file paths is prone to error. (How do I type the back-slash, \ or /? Do I need the :?)</li>
 <li>It’s hard-coded: If you were to change computers or share your code with someone, those working directories won’t work.</li>
 </ol>
 <p>Fortunately, there’s a very simple solution to these issues: Use the <a href="https://here.r-lib.org/">here</a> package. This package creates a working directory <u>relative</u> to the location of the R project you are working in. This means that wherever your project is in the folder structure of your computer, the <code>here()</code> function to define your working directory and thus any read/write commands that rely on it will just work.</p>
-<p>(Jenny Bryan’s <a href="https://github.com/jennybc/here_here">ode</a> to the here package is worth a read.)</p>
+<p>(Jenny Bryan’s <a href="https://github.com/jennybc/here_here">ode</a> to the here package is a great read.)</p>
 <p><strong>What is a project?</strong> A project is an RStudio file associated with a working directory that makes it easy to keep all code, data, and other documents in one place on your computer. To write this course, I created a project called teach-r.</p>
 <p><img src="images/project-teach-r-screenshot.png" /></p>
 <p>Note that all of folders in the same folder as the .Rproj file will conveniently appear in the “Files” tab.</p>
+<p>It’s worth giving some thought to the project’s folder structure. There are no hard-and-fast rules, but I, minimally, have taken <a href="https://chrisvoncsefalvay.com/2018/08/09/structuring-r-projects/">this advice</a> and typically create separate folders for code, input data that should never be modified, and processed data that is a result of code.</p>
 <p><img src="images/teach-r-files.png" width="500" /></p>
 <p>You don’t have to use projects to use R or RStudio, but I think it’s a good idea, in part because of how well projects pair with the <strong>here</strong> package.</p>
 </div>
@@ -469,18 +471,21 @@ div.tocify {
 <pre class="r"><code>setwd(here(&quot;data-input&quot;))
 getwd() #check</code></pre>
 <pre><code>## [1] &quot;/Users/michaeldgarber/Dropbox/Work/teach/teach-r/data-input&quot;</code></pre>
-<p>And if we want to change it back to the original directory containing the project? Simply use <code>here()</code> without specifying anything.</p>
+<p>Note if we wanted to set the working directory to another level beneath data-input, we would write: <code>setwd(here("data-input","another-level-beneath")</code>. That is, we would write the name of the sub-folder in quotes after a comma.</p>
+<p>And if we want to change it back to the original directory containing the project? Simply use <code>here()</code> without specifying an argument.</p>
 <pre class="r"><code>setwd(here())
 getwd() #check</code></pre>
 <pre><code>## [1] &quot;/Users/michaeldgarber/Dropbox/Work/teach/teach-r&quot;</code></pre>
 </div>
-<div id="example-save-a-file-to-a-working-directory" class="section level2" number="5.3">
-<h2><span class="header-section-number">5.3</span> Example: save a file to a working directory</h2>
-<p>Okay, as mentioned, the tidyverse includes lots of packages. One of them is <strong>datasets</strong>, which includes, well, several datasets that can be used for demos like this one. I’m a Michigander, so let’s grab the dataset on the water levels of Lake Huron from 1875 - 1972, make a few changes to it, and save it to a local folder.</p>
+<div id="example-save-a-file-to-a-working-directory-and-a-taste-of-dplyr" class="section level2" number="5.3">
+<h2><span class="header-section-number">5.3</span> Example: save a file to a working directory and a taste of dplyr</h2>
+<p>Okay, as mentioned, the tidyverse contains lots of packages. One of them is <strong>datasets</strong>, which includes, well, several datasets that can be used for demos like this one. I’m a Michigander, so let’s grab the dataset on the water levels of Lake Huron from 1875 - 1972, make a few changes to it, and save it to a local folder.</p>
 <p><img src="images/description-lake-huron-data.png" width="500" /></p>
-<pre class="r"><code>lake_huron_raw = datasets::LakeHuron #define new object called lake_huron_raw
+<p>The below code chunk simply creates a copy of the LakeHuron dataset and calls it lake_huron_raw that is. In the next line of code, we print the object by typing its name.</p>
+<p>Side-note: the <code>package_name::object</code> syntax, as in <code>datasets::LakeHuron</code>, is R’s way of explicitly stating which package the object is coming from. We could have equally have written <code>lake_huron_raw = LakeHuron</code>, but sometimes it can be clearer to be explicit. And sometimes we <em>must</em> state the package name if the same word is used by multiple packages.</p>
+<pre class="r"><code>lake_huron_raw = datasets::LakeHuron #Define new object called lake_huron_raw.
 
-lake_huron_raw #Take a look</code></pre>
+lake_huron_raw #Take a look at it.</code></pre>
 <pre><code>## Time Series:
 ## Start = 1875 
 ## End = 1972 
@@ -495,8 +500,8 @@ lake_huron_raw #Take a look</code></pre>
 ## [71] 579.26 579.22 579.38 579.10 577.95 578.12 579.75 580.85 580.41 579.96
 ## [81] 579.61 578.76 578.18 577.21 577.13 579.10 578.25 577.91 576.89 575.96
 ## [91] 576.80 577.68 578.38 578.52 579.74 579.31 579.89 579.96</code></pre>
-<p>I find that to be hard to read. Let’s clean it up and save it.</p>
-<p>Don’t sweat the dplyr code itself just yet (introduced next session), but, as an appetizer, we convert the dataset into an easier-to-work-with format (<a href="https://tibble.tidyverse.org/">a tibble</a>) using <code>as_tibble()</code>, rename its one variable from <code>x</code> to <code>level_ft</code> using <code>rename()</code>, and create a new variable called <code>year</code> using <code>mutate()</code>, defined based on the row number (<code>row_number()</code> returns the row number). And we connect all these steps together using the <a href="https://r4ds.had.co.nz/pipes.html">pipe operator</a> (%&gt;%).</p>
+<p>That’s hard to read. Let’s clean it up and save it.</p>
+<p>Don’t sweat the dplyr code itself just yet (introduced next session), but, as an appetizer, we convert the dataset into an easier-to-work-with format (<a href="https://tibble.tidyverse.org/">a tibble</a>) using <code>as_tibble()</code>, rename its one variable from <code>x</code> to <code>level_ft</code> using <code>rename()</code>, and create a new variable called <code>year</code> using <code>mutate()</code>, defined based on the row number (<code>row_number()</code> returns the row number). And we connect all these steps together using the <a href="https://r4ds.had.co.nz/pipes.html">pipe operator</a> (<code>%&gt;%</code>).</p>
 <pre class="r"><code>lake_huron_transformed = lake_huron_raw %&gt;% #use the object defined above
   as_tibble() %&gt;% 
   rename(level_ft =x) %&gt;% #rename variable to &quot;level_ft&quot;
@@ -517,7 +522,7 @@ lake_huron_transformed #look at the transformed data</code></pre>
 ##  9     581.  1883
 ## 10     581.  1884
 ## # … with 88 more rows</code></pre>
-<p>Now we have a cleaner dataset called <code>lake_huron</code>. I’d like to save it to the folder called “data-processed,” which is one level beneath the project file. The save function takes the R object as its first argument and what it will be named on the computer as its second arguments. <a href="https://bookdown.org/ndphillips/YaRrr/rdata-files.html">A good</a> (not the only) file format with which to save R objects locally is <code>.Rdata.</code></p>
+<p>Now we have an easier-to-comprehend dataset called <code>lake_huron</code> with two columns. I’d like to save it to the folder called “data-processed,” which is one level beneath the project file. The <a href="https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/save"><code>save()</code></a> function takes the object to be saved as its first argument and what it will be named on the computer as its second arguments. <a href="https://bookdown.org/ndphillips/YaRrr/rdata-files.html">A good</a> (not the only) file format with which to save R objects locally is <code>.Rdata.</code></p>
 <pre class="r"><code>library(here)
 setwd(here(&quot;data-processed&quot;))
 getwd() #check to confirm</code></pre>
