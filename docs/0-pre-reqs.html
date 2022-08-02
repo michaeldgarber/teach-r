@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Michael Garber" />
+
+
+<title>First things first: background and prereqs before dplyr</title>
+
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="https://michaeldgarber.github.io/">
+    <span class="fa fa-home"></span>
+     
+    MDG
+  </a>
+</li>
+<li>
+  <a href="index.html">R course</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">First things first: background and prereqs before dplyr</h1>
+<h4 class="author">Michael Garber</h4>
+<h4 class="date">Revised August 1st, 2022</h4>
+
+</div>
+
+
+<p>This page motivates the use of R and describes some preliminary concepts and steps before we begin with the sessions on data wrangling and visualization.</p>
+<div id="what-is-r" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> What is R?</h1>
+<p>According to the R <a href="https://www.r-project.org/">website</a>, R is “a free software environment for statistical computing and graphics.” Its hashtag on Twitter is #RStats, but, as some have <a href="https://mobile.twitter.com/WeAreRLadies/status/1541914841199149057">alluded to</a>, R can do much more than statistics. For example, it can <a href="https://r-spatial.github.io/mapview/">make maps</a>, <a href="https://bookdown.org/yihui/rmarkdown/">create websites</a>, and, importantly, <a href="https://dplyr.tidyverse.org/">manipulate data</a>.</p>
+<p>Aside: I don’t view the manipulation and analysis of data (creating variables, counting things, putting things in groups, etc.) as necessarily within the realm of statistics per se, unless I intend to infer the results of that analysis to a larger or separate population.</p>
+<p><a href="https://www.yourdictionary.com/statistics">Definitions of statistics aside</a>, the point is that R is a programming language that allows you to perform most any data-manipulation, data-analysis, or data-visualization task (including statistics).</p>
+</div>
+<div id="why-r" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Why R?</h1>
+<p>Why should we use R for manipulating and analyzing data?</p>
+<div id="r-vs-point-and-click-data-analysis-tools-like-excel-and-arcgis" class="section level2" number="2.1">
+<h2><span class="header-section-number">2.1</span> R vs point-and-click data-analysis tools like Excel and ArcGIS</h2>
+<p>This <a href="https://www.jessesadler.com/post/excel-vs-r/">post</a> by Jesse Adler (a digital historian) is a well-written overview of the advantages of using a programming language like R to manipulate and analyze data rather than spreadsheet tools like Excel. Summarizing their post with <a href="https://www.dataquest.io/blog/9-reasons-excel-users-should-consider-learning-programming/">another</a> on the topic, here are the top four advantages of programming:</p>
+<ul>
+<li><p><strong>Every step is written down</strong>, so it’s easier to find and fix errors.</p></li>
+<li><p><strong>Easier to repeat analysis steps</strong>: suppose you realize you want to make a change upstream in your analysis that affects everything downstream of it. In R, this is straightforward: simply make the change, and rerun all of the code that relies upon it (and possibly make some changes to the downstream code to accommodate that change as needed). In a point-and-click interface like Excel or ArcGIS, you may have to repeat several point-and-click steps, which would take longer and be more prone to error.</p></li>
+<li><p>There is a <strong>clear division between data entry and data manipulation and analysis</strong>: it’s easier to avoid the temptation of editing the raw data. Although you can certainly make a copy of raw data in Excel, it can be tempting to edit the raw data.</p></li>
+<li><p><strong>Easier to automate similar tasks</strong>. The ability to automate analysis steps becomes especially important for bootstrapping where we effectively repeat the analysis steps hundreds of time while allowing some of the steps to randomly vary. This would be much more challenging in Excel.</p></li>
+</ul>
+<p>To be clear, I think Excel is great, too. I use it often for simple analyses or for data entry. But I don’t use it as much as I once did for more involved analyses.</p>
+</div>
+<div id="why-r-vs-sas-stata-and-python" class="section level2" number="2.2">
+<h2><span class="header-section-number">2.2</span> Why R vs SAS, STATA, and Python?</h2>
+<p>Okay, but there are other programming tools for data analysis (e.g., SAS, STATA, Python). Why R, specifically?</p>
+<ol style="list-style-type: decimal">
+<li>It’s free. SAS and STATA cost money.</li>
+<li>It has an active, helpful, and friendly user community. Googling a topic along with “R” often leads to useful public discussion on forums like <a href="https://stackoverflow.com/questions/tagged/r">stackoverflow</a> or <a href="https://community.rstudio.com/">RStudio community</a>.</li>
+<li>It can manipulate spatial data and make maps. No need to switch software for GIS.</li>
+<li>Having used SAS for years, I personally think R is simply more fun.</li>
+<li>As noted above, R can do a lot of cool stuff. For example, with RMarkdown, you can make websites like this <a href="https://michaeldgarber.github.io/">one</a>, create <a href="https://rmarkdown.rstudio.com/gallery.html">interactive dashboards</a>, and do lots more amazing <a href="https://www.youtube.com/watch?v=qLEkUjxk7e8">talk</a> by RMarkdown creator).</li>
+</ol>
+<p>I know many people use and like Python, which is also free and shares many of R’s advantages. I don’t have much Python experience, so I can’t really comment on it. Every now and then, I encounter a situation where I wish I had some Python skills (e.g., to use this <a href="https://github.com/gboeing/osmnx">package</a> to compute measures on street networks from OpenStreetMap), but those situations are rare.</p>
+</div>
+</div>
+<div id="install-r-and-rstudio-and-become-familiar-with-the-user-interface." class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Install R and RStudio and become familiar with the user interface.</h1>
+<ol style="list-style-type: decimal">
+<li><strong>Install R and RStudio.</strong> R can be used as a stand-alone program, but RStudio (an <a href="https://en.wikipedia.org/wiki/Integrated_development_environment">IDE</a>) adds several helpful features that make coding in R easier.</li>
+</ol>
+<ul>
+<li>To download R, go to CRAN and download R from the location nearest you: <a href="https://cran.r-project.org/mirrors.html" class="uri">https://cran.r-project.org/mirrors.html</a>.</li>
+<li>Then, install RStudio Desktop (the free version) at this link: <a href="https://rstudio.com/products/rstudio/download" class="uri">https://rstudio.com/products/rstudio/download</a> .</li>
+</ul>
+<p>The <a href="https://rstudio-education.github.io/hopr/starting.html#how-to-download-and-install-r">Appendix</a> of this free online book - <a href="https://rstudio-education.github.io/hopr/">Hands-On Programming with R</a>, by Garrett Grolemund - explains why both R and RStudio should be downloaded.</p>
+<ol start="2" style="list-style-type: decimal">
+<li><strong>Familiarize yourself with the RStudio interface.</strong> There are a few ways to write code in R, including.</li>
+</ol>
+<ul>
+<li><p><strong>Using a <a href="https://rstudio-education.github.io/hopr/basics.html#scripts">script</a></strong>. I almost always write code using a <a href="https://rstudio-education.github.io/hopr/basics.html#scripts">script</a>, which is essentially a text file that can be saved and edited as you would a Word document.</p></li>
+<li><p><strong>Using <a href="https://bookdown.org/yihui/rmarkdown/">RMarkdown</a></strong> is another option. I made this web page using RMarkdown. It allows the author to include free text, code, and the code’s results in one streamlined document. RMarkdown is well-suited for something that will be presented (to someone besides yourself) and in my opinion is not the best choice for a typical data-analysis workflow, where I prefer scripts for their simplicity.</p></li>
+<li><p><strong>Using the console</strong>. Finally, if you just want to do a very basic task or calculation without creating a new file, you can type code in the console. I almost never do that.</p></li>
+</ul>
+<p>The book by Grolemund provides an overview of <a href="https://rstudio-education.github.io/hopr/basics.html#the-r-user-interface">RStudio’s user interface</a>.</p>
+<p>Here’s a screenshot of what the script window might look like:</p>
+<p><img src="images/script-screenshot.PNG" width="500" /></p>
+</div>
+<div id="functions-and-packages" class="section level1" number="4">
+<h1><span class="header-section-number">4</span> Functions and packages</h1>
+<div id="terminology" class="section level2" number="4.1">
+<h2><span class="header-section-number">4.1</span> Terminology</h2>
+<p>Two often-<a href="https://adv-r.hadley.nz/functions.html">quoted</a> slogans describing R are that:</p>
+<blockquote>
+<p>“Everything that exists is an object.”</p>
+<p>“Everything that happens is a function.”</p>
+<p>-<a href="https://www.r-bloggers.com/2016/07/extending-r/">John Chambers</a>.</p>
+</blockquote>
+<p>So, at its core, when using R, you are using functions to perform actions on objects. (As we’ll see explicitly when going over <a href="https://purrr.tidyverse.org/">purrr</a>, <a href="https://cran.r-project.org/doc/manuals/r-devel/R-lang.html#Function-objects">functions are themselves objects</a> and can be manipulated by other functions.)</p>
+<p>R comes pre-loaded with a set of functions that can be used to analyze data. This is called “base R” and is the foundation upon which everything else in R is built.</p>
+<p>Many commonly used functions, however, are not a part of base R but are instead part of a <a href="https://rstudio-education.github.io/hopr/packages2.html">package</a>. Packages are collections of functions with related goals. They can also include data and documentation as part of the bundle. For example, <a href="https://dplyr.tidyverse.org/">dplyr</a> is a package of functions with a common philosophy for manipulating data, and it includes some demo datasets.</p>
+</div>
+<div id="install-a-package" class="section level2" number="4.2">
+<h2><span class="header-section-number">4.2</span> Install a package</h2>
+<p>Using a package requires first installing it with the <code>install.packages("package_name")</code> function and then loading it using the <code>library(package_name)</code> function. Note the absence of quotes when loading a package (<code>library(package_name)</code>. There is some stackoverflow <a href="https://stackoverflow.com/questions/36802132/the-use-of-quotation-marks-when-loading-a-package-in-r">discussion</a> on whether to use quotes when loading packages. In my experience, it works better to <em>not</em> use quotes when loading packages but to use them when installing packages.</p>
+<p>For this exercise, let’s install the full <strong>tidyverse</strong>. The <a href="https://www.tidyverse.org/">tidyverse</a> is a unique package in that it is a collection of packages, one of which is <strong>dplyr</strong>.</p>
+<p>So here is our first code chunk to run:</p>
+<pre class="r"><code>install.packages(&quot;tidyverse&quot;)</code></pre>
+<p>To run the code, put your cursor on that line or highlight that line of code, and then click the <strong>Run</strong> button above and to the right of the scripts window pane.</p>
+<p><img src="images/run-screenshot" /></p>
+<p>On Windows, the keyboard shortcut for <strong>Run</strong> is <strong>control+enter</strong>. On a Mac, it’s <strong>command+enter (return)</strong>.</p>
+<p>In my experience, it’s usually fine to let R pick where it installs the packages on your computer. This may depend on whether you’re using your own computer or, say, a work computer with limited access to certain drives. If needed, you can <a href="https://www.r-bloggers.com/2020/10/customizing-your-package-library-location/">specify</a> where you want the package to land by adding the <code>lib= "file path"</code> argument in the <code>install.packages()</code> function. For example: <code>install.packages("tidyverse", lib = "file-path")</code>.</p>
+</div>
+<div id="load-the-package" class="section level2" number="4.3">
+<h2><span class="header-section-number">4.3</span> Load the package</h2>
+<p>Now that the package is installed, load it using the <code>library()</code> function (no quotes). Loading the package tells R to make the functions of the package available for your current work session.</p>
+<pre class="r"><code>library(tidyverse)</code></pre>
+</div>
+</div>
+<div id="here-here-a-word-on-working-directories-and-projects" class="section level1" number="5">
+<h1><span class="header-section-number">5</span> Here, here: a word on working directories and projects</h1>
+<div id="here-package-and-projects" class="section level2" number="5.1">
+<h2><span class="header-section-number">5.1</span> Here package and projects</h2>
+<p>The folder in which R reads (loads) and writes (saves) files is called the working directory. For years, I had set the working directory by typing the entire file path. This is not ideal practice for a few of reasons:</p>
+<ol style="list-style-type: decimal">
+<li>It takes a long time to type a long file path.</li>
+<li>Typing file paths is prone to error.</li>
+<li>It’s hard-coded: If you were to change computers or share your code with someone, those working directories won’t work.</li>
+</ol>
+<p>Fortunately, there’s a very simple solution to these issues: Use the <a href="https://here.r-lib.org/">here</a> package. This package creates a working directory <u>relative</u> to the location of the R project you are working in. This means that wherever your project is in the folder structure of your computer, the <code>here()</code> function to define your working directory and thus any read/write commands that rely on it will just work.</p>
+<p>(Jenny Bryan’s <a href="https://github.com/jennybc/here_here">ode</a> to the here package is worth a read.)</p>
+<p><strong>What is a project?</strong> A project is an RStudio file associated with a working directory that makes it easy to keep all code, data, and other documents in one place on your computer. To write this course, I created a project called teach-r.</p>
+<p><img src="images/project-teach-r-screenshot.png" /></p>
+<p>Note that all of folders in the same folder as the .Rproj file will conveniently appear in the “Files” tab.</p>
+<p><img src="images/teach-r-files.png" width="500" /></p>
+<p>You don’t have to use projects to use R or RStudio, but I think it’s a good idea, in part because of how well projects pair with the <strong>here</strong> package.</p>
+</div>
+<div id="example-change-working-directory-using-here" class="section level2" number="5.2">
+<h2><span class="header-section-number">5.2</span> Example: change working directory using here()</h2>
+<pre class="r"><code>install.packages(&quot;here&quot;)</code></pre>
+<pre class="r"><code>library(here) #load package.</code></pre>
+<pre><code>## here() starts at /Users/michaeldgarber/Dropbox/Work/teach/teach-r</code></pre>
+<p>Note when you load the here package, it will by default tell you where your working directory is. We can also confirm this using the <code>getwd</code> base-R function.</p>
+<pre class="r"><code>getwd() #base R</code></pre>
+<pre><code>## [1] &quot;/Users/michaeldgarber/Dropbox/Work/teach/teach-r/docs&quot;</code></pre>
+<p>What if we want to change the working directory, to the “data-input” folder? Use the base-R <code>setwd()</code> function to set the working directory and the here function to define the path relative to the project. Note the “data-input” folder is one level beneath the .Rproj file (screenshot above).</p>
+<pre class="r"><code>setwd(here(&quot;data-input&quot;))
+getwd() #check</code></pre>
+<pre><code>## [1] &quot;/Users/michaeldgarber/Dropbox/Work/teach/teach-r/data-input&quot;</code></pre>
+<p>And if we want to change it back to the original directory containing the project? Simply use <code>here()</code> without specifying anything.</p>
+<pre class="r"><code>setwd(here())
+getwd() #check</code></pre>
+<pre><code>## [1] &quot;/Users/michaeldgarber/Dropbox/Work/teach/teach-r&quot;</code></pre>
+</div>
+<div id="example-save-a-file-to-a-working-directory" class="section level2" number="5.3">
+<h2><span class="header-section-number">5.3</span> Example: save a file to a working directory</h2>
+<p>Okay, as mentioned, the tidyverse includes lots of packages. One of them is <strong>datasets</strong>, which includes, well, several datasets that can be used for demos like this one. I’m a Michigander, so let’s grab the dataset on the water levels of Lake Huron from 1875 - 1972, make a few changes to it, and save it to a local folder.</p>
+<p><img src="images/description-lake-huron-data.png" width="500" /></p>
+<pre class="r"><code>lake_huron_raw = datasets::LakeHuron #define new object called lake_huron_raw
+
+lake_huron_raw #Take a look</code></pre>
+<pre><code>## Time Series:
+## Start = 1875 
+## End = 1972 
+## Frequency = 1 
+##  [1] 580.38 581.86 580.97 580.80 579.79 580.39 580.42 580.82 581.40 581.32
+## [11] 581.44 581.68 581.17 580.53 580.01 579.91 579.14 579.16 579.55 579.67
+## [21] 578.44 578.24 579.10 579.09 579.35 578.82 579.32 579.01 579.00 579.80
+## [31] 579.83 579.72 579.89 580.01 579.37 578.69 578.19 578.67 579.55 578.92
+## [41] 578.09 579.37 580.13 580.14 579.51 579.24 578.66 578.86 578.05 577.79
+## [51] 576.75 576.75 577.82 578.64 580.58 579.48 577.38 576.90 576.94 576.24
+## [61] 576.84 576.85 576.90 577.79 578.18 577.51 577.23 578.42 579.61 579.05
+## [71] 579.26 579.22 579.38 579.10 577.95 578.12 579.75 580.85 580.41 579.96
+## [81] 579.61 578.76 578.18 577.21 577.13 579.10 578.25 577.91 576.89 575.96
+## [91] 576.80 577.68 578.38 578.52 579.74 579.31 579.89 579.96</code></pre>
+<p>I find that to be hard to read. Let’s clean it up and save it.</p>
+<p>Don’t sweat the dplyr code itself just yet (introduced next session), but, as an appetizer, we convert the dataset into an easier-to-work-with format (<a href="https://tibble.tidyverse.org/">a tibble</a>) using <code>as_tibble()</code>, rename its one variable from <code>x</code> to <code>level_ft</code> using <code>rename()</code>, and create a new variable called <code>year</code> using <code>mutate()</code>, defined based on the row number (<code>row_number()</code> returns the row number). And we connect all these steps together using the <a href="https://r4ds.had.co.nz/pipes.html">pipe operator</a> (%&gt;%).</p>
+<pre class="r"><code>lake_huron_transformed = lake_huron_raw %&gt;% #use the object defined above
+  as_tibble() %&gt;% 
+  rename(level_ft =x) %&gt;% #rename variable to &quot;level_ft&quot;
+  mutate(year = row_number()-1+1875) #add a column for year
+
+lake_huron_transformed #look at the transformed data</code></pre>
+<pre><code>## # A tibble: 98 × 2
+##    level_ft  year
+##       &lt;dbl&gt; &lt;dbl&gt;
+##  1     580.  1875
+##  2     582.  1876
+##  3     581.  1877
+##  4     581.  1878
+##  5     580.  1879
+##  6     580.  1880
+##  7     580.  1881
+##  8     581.  1882
+##  9     581.  1883
+## 10     581.  1884
+## # … with 88 more rows</code></pre>
+<p>Now we have a cleaner dataset called <code>lake_huron</code>. I’d like to save it to the folder called “data-processed,” which is one level beneath the project file. The save function takes the R object as its first argument and what it will be named on the computer as its second arguments. <a href="https://bookdown.org/ndphillips/YaRrr/rdata-files.html">A good</a> (not the only) file format with which to save R objects locally is <code>.Rdata.</code></p>
+<pre class="r"><code>library(here)
+setwd(here(&quot;data-processed&quot;))
+getwd() #check to confirm</code></pre>
+<pre><code>## [1] &quot;/Users/michaeldgarber/Dropbox/Work/teach/teach-r/data-processed&quot;</code></pre>
+<pre class="r"><code>save(lake_huron_transformed, file = &quot;lake_huron_transformed.RData&quot;)</code></pre>
+<p>That concludes the background material. Now onto dplyr!</p>
+</div>
+</div>
+
+<br>
+<br>
+<p>Copyright &copy; 2022 Michael D. Garber </p>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3,h4",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

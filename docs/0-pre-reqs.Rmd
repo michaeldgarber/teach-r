@@ -1,7 +1,7 @@
 ---
-title: "Prequisites: R  for data wrangling"
-author: "Michael D. Garber, PhD MPH"
-date: "Revised June 2, 2022"
+title: "First things first: background and prereqs before dplyr"
+author: "Michael Garber "
+date: "Revised August 1st, 2022"
 output:
   html_document:
     toc: true
@@ -72,7 +72,9 @@ Here's a screenshot of what the script window might look like:
 
 ![](images/script-screenshot.PNG){width="500"}
 
-# Install and use some packages
+# Functions and packages
+
+## Terminology
 
 Two often-[quoted](https://adv-r.hadley.nz/functions.html) slogans describing R are that:
 
@@ -82,9 +84,11 @@ Two often-[quoted](https://adv-r.hadley.nz/functions.html) slogans describing R 
 >
 > \-[John Chambers](https://www.r-bloggers.com/2016/07/extending-r/).
 
-So, at its core, when using R, you are using functions to do things to objects. R comes pre-loaded with a set of functions that can be used to analyze data. This is called "base R" and is the foundation upon which everything else in R is built.
+So, at its core, when using R, you are using functions to perform actions on objects. (As we'll see explicitly when going over [purrr](https://purrr.tidyverse.org/), [functions are themselves objects](https://cran.r-project.org/doc/manuals/r-devel/R-lang.html#Function-objects) and can be manipulated by other functions.)
 
-Many widely used functions, however, are not a part of base R but are rather part of a [package](https://rstudio-education.github.io/hopr/packages2.html). Packages are collections of functions with related goals. They can also include data and documentation as part of the bundle. For example, [dplyr](https://dplyr.tidyverse.org/) is a package of functions with a common philosophy for manipulating data, and it includes some demo datasets.
+R comes pre-loaded with a set of functions that can be used to analyze data. This is called "base R" and is the foundation upon which everything else in R is built.
+
+Many commonly used functions, however, are not a part of base R but are instead part of a [package](https://rstudio-education.github.io/hopr/packages2.html). Packages are collections of functions with related goals. They can also include data and documentation as part of the bundle. For example, [dplyr](https://dplyr.tidyverse.org/) is a package of functions with a common philosophy for manipulating data, and it includes some demo datasets.
 
 ## Install a package
 
@@ -114,17 +118,17 @@ Now that the package is installed, load it using the `library()` function (no qu
 library(tidyverse)
 ```
 
-# Here, here, a word on working directories and projects
+# Here, here: a word on working directories and projects
 
 ## Here package and projects
 
 The folder in which R reads (loads) and writes (saves) files is called the working directory. For years, I had set the working directory by typing the entire file path. This is not ideal practice for a few of reasons:
 
 1.  It takes a long time to type a long file path.
-2.  Typing file paths is error prone.
+2.  Typing file paths is prone to error.
 3.  It's hard-coded: If you were to change computers or share your code with someone, those working directories won't work.
 
-Fortunately, there's a very simple solution to these issues: Use the [here](https://here.r-lib.org/) package. This package creates paths [relative]{.underline} to the location of the R project you are working in. This means that wherever your project is in the folder structure of your computer, the `here()` function to define your working directory and thus any read/write commands that rely on it will just work.
+Fortunately, there's a very simple solution to these issues: Use the [here](https://here.r-lib.org/) package. This package creates a working directory [relative]{.underline} to the location of the R project you are working in. This means that wherever your project is in the folder structure of your computer, the `here()` function to define your working directory and thus any read/write commands that rely on it will just work.
 
 (Jenny Bryan's [ode](https://github.com/jennybc/here_here) to the here package is worth a read.)
 
@@ -136,9 +140,9 @@ Note that all of folders in the same folder as the .Rproj file will conveniently
 
 ![](images/teach-r-files.png){width="500"}
 
-You don't have to use projects to use R or RStudio, but I think it's a good idea, in part because of how well projects pair with the **here** package. RStudio projects also integrate nicely with GitHub for version control and code sharing (as for this [course](https://github.com/michaeldgarber/teach-r)).
+You don't have to use projects to use R or RStudio, but I think it's a good idea, in part because of how well projects pair with the **here** package.
 
-## Example: change working directory, and save a file there.
+## Example: change working directory using here()
 
 ```{r,eval=FALSE}
 install.packages("here")
@@ -148,25 +152,58 @@ install.packages("here")
 library(here) #load package.
 ```
 
-Note when you load the here package, it will by default tell you where your working directory is. We can also confirm this using the `getwd` base-R function:
+Note when you load the here package, it will by default tell you where your working directory is. We can also confirm this using the `getwd` base-R function.
 
 ```{r}
 getwd() #base R
-load(cars)
 ```
 
-Okay, as mentioned, the tidyverse includes lots of packages. One of them is **datasets**, which includes lots of datasets that can be used. Let's grab the dataset on the water levels of LakeHuron, make a few changes to it, and save it to a local folder.
+What if we want to change the working directory, to the "data-input" folder? Use the base-R `setwd()` function to set the working directory and the here function to define the path relative to the project. Note the "data-input" folder is one level beneath the .Rproj file (screenshot above).
 
-[Example:]{.underline}
+```{r}
+setwd(here("data-input"))
+getwd() #check
+```
 
-Fortunately,
+And if we want to change it back to the original directory containing the project? Simply use `here()` without specifying anything.
 
-I used R for several years without using here() and I wish I had learned about this package earlier. It's fantastic.
+```{r}
+setwd(here())
+getwd() #check
+```
 
-The problems it solves:
+## Example: save a file to a working directory
 
-1\. Typing the full working directory of your having to type the full file path every time you 2. If you were to change computers or share your code with someone, those file paths would almost certainly not work anymore. The Here makes the working directory relative to the project, so it will work wherever the project is.
+Okay, as mentioned, the tidyverse includes lots of packages. One of them is **datasets**, which includes, well, several datasets that can be used for demos like this one. I'm a Michigander, so let's grab the dataset on the water levels of Lake Huron from 1875 - 1972, make a few changes to it, and save it to a local folder.
 
-It's a simple function that calls your file
+![](images/description-lake-huron-data.png){width="500"}
 
-Jenny Bryan, educator at RStudio, [loves](https://github.com/jennybc/here_here) the here package as well. Her explanation for why is worth a read.
+```{r}
+lake_huron_raw = datasets::LakeHuron #define new object called lake_huron_raw
+
+lake_huron_raw #Take a look
+```
+
+I find that to be hard to read. Let's clean it up and save it.
+
+Don't sweat the dplyr code itself just yet (introduced next session), but, as an appetizer, we convert the dataset into an easier-to-work-with format ([a tibble](https://tibble.tidyverse.org/)) using `as_tibble()`, rename its one variable from `x` to `level_ft` using `rename()`, and create a new variable called `year` using `mutate()`, defined based on the row number (`row_number()` returns the row number). And we connect all these steps together using the [pipe operator](https://r4ds.had.co.nz/pipes.html) (%\>%).
+
+```{r}
+lake_huron_transformed = lake_huron_raw %>% #use the object defined above
+  as_tibble() %>% 
+  rename(level_ft =x) %>% #rename variable to "level_ft"
+  mutate(year = row_number()-1+1875) #add a column for year
+
+lake_huron_transformed #look at the transformed data
+```
+
+Now we have a cleaner dataset called `lake_huron`. I'd like to save it to the folder called "data-processed," which is one level beneath the project file. The save function takes the R object as its first argument and what it will be named on the computer as its second arguments. [A good](https://bookdown.org/ndphillips/YaRrr/rdata-files.html) (not the only) file format with which to save R objects locally is `.Rdata.`
+
+```{r}
+library(here)
+setwd(here("data-processed"))
+getwd() #check to confirm
+save(lake_huron_transformed, file = "lake_huron_transformed.RData")
+```
+
+That concludes the background material. Now onto dplyr!
