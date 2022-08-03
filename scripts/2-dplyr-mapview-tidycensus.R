@@ -37,7 +37,7 @@ nyt_state_wrangle = nyt_state_data %>%
 nyt_state_wrangle %>% 
   dplyr::select(date, year, month)
 
-View(nyt_state_wrangle)
+#View(nyt_state_wrangle)
 # Load state-level census data using tidycensus-------
 nyt_state_data
 
@@ -48,25 +48,30 @@ nyt_state_data
 options(tigris_use_cache = TRUE) 
 
 #One way I keep track of whether an object has geometry associated with it to add a _geo suffix to the name.
-# pop_by_state_geo =get_acs(
-#   year=2019,
-#   variables = "B01001_001", #total population
-#   geography = "state",
-#   geometry = TRUE #to grab geometry
-# )
+pop_by_state_geo =get_acs(
+  year=2019,
+  variables = "B01001_001", #total population
+  geography = "state",
+  geometry = TRUE #to grab geometry
+)
+library(here)
+pop_by_state_geo
+setwd(here("data-processed"))
+save(pop_by_state_geo, file = "pop_by_state_geo.RData")
 #I"m commenting it out, since I've already run it.
 
 #A convenient way to search through the census variables is to use the `load_variables` function, 
 #as described here: https://walker-data.com/tidycensus/articles/basic-usage.html.
 vars_acs_2019 = load_variables(2019, "acs5", cache = TRUE)
-#View(vars_acs_2019)
+View(vars_acs_2019)
 
 #Confirm the data are an sf object (simple feature) and explore the variable names.
 class(pop_by_state_geo)
 pop_by_state_geo
 
 ## A quick mapview------
-#Another essential package in the **sf** workflow is **mapview** (https://r-spatial.github.io/mapview/index.html), 
+#Another essential package in the **sf** workflow is **mapview** 
+#(https://r-spatial.github.io/mapview/index.html), 
 #which creates quick interactive maps. In just one line, we can interactively map the ACS state-level population data we just loaded. 
 
 #The `zcol` argument colors the polygons (states, here) based on the value of the variable, 
@@ -77,6 +82,8 @@ pop_by_state_geo
 mapview(pop_by_state_geo, zcol = "estimate")
 
 pop_by_state_geo %>% #the object name and then the pipe
+  filter(estimate>30000000) %>% 
+#  filter(NAME == "Texas") %>% 
   mapview(zcol = "estimate" )#the column to be visualized
 
 ## Wrangle the census data further to prep for the join with the NYT state-level COVID-19 data.--------
@@ -121,6 +128,10 @@ nyt_by_state_w_pop_geo = nyt_state_wrangle %>%
     deaths_cumul_per_pop = deaths_cumul/population
   )
 
+class(nyt_by_state_w_pop_geo)
+View(nyt_by_state_w_pop_geo)
+
+nyt_by_state_w_pop_geo
 ### Visualize cumulative incidence per population using mapview-------
 nyt_by_state_w_pop_geo %>%
   #Limit to continental 48 so the default zoom is more zoomed in.
@@ -132,7 +143,6 @@ nyt_by_state_w_pop_geo %>%
 
 #Calculate the number of incident cases per person year for each state.
 
-
 nyt_by_state_w_pop_geo %>%
   filter(continental_48==1) %>%   #Limit to continental 48 so the default zoom is more zoomed in.
   mapview(
@@ -142,14 +152,7 @@ nyt_by_state_w_pop_geo %>%
     col.regions = viridis_pal(alpha = 1, begin = 0, end = 1, direction = -1, option = "B")
   )
 
-nyt_by_state_w_pop_geo %>%
-  filter(continental_48==1) %>%   #Limit to continental 48 so the default zoom is more zoomed in.
-  mapview(
-    zcol = "cases_cumul_per_pop",
-    layer.name = "Cumulative incidence per pop",
-    #The palette function is from the viridis package.
-    col.regions = viridis_pal(alpha = 1, begin = 0, end = 1, direction = -1, option = "B")
-  )
+
 
 ### Visualize using a ggplot2 histogram--------
 nyt_by_state_w_pop_geo %>%
@@ -159,8 +162,16 @@ nyt_by_state_w_pop_geo %>%
 
 ## Link the daily NYT COVID-19 data with the population data to analyze temporal trends in incidence by state---------
 pop_by_state_wrangle_nogeo = pop_by_state_wrangle_geo %>% 
-  st_set_geometry(NULL)
+  st_set_geometry(NULL) %>% 
+  as_tibble()
 
+class(pop_by_state_wrangle_geo)
+class(pop_by_state_wrangle_nogeo)
+
+pop_by_state_wrangle_nogeo
+
+nrow(nyt_state_wrangle)
+nrow(pop_by_state_wrangle_nogeo)
 nyt_state_pop_wrangle = nyt_state_wrangle %>% 
   left_join(pop_by_state_wrangle_nogeo, by = "state") %>% 
   mutate(
@@ -169,6 +180,12 @@ nyt_state_pop_wrangle = nyt_state_wrangle %>%
     cases_incident_per_pop = cases_incident/population,
     deaths_incident_per_pop = deaths_incident/population 
   )
+
+names(nyt_state_pop_wrangle)
+
+nyt_state_pop_wrangle %>% 
+  dplyr::select(date, state, contains("cumul"), contains("incident"))
+
 
 ### Visualize daily cumulative incidence per population for the continental 48 states using ggplot2.-------
 nyt_state_pop_wrangle %>% 

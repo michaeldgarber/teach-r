@@ -72,3 +72,81 @@ This course will introduce participants to popular tools in R for manipulating (
     Creating your own functions can help reduce tedious and error-prone repetition in code. Functions can also be used to iteratively modify steps in the data analysis to estimate uncertainty of results via the statistical technique called bootstrapping. This module will introduce the basics of creating simple functions in R in a data-processing workflow. It will then illustrate how to use functions and the purrr toolkit to do basic bootstrapping.
 
     Link TBD
+
+[**Key resources I would recommend:**]{.underline}
+
+The R universe has a wealth of excellent free online resources. Here are some that I would recommend:
+
+-   For **general data wrangling** and other data management in the tidyverse (dplyr and other tidyverse packages)
+
+    -   Tidyverse home page: <https://www.tidyverse.org/>
+
+    -   dplyr home page: <https://dplyr.tidyverse.org/>
+
+    -   R for Data Science: <https://r4ds.had.co.nz/>.
+
+        -   I would say this book by Hadley Wickham and Garrett Grolemund is the "go-to" book for learning dplyr and other tidyverse packages.
+
+        -   The chapter on **dplyr** specifically is <https://r4ds.had.co.nz/transform.html>.
+
+    -   Cheat sheet for importing data: <https://raw.githubusercontent.com/rstudio/cheatsheets/main/data-import.pdf>
+
+    -   For explanation of more "under-the-hood" technical topics, I would suggest <https://adv-r.hadley.nz/>
+
+-   For **manipulating spatial data** (sf)
+
+    -   sf home page: <https://r-spatial.github.io/sf/index.html>
+
+    -   Geocomputation with R by: <https://geocompr.robinlovelace.net/>
+
+        -   Chapter on spatial operations: <https://geocompr.robinlovelace.net/spatial-operations.html>
+
+        -   This book also covers raster data and corresponding packages (terra and raster).
+
+    -   Chapter on sf in Spatial Data Science (Pebesma, Bivand): <https://keen-swartz-3146c4.netlify.app/sf.html#sfintro>
+
+-   For making charts and figures (**ggplot2**)
+
+    -   ggplot2 home page: <https://ggplot2.tidyverse.org/>
+
+    -   cookbook: <http://www.cookbook-r.com/Graphs/>
+
+    -   ggplot2 cheat sheet: <https://raw.githubusercontent.com/rstudio/cheatsheets/main/data-visualization.pdf>
+
+-   For making **maps** (mapview, tmap, ggplot2)
+
+    -   Mapview is my favorite mapping package, in part for its simplicity.
+
+        -   Its home page is <https://r-spatial.github.io/mapview/>
+
+        -   Several vignettes are available on that page, e.g.,: <https://r-spatial.github.io/mapview/articles/mapview_01-basics.html>
+
+    -   Tmap is another widely used mapping package and can create both static and interactive maps.
+
+        -   <https://r-tmap.github.io/tmap/index.html>
+
+        -   <https://r-tmap.github.io/tmap/articles/tmap-getstarted.html>
+
+        -   <https://cengel.github.io/R-spatial/mapping.html#choropleth-with-tmap>
+
+    -   ggplot2 can also be used to make static maps of sf objects:
+
+        -   <https://ggplot2.tidyverse.org/reference/ggsf.html>
+
+        -   Chapter in Spatial Data Science: <https://keen-swartz-3146c4.netlify.app/plotting.html#geomsf>
+
+    -   Chapter in Geocomputation with R: <https://geocompr.robinlovelace.net/adv-map.html>
+
+-   Other miscellaneous resources I frequently use:
+
+    -   RStudio cheatsheets on dplyr, ggplot2, and more: <https://www.rstudio.com/resources/cheatsheets/>
+
+    -   Downloading census data: <https://walker-data.com/tidycensus/>
+
+    -   Downloading OpenStreetMap data: <https://github.com/ropensci/osmdata>
+
+    -   RMarkdown resources
+
+        -   R Markdown, the Definitive Guide: <https://bookdown.org/yihui/rmarkdown/>
+
+        -   R Markdown Cookbook: <https://bookdown.org/yihui/rmarkdown-cookbook/>
