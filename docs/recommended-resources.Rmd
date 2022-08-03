@@ -10,7 +10,7 @@ output:
 
 [**Key resources I would recommend:**]{.underline}
 
-The R universe has a wealth of helpful free online resources. Here are some that I would recommend:
+The R universe has lots of helpful and free online resources. Here are some that I would recommend:
 
 -   For **general data wrangling** and other data management in the tidyverse (dplyr and other tidyverse packages)
 
@@ -20,11 +20,11 @@ The R universe has a wealth of helpful free online resources. Here are some that
 
     -   R for Data Science: <https://r4ds.had.co.nz/>.
 
-        -   I would say this book by Hadley Wickham and Garrett Grolemund is the "go-to" book for learning dplyr and other tidyverse packages.
+        -   This book by Hadley Wickham and Garrett Grolemund seems to be the "go-to" book for learning dplyr and other tidyverse packages.
 
         -   The chapter on **dplyr** specifically is <https://r4ds.had.co.nz/transform.html>.
 
-    -   Cheat sheet for importing data: <https://raw.githubusercontent.com/rstudio/cheatsheets/main/data-import.pdf>
+    -   For importing rectangular data (e.g., CSV) using readr: <https://readr.tidyverse.org/>
 
     -   For explanation of more "under-the-hood" technical topics, I would suggest <https://adv-r.hadley.nz/>
 
@@ -32,7 +32,7 @@ The R universe has a wealth of helpful free online resources. Here are some that
 
     -   sf home page: <https://r-spatial.github.io/sf/index.html>
 
-    -   Geocomputation with R by: <https://geocompr.robinlovelace.net/>
+    -   Geocomputation with R (Lovelace, Nowosad, Muenchow) : <https://geocompr.robinlovelace.net/>
 
         -   Chapter on spatial operations: <https://geocompr.robinlovelace.net/spatial-operations.html>
 
