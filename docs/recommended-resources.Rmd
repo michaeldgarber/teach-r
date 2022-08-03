@@ -72,7 +72,7 @@ The R universe has lots of helpful and free online resources. Here are some that
 
         -   Chapter in Spatial Data Science: <https://keen-swartz-3146c4.netlify.app/plotting.html#geomsf>
 
--   Other miscellaneous resources I frequently use:
+-   Other **miscellaneous** resources I frequently use:
 
     -   RStudio cheatsheets on dplyr, ggplot2, and more: <https://www.rstudio.com/resources/cheatsheets/>
 
