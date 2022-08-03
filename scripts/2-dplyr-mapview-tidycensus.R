@@ -54,16 +54,16 @@ pop_by_state_geo =get_acs(
   geography = "state",
   geometry = TRUE #to grab geometry
 )
+
 library(here)
-pop_by_state_geo
 setwd(here("data-processed"))
 save(pop_by_state_geo, file = "pop_by_state_geo.RData")
-#I"m commenting it out, since I've already run it.
+
 
 #A convenient way to search through the census variables is to use the `load_variables` function, 
 #as described here: https://walker-data.com/tidycensus/articles/basic-usage.html.
 vars_acs_2019 = load_variables(2019, "acs5", cache = TRUE)
-View(vars_acs_2019)
+#View(vars_acs_2019)
 
 #Confirm the data are an sf object (simple feature) and explore the variable names.
 class(pop_by_state_geo)

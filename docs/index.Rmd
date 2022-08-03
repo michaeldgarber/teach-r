@@ -1,7 +1,7 @@
 ---
 title: "R course"
 author: "Michael Garber, PhD MPH"
-date: "Revised August 2, 2022"
+date: "Revised August 3, 2022"
 output: 
   bookdown::html_document2:
     toc: FALSE #overwrite the _yml
@@ -17,13 +17,21 @@ My background using R: <https://michaeldgarber.github.io/teach-r/why-me.html>
 
 [**Course summary**]{.underline}
 
-This course will introduce participants to popular tools in R for manipulating ("wrangling") and visualizing data through public-health-focused examples. Specifically, students will become familiar with ways to wrangle and visualize both aspatial (i.e., common spreadsheet-like) data and spatial data. The course will focus on tools that are a part of and that work well with the tidyverse, a set of packages with a common philosophy that, in my opinion, make R intuitive and fun. Packages covered will include dplyr and sf for manipulating data, and ggplot2, mapview, and tmap for visualizing data. Many examples will transition back and forth between data with and without a spatial component, showing that working with spatial data need not require separate specialized geographic information systems (GIS) software. The course will conclude with a somewhat advanced but important topic, creating functions and iterating over them using the purrr toolkit.
+This course will introduce participants to popular tools in R for manipulating ("wrangling") and visualizing data through public-health-focused examples. Specifically, students will become familiar with ways to wrangle and visualize both aspatial (i.e., common spreadsheet-like) data and spatial data. The course will focus on tools that are a part of and that work well with the tidyverse, a set of packages with a common philosophy that, in my opinion, makes R intuitive and fun. Packages covered will include dplyr and sf for manipulating data, and ggplot2, mapview, and tmap for visualizing data. Many examples will transition back and forth between data with and without a spatial component, showing that working with spatial data need not require separate specialized geographic information systems (GIS) software. The course will conclude with a somewhat advanced but important topic, creating functions and iterating over them using the purrr toolkit.
 
 [**Sessions**]{.underline}
 
 *Session 1 (August 2, 2022)*
 
--   [Folder](https://www.dropbox.com/sh/0t7sw3hn750ppf1/AAAA8PWDeUEvv_pYRxD1qLf0a?dl=0) with recording and chat
+-   Session [recording](https://www.dropbox.com/s/2rooqu9w0tbjqlg/r-course-sesion-1-video.mp4?dl=0) on Dropbox (please download to watch past 1 hour)
+
+-   Session [recording](https://drive.google.com/file/d/13miuMQ-qFwC0d-alyABu5-RbaZ8xmQGH/view?usp=sharing) on Google Drive
+
+-   Modules covered (described below):
+
+    -   <https://michaeldgarber.github.io/teach-r/0-pre-reqs>
+
+    -   <https://michaeldgarber.github.io/teach-r/1-dplyr-nyt-covid.html>
 
 -   R scripts used during session
 
@@ -31,9 +39,23 @@ This course will introduce participants to popular tools in R for manipulating (
 
     -   <https://github.com/michaeldgarber/teach-r/blob/main/scripts/1-dplyr-nyt-covid.R>
 
--   Modules covered (described below): [0](https://michaeldgarber.github.io/teach-r/0-pre-reqs.html) and [1](https://michaeldgarber.github.io/teach-r/1-dplyr-nyt-covid.html)
+*Session 2 (August 3, 2022)*
 
-[Folder](https://www.dropbox.com/sh/rpqerzm0ukawhuk/AAAFN4FVfLsq9m4pBvdH83JCa?dl=0) with all session recordings
+-   Session [recording](https://www.dropbox.com/s/eitst7w7kytl7bm/r-course-session-2-video.mp4?dl=0) on Dropbox
+
+-   Session [recording](https://drive.google.com/file/d/11M9PlQJTO8PGgFX7dJm5OytRYMUBQYdS/view?usp=sharing) on Google Drive
+
+-   Module covered: <https://michaeldgarber.github.io/teach-r/1-dplyr-nyt-covid.html>
+
+-   R script used during session
+
+    -   <https://github.com/michaeldgarber/teach-r/blob/main/scripts/0-pre-reqs.R>
+
+    -   <https://github.com/michaeldgarber/teach-r/blob/main/scripts/1-dplyr-nyt-covid.R>
+
+Dropbox [folder](https://www.dropbox.com/sh/rpqerzm0ukawhuk/AAAFN4FVfLsq9m4pBvdH83JCa?dl=0) with all recordings
+
+Google [Drive](https://drive.google.com/drive/folders/125F0jIChEAPEqTKQx5VdFpKHe4xOOKYP?usp=sharing) folder with all recordings
 
 [**Modules:**]{.underline}
 
@@ -75,6 +97,4 @@ This course will introduce participants to popular tools in R for manipulating (
 
 [**Key resources I would recommend:**]{.underline}
 
-The R universe has lots of helpful and free online resources. Here are some that I would recommend:
-
-<https://michaeldgarber.github.io/teach-r/recommended-resources.html>
+The R universe has lots of helpful and free online resources. Here are some that I would recommend: <https://michaeldgarber.github.io/teach-r/recommended-resources.html>
