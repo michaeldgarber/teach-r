@@ -13,7 +13,7 @@ This is the main landing page for the course, ***Introduction to managing and vi
 
 Page url: <https://michaeldgarber.github.io/teach-r/>
 
-My background using R: <https://michaeldgarber.github.io/teach-r/why-me.html>
+My background using R: [https://michaeldgarber.github.io/teach-r/who-am-i.html](https://michaeldgarber.github.io/teach-r/why-me.html){.uri}
 
 [**Course summary**]{.underline}
 
@@ -47,15 +47,11 @@ This course will introduce participants to popular tools in R for manipulating (
 
 -   Module covered: <https://michaeldgarber.github.io/teach-r/1-dplyr-nyt-covid.html>
 
--   R script used during session
-
-    -   <https://github.com/michaeldgarber/teach-r/blob/main/scripts/0-pre-reqs.R>
-
-    -   <https://github.com/michaeldgarber/teach-r/blob/main/scripts/1-dplyr-nyt-covid.R>
+-   R script used during session: <https://github.com/michaeldgarber/teach-r/blob/main/scripts/2-dplyr-mapview-tidycensus.R>
 
 Dropbox [folder](https://www.dropbox.com/sh/rpqerzm0ukawhuk/AAAFN4FVfLsq9m4pBvdH83JCa?dl=0) with all recordings
 
-Google [Drive](https://drive.google.com/drive/folders/125F0jIChEAPEqTKQx5VdFpKHe4xOOKYP?usp=sharing) folder with all recordings
+Google Drive [folder](https://drive.google.com/drive/folders/125F0jIChEAPEqTKQx5VdFpKHe4xOOKYP?usp=sharing) with all recordings
 
 [**Modules:**]{.underline}
 
@@ -97,4 +93,6 @@ Google [Drive](https://drive.google.com/drive/folders/125F0jIChEAPEqTKQx5VdFpKHe
 
 [**Key resources I would recommend:**]{.underline}
 
-The R universe has lots of helpful and free online resources. Here are some that I would recommend: <https://michaeldgarber.github.io/teach-r/recommended-resources.html>
+The R universe has lots of helpful and free online resources. Here are some that I would recommend:
+
+<https://michaeldgarber.github.io/teach-r/recommended-resources.html>
