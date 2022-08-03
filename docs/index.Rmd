@@ -13,7 +13,7 @@ This is the main landing page for the course, ***Introduction to managing and vi
 
 Page url: <https://michaeldgarber.github.io/teach-r/>
 
-My background using R: [https://michaeldgarber.github.io/teach-r/who-am-i.html](https://michaeldgarber.github.io/teach-r/why-me.html){.uri}
+My background using R: <https://michaeldgarber.github.io/teach-r/who-am-i.html>
 
 [**Course summary**]{.underline}
 
@@ -45,7 +45,7 @@ This course will introduce participants to popular tools in R for manipulating (
 
 -   Session [recording](https://drive.google.com/file/d/11M9PlQJTO8PGgFX7dJm5OytRYMUBQYdS/view?usp=sharing) on Google Drive
 
--   Module covered: <https://michaeldgarber.github.io/teach-r/1-dplyr-nyt-covid.html>
+-   Module covered: <https://michaeldgarber.github.io/teach-r/2-dplyr-mapview-tidycensus.html>
 
 -   R script used during session: <https://github.com/michaeldgarber/teach-r/blob/main/scripts/2-dplyr-mapview-tidycensus.R>
 
