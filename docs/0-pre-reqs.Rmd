@@ -1,7 +1,7 @@
 ---
 title: "First things first: background and setup before dplyr"
 author: "Michael Garber "
-date: "Revised August 1st, 2022"
+date: "Revised August 3rd, 2022"
 output:
   html_document:
     toc: true
@@ -33,7 +33,7 @@ This [post](https://www.jessesadler.com/post/excel-vs-r/) by Jesse Adler (a digi
 
 -   There is a **clear division between data entry and data manipulation and analysis**: it's easier to avoid the temptation of editing the raw data. Although you can certainly make a copy of raw data in Excel (e.g., copy to new sheet), it can be tempting to edit the raw data.
 
--   **Easier to automate similar tasks**. Frequently in data analysis, we'd like to repeat very similar steps, maybe just by changing one element. The ability to automate similar steps becomes especially important for bootstrapping where we effectively repeat the analysis hundreds of time while allowing some of the steps to randomly vary. This would be much more challenging in Excel.
+-   **Easier to automate similar tasks**. Frequently in data analysis, we'd like to repeat very similar steps, maybe just by changing one element. The ability to automate similar steps becomes especially important for bootstrapping where we effectively repeat the analysis hundreds of times while allowing some of the steps to randomly vary. This would be much more challenging in Excel.
 
 To be clear, I think Excel is great, too. I use it often for simple analyses or for data entry. But I don't use it as much as I once did for more involved analyses.
 
