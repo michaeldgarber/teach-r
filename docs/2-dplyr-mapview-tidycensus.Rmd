@@ -1,7 +1,7 @@
 ---
 title: "R for data wrangling 2: more dplyr and some tidycensus, mapview, and ggplot"
 author: "Michael Garber, PhD MPH"
-date: "Revised August 3rd, 2022"
+date: "Revised August 3, 2022"
 output:
   html_document:
     toc: true

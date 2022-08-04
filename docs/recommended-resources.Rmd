@@ -1,6 +1,6 @@
 ---
 title: "Recommended resources"
-date: "Revised August 3, 2022"
+date: "Revised August 4, 2022"
 output: 
   bookdown::html_document2:
     toc: FALSE #overwrite the _yml
@@ -10,7 +10,7 @@ output:
 
 [**Key resources I would recommend:**]{.underline}
 
-The R universe has lots of helpful and free online resources. Here are some that I would recommend:
+I mostly use packages that are a part of the tidyverse or which work well with the tidyverse (e.g., sf). The R universe is brimming with helpful and free online resources on those topics. Here are some resources that I'd recommend:
 
 -   For **general data wrangling** and other data management in the tidyverse (dplyr and other tidyverse packages)
 
@@ -44,7 +44,11 @@ The R universe has lots of helpful and free online resources. Here are some that
 
     -   Geocomputation with R (Lovelace, Nowosad, Muenchow) : <https://geocompr.robinlovelace.net/>
 
-        -   Chapter on spatial operations: <https://geocompr.robinlovelace.net/spatial-operations.html>
+        -   Key chapters on managing sf:
+
+            -   <https://geocompr.robinlovelace.net/spatial-operations.html>
+
+            -   <https://geocompr.robinlovelace.net/geometric-operations.html>
 
         -   This book also covers raster data and corresponding packages (terra and raster).
 
@@ -57,6 +61,8 @@ The R universe has lots of helpful and free online resources. Here are some that
     -   cookbook: <http://www.cookbook-r.com/Graphs/>
 
     -   ggplot2 cheat sheet: <https://raw.githubusercontent.com/rstudio/cheatsheets/main/data-visualization.pdf>
+
+    -   Data visualization principles: book (not free) by Kieran Healy, <https://kieranhealy.org/publications/dataviz/>
 
 -   For **making maps** (mapview, tmap, ggplot2)
 
@@ -82,7 +88,21 @@ The R universe has lots of helpful and free online resources. Here are some that
 
         -   Chapter in Spatial Data Science: <https://keen-swartz-3146c4.netlify.app/plotting.html#geomsf>
 
--   Other **miscellaneous** resources I frequently use:
+    -   Color palettes:
+
+        -   viridis: <https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html>
+
+            -   Note this is often the default option in mapview.
+
+            -   Note viridis is built into some ggplot2 functions.
+
+        -   RColorBrewer:
+
+            -   website to see color palettes: [https://colorbrewer2.org/](https://colorbrewer2.org/#type=sequential&scheme=BuGn&n=3)
+
+            -   R package: <https://cran.r-project.org/web/packages/RColorBrewer/index.html>
+
+-   Other **miscellaneous** resources I frequently use and reading I recommend:
 
     -   RStudio cheatsheets on dplyr, ggplot2, and more: <https://www.rstudio.com/resources/cheatsheets/>
 
@@ -97,3 +117,11 @@ The R universe has lots of helpful and free online resources. Here are some that
         -   R Markdown, the Definitive Guide: <https://bookdown.org/yihui/rmarkdown/>
 
         -   R Markdown Cookbook: <https://bookdown.org/yihui/rmarkdown-cookbook/>
+
+    -   On managing working directory and organizing projects:
+
+        -   Jenny Bryan on the importance of a project-oriented workflow: <https://www.tidyverse.org/blog/2017/12/workflow-vs-script/>
+
+        -   Jenny Bryan's Ode to the here package: <https://github.com/jennybc/here_here>
+
+        -   Folder structure of R projects: <https://chrisvoncsefalvay.com/2018/08/09/structuring-r-projects/>

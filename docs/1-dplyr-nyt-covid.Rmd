@@ -1,7 +1,7 @@
 ---
 title: "R for data wrangling 1: learning the ground rules of dplyr with publicly available COVID-19 data"
 author: "Michael D. Garber, PhD MPH"
-date: "Revised August 1, 2022"
+date: "Revised August 4, 2022"
 output:
   html_document:
     toc: true
@@ -171,8 +171,8 @@ The seven dplyr verbs I use the most are `mutate()`, `filter()`, `select()`, `ar
 -   `select()` selects variables (or columns) based on their names. It can also be thought of as a subset operator by column rather than by row.
 -   `arrange()` sorts data. It orders the rows of a data frame by the values of selected columns. The default behavior is to sort ascending, meaning the lowest value will be on top. Use `desc()` within the `arrange()` function to sort descending. Importantly, `arrange()` will sort by group if data are grouped (below).
 -   `group_by()` groups the table by a variable. `group_by()` is often but not always used with `summarise()`. When the two are used together, the result is akin to a pivot table in Excel.
--   `summarise()` creates a new data frame, with rows corresponding to combinations of the grouping variables. `summarise()` is like a summary operator in an Excel pivot table. (Note the British spelling. The package author is from New Zealand.)
--   `left_join()` joins two tables together. It's like a vlookup in Excel or, as the name implies, a JOIN in SQL. It's distinct from the other verbs in this list in that it is a [two-table verb](https://dplyr.tidyverse.org/articles/two-table.html). There are [other types of joins](https://dplyr.tidyverse.org/reference/join.html), but I almost always use `left_join()`. In the below set of examples, `left_join` isn't used. It is used in our [next tutorial](https://rpubs.com/michaeldgarber/dplyr_2_tidycensus_mapview), though.
+-   `summarise()`, when used after `group_by()`, collapses the data, with rows corresponding to combinations of the grouping variables. And a new variable can be created within the `summarise()` function akin to a `mutate()`. Note that `summarise()` can also be used if data are not grouped. It can be used to compute a column-wise summary (e.g., mean, median, max) but will keep the dataset in its original form (i.e., not collapsed).
+-   `left_join()` joins two tables together. It's like a vlookup in Excel or, as the name implies, a JOIN in SQL. It's distinct from the other verbs in this list in that it is a [two-table verb](https://dplyr.tidyverse.org/articles/two-table.html). There are [other types of joins](https://dplyr.tidyverse.org/reference/join.html), but I almost always use `left_join()`. A left join, specifically, keeps all of the values of the first datset and only those of the second dataset which correspond to the rows containing with a key common to the first object. In the below set of examples, `left_join` isn't used. It is used in subsequent tutorials.
 
 There are [several other](https://github.com/rstudio/cheatsheets/blob/master/data-transformation.pdf) verbs within dplyr, but many, perhaps most, data-wrangling tasks can be done with just these seven tools.
 

@@ -533,6 +533,16 @@ pharm_points_polygons_join = pharm_points_fd_buff_20m %>%
       TRUE ~ 0
     ))
 
+#Save because for some reason this isn't working in RMarkdown
+library(here)
+setwd(here("data-processed"))
+save(pharm_points_polygons_join, file = "pharm_points_polygons_join.RData")
+save(pharm_points_fd_buff_20m, file = "pharm_points_fd_buff_20m.RData")
+save(pharm_polygons_fd, file = "pharm_polygons_fd.RData")
+nrow() #joined version, points
+nrow(pharm_points_fd_buff_20m) #original version of points
+nrow() #polygons
+
 names(pharm_points_polygons_join)
 #confirm it's a left join without any new rows added.
 nrow(pharm_points_polygons_join)
@@ -557,7 +567,7 @@ pharm_points_polygons_join %>%
 
 ## Remove points that joined with polygons from the point dataset.--------------
 pharm_points_fd_nodupes = pharm_points_polygons_join %>% 
-  dpylr::filter(point_overlaps_polygon==0)
+  dplyr::filter(point_overlaps_polygon==0)
 
 nrow(pharm_points_fd_nodupes)
 
@@ -617,23 +627,18 @@ names(pharm_points_fd_nodupes)
 names(pharm_polygons_fd_no_multipolygon)
 names(pharm_multipolygons_fd)
 pharm_points_fd_nodupes_centroid = pharm_points_fd_nodupes %>% 
+  dplyr::select(starts_with("osm_id")) %>% 
+  st_as_sf() %>% 
   st_centroid() %>%
-  dplyr::select(osm_id_point, geometry) %>% 
-  rename(osm_id = osm_id_point) %>% 
-  left_join(pharm_points_fd_nogeo, by = "osm_id") %>% 
   mutate(type_original = "point")
 
 pharm_polygons_fd_no_multipolygon_centroid = pharm_polygons_fd_no_multipolygon %>% 
+  dplyr::select(starts_with("osm_id")) %>% 
   st_centroid()  %>% 
-  dplyr::select(osm_id_polygon, geometry) %>% 
-  rename(osm_id = osm_id_polygon) %>% 
-  left_join(pharm_polygons_fd_nogeo, by = "osm_id") %>% 
   mutate(type_original = "polygon")
 
-# View(pharm_points_fd_nodupes_centroid)
-# View(pharm_polygons_fd_no_multipolygon_centroid)
-
 pharm_multipolygons_fd_centroid = pharm_multipolygons_fd %>% 
+  dplyr::select(starts_with("osm_id")) %>% 
   st_centroid() %>% 
   mutate(type_original = "multipolygon")
 
@@ -650,7 +655,7 @@ pharm_fd_combined = pharm_points_fd_nodupes_centroid %>%
   )
 
 # how many pharmacies?
-nrow(pharm_fd_combined) #66
+nrow(pharm_fd_combined) 
 mapview(pharm_fd_combined, zcol = "type_original") +  
   mapview(fulton_dekalb_union, col.regions = "gray50") 
 

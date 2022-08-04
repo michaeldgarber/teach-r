@@ -347,7 +347,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">R for data wrangling 1: learning the ground rules of dplyr with publicly available COVID-19 data</h1>
 <h4 class="author">Michael D. Garber, PhD MPH</h4>
-<h4 class="date">Revised August 1, 2022</h4>
+<h4 class="date">Revised August 4, 2022</h4>
 
 </div>
 
@@ -413,12 +413,12 @@ div.tocify {
 <p>Now that we have RStudio installed and up and running, our first step is to install packages, the basics of which we described in the <a href="https://michaeldgarber.github.io/teach-r/0-pre-reqs">previous module</a>.</p>
 <pre class="r"><code>install.packages(&quot;tidyverse&quot;)</code></pre>
 <pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──</code></pre>
-<pre><code>## ✔ ggplot2 3.3.6     ✔ purrr   0.3.4
+<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
+## ✔ ggplot2 3.3.6     ✔ purrr   0.3.4
 ## ✔ tibble  3.1.7     ✔ dplyr   1.0.9
 ## ✔ tidyr   1.2.0     ✔ stringr 1.4.0
-## ✔ readr   2.1.2     ✔ forcats 0.5.1</code></pre>
-<pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✔ readr   2.1.2     ✔ forcats 0.5.1
+## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ## ✖ dplyr::filter() masks stats::filter()
 ## ✖ dplyr::lag()    masks stats::lag()</code></pre>
 </div>
@@ -527,8 +527,8 @@ nyt_state_data = read_csv(&quot;nyt_state_data_downloaded.csv&quot;)</code></pre
 <li><code>select()</code> selects variables (or columns) based on their names. It can also be thought of as a subset operator by column rather than by row.</li>
 <li><code>arrange()</code> sorts data. It orders the rows of a data frame by the values of selected columns. The default behavior is to sort ascending, meaning the lowest value will be on top. Use <code>desc()</code> within the <code>arrange()</code> function to sort descending. Importantly, <code>arrange()</code> will sort by group if data are grouped (below).</li>
 <li><code>group_by()</code> groups the table by a variable. <code>group_by()</code> is often but not always used with <code>summarise()</code>. When the two are used together, the result is akin to a pivot table in Excel.</li>
-<li><code>summarise()</code> creates a new data frame, with rows corresponding to combinations of the grouping variables. <code>summarise()</code> is like a summary operator in an Excel pivot table. (Note the British spelling. The package author is from New Zealand.)</li>
-<li><code>left_join()</code> joins two tables together. It’s like a vlookup in Excel or, as the name implies, a JOIN in SQL. It’s distinct from the other verbs in this list in that it is a <a href="https://dplyr.tidyverse.org/articles/two-table.html">two-table verb</a>. There are <a href="https://dplyr.tidyverse.org/reference/join.html">other types of joins</a>, but I almost always use <code>left_join()</code>. In the below set of examples, <code>left_join</code> isn’t used. It is used in our <a href="https://rpubs.com/michaeldgarber/dplyr_2_tidycensus_mapview">next tutorial</a>, though.</li>
+<li><code>summarise()</code>, when used after <code>group_by()</code>, collapses the data, with rows corresponding to combinations of the grouping variables. And a new variable can be created within the <code>summarise()</code> function akin to a <code>mutate()</code>. Note that <code>summarise()</code> can also be used if data are not grouped. It can be used to compute a column-wise summary (e.g., mean, median, max) but will keep the dataset in its original form (i.e., not collapsed).</li>
+<li><code>left_join()</code> joins two tables together. It’s like a vlookup in Excel or, as the name implies, a JOIN in SQL. It’s distinct from the other verbs in this list in that it is a <a href="https://dplyr.tidyverse.org/articles/two-table.html">two-table verb</a>. There are <a href="https://dplyr.tidyverse.org/reference/join.html">other types of joins</a>, but I almost always use <code>left_join()</code>. A left join, specifically, keeps all of the values of the first datset and only those of the second dataset which correspond to the rows containing with a key common to the first object. In the below set of examples, <code>left_join</code> isn’t used. It is used in subsequent tutorials.</li>
 </ul>
 <p>There are <a href="https://github.com/rstudio/cheatsheets/blob/master/data-transformation.pdf">several other</a> verbs within dplyr, but many, perhaps most, data-wrangling tasks can be done with just these seven tools.</p>
 <p>(For the record, <code>filter()</code>, <code>arrange()</code>, <code>select()</code>, <code>mutate()</code>, and <code>summarise()</code> are considered to be the <a href="https://r4ds.had.co.nz/transform.html#introduction-2">five key dplyr functions</a>. I’ve added <code>group_by()</code> and <code>left_join()</code> because I use them so often.)</p>

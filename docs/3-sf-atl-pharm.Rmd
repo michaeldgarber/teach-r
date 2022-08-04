@@ -1,7 +1,7 @@
 ---
 title: "R for spatial data wrangling: a demo of sf through an example analysis assessing population living near pharmacies in Atlanta"
 author: "Michael Garber, PhD MPH"
-date: "Revised August 3rd, 2022"
+date: "Revised August 4, 2022"
 output:
   html_document:
     toc: true
@@ -736,7 +736,7 @@ Some functions that could help with this problem:
 
 Okay, the spatial join:
 
-```{r}
+```{r, eval=FALSE}
 pharm_points_polygons_join = pharm_points_fd_buff_20m %>% 
   sf::st_join(
     pharm_polygons_fd, 
@@ -753,6 +753,13 @@ pharm_points_polygons_join = pharm_points_fd_buff_20m %>%
 ```
 
 Confirm the joined version has the same number of observations as the points.
+
+```{r, include=FALSE, eval=TRUE, echo=FALSE}
+setwd(here("data-processed"))
+load("pharm_points_polygons_join.RData")
+load("pharm_points_fd_buff_20m.RData")
+load("pharm_polygons_fd.RData")
+```
 
 ```{r}
 nrow(pharm_points_polygons_join) #joined version, points
@@ -823,7 +830,7 @@ pharm_points_fd_nodupes = pharm_points_fd %>%
   dplyr::filter(point_overlaps_polygon==0)
 ```
 
-## Use a similar `st_join()` procedure for the one multipolygon. 
+## Use a similar `st_join()` procedure for the one multipolygon.
 
 Here, I want to know which polygon, if any, is overlapped by the multipolygon:
 
@@ -874,25 +881,46 @@ What does the warning mean?
 
 ```{r}
 pharm_points_fd_nodupes_centroid = pharm_points_fd_nodupes %>% 
+  dplyr::select(starts_with("osm_id")) %>% #reduce size of data.
+  st_as_sf() %>% 
   st_centroid() %>%
-  dplyr::select(osm_id_point, geometry) %>% 
-  rename(osm_id = osm_id_point) %>% 
-  left_join(pharm_points_fd_nogeo, by = "osm_id") %>% 
   mutate(type_original = "point")
 
 pharm_polygons_fd_no_multipolygon_centroid = pharm_polygons_fd_no_multipolygon %>% 
-  st_centroid()  %>% 
-  dplyr::select(osm_id_polygon, geometry) %>% 
-  rename(osm_id = osm_id_polygon) %>% 
-  left_join(pharm_polygons_fd_nogeo, by = "osm_id") %>% 
-  mutate(type_original = "polygon")
+  dplyr::select(starts_with("osm_id")) %>% 
+  st_as_sf() %>% 
+  st_centroid() %>%
+  dplyr::mutate(type_original = "polygon")
 
 pharm_multipolygons_fd_centroid = pharm_multipolygons_fd %>% 
-  st_centroid() %>% 
-  mutate(type_original = "multipolygon")
-
-#visualize
-mapview(pharm_points_fd_nodupes_centroid, col.regions = "blue") +
-  mapview(pharm_polygons_fd_no_multipolygon_centroid, col.regions = "red")+
-  mapview(pharm_multipolygons_fd_centroid, col.regions = "orange")
+  dplyr::select(starts_with("osm_id")) %>% 
+  st_as_sf() %>% 
+  st_centroid() %>%
+  dplyr::mutate(type_original = "multipolygon")
 ```
+
+### Use `bind_rows()` to combine them to stack them together into one dataset
+
+```{r}
+### 4.7.2. Use bind_rows to stack them together into one dataset--------
+pharm_fd_combined = pharm_points_fd_nodupes_centroid %>% 
+  dplyr::bind_rows(
+    pharm_polygons_fd_no_multipolygon_centroid,
+    pharm_multipolygons_fd_centroid
+  )
+```
+
+How many pharmacies?
+
+```{r}
+nrow(pharm_fd_combined)
+```
+
+Map them classified by their original type. Note that they are all points now.
+
+```{r}
+mapview(pharm_fd_combined, zcol = "type_original") +  
+  mapview(fulton_dekalb_union, col.regions = "gray50") 
+```
+
+Next session: estimate population living within a certain radius of these pharmacies.

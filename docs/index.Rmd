@@ -1,7 +1,7 @@
 ---
 title: "R course"
 author: "Michael Garber, PhD MPH"
-date: "Revised August 3, 2022"
+date: "Revised August 4, 2022"
 output: 
   bookdown::html_document2:
     toc: FALSE #overwrite the _yml
@@ -93,6 +93,6 @@ Google Drive [folder](https://drive.google.com/drive/folders/125F0jIChEAPEqTKQx5
 
 [**Key resources I would recommend:**]{.underline}
 
-The R universe has lots of helpful and free online resources. Here are some that I would recommend:
+I mostly use packages that are a part of the tidyverse or which work well with the tidyverse (e.g., sf). The R universe is brimming with helpful and free online resources on those topics. Here are some resources that I'd recommend:
 
 <https://michaeldgarber.github.io/teach-r/recommended-resources.html>

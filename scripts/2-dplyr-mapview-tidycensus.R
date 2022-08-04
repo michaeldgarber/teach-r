@@ -260,8 +260,37 @@ nyt_state_pop_wrangle %>%
 
 # Solutions to exercises-------------
 ## Exercise 1-------
-#not done yet
+nyt_state_pop_wrangle_year = nyt_state_pop_wrangle %>% 
+  group_by(state, year) %>% 
+  #group by with summarise here
+  summarise(
+    cases_cumul_year = max(cases_cumul, na.rm=TRUE),
+    deaths_cumul_year = max(deaths_cumul, na.rm=TRUE)
+  ) %>% 
+  ungroup() %>% #just to be sure
+  group_by(state) %>%  
+  #note we use group_by() without summarise here
+  arrange(year) %>% 
+  mutate(
+    cases_cumul_year_before = lag(cases_cumul_year),
+    cases_incident_year = cases_cumul_year - cases_cumul_year_before,
+    deaths_cumul_year_before = lag(deaths_cumul_year),
+    deaths_incident_year = deaths_cumul_year - deaths_cumul_year_before
+  ) %>% 
+  ungroup() %>% 
+  #link in the population data
+  left_join(pop_by_state_wrangle_nogeo, by = "state") %>% 
+  #calculate weekly cumulative incidence per population 
+  #up until that point in time in that week and the weekly incidence rate
+  mutate(
+    cases_cumul_per_pop_year = cases_cumul_year/population,
+    deaths_cumul_per_pop_year = deaths_cumul_year/population,
+    cases_incident_per_pop_year = cases_incident_year/population,
+    deaths_incident_per_pop_year = deaths_incident_year/population 
+  ) 
 
+nyt_state_pop_wrangle_year
+View(nyt_state_pop_wrangle_year)
 ## Exercise 2------
 #not done yet
 
