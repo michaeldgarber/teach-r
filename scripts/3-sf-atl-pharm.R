@@ -533,16 +533,17 @@ pharm_points_polygons_join = pharm_points_fd_buff_20m %>%
       TRUE ~ 0
     ))
 
-#Save because for some reason this isn't working in RMarkdown
+#Save these locally because for some reason this isn't working in RMarkdown
 library(here)
 setwd(here("data-processed"))
 save(pharm_points_polygons_join, file = "pharm_points_polygons_join.RData")
 save(pharm_points_fd_buff_20m, file = "pharm_points_fd_buff_20m.RData")
 save(pharm_polygons_fd, file = "pharm_polygons_fd.RData")
-nrow() #joined version, points
+
+
+
 nrow(pharm_points_fd_buff_20m) #original version of points
 nrow() #polygons
-
 names(pharm_points_polygons_join)
 #confirm it's a left join without any new rows added.
 nrow(pharm_points_polygons_join)
@@ -647,7 +648,7 @@ mapview(pharm_points_fd_nodupes_centroid, col.regions = "blue") +
   mapview(pharm_polygons_fd_no_multipolygon_centroid, col.regions = "red")+
   mapview(pharm_multipolygons_fd_centroid, col.regions = "orange")
 
-### 4.7.2. Use bind_rows to stack them together into one dataset--------
+### Use bind_rows to stack them together into one dataset--------
 pharm_fd_combined = pharm_points_fd_nodupes_centroid %>% 
   dplyr::bind_rows(
     pharm_polygons_fd_no_multipolygon_centroid,

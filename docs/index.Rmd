@@ -77,7 +77,7 @@ Google Drive [folder](https://drive.google.com/drive/folders/125F0jIChEAPEqTKQx5
 
     The sf package and its corresponding object class have become standard tools for managing and representing (vector-based) spatial data in R. An appealing aspect of the sf object class is that it behaves like regular rectangular data and is thus amenable to common data manipulation techniques. In this module, we will describe operations in the sf ecosystem, including ways to merge spatial data, manipulate coordinate systems, and create buffers.
 
-    Link TBD
+    Link: <https://michaeldgarber.github.io/teach-r/3-sf-atl-pharm.html>
 
 4.  **Making static and interactive maps in R**
 
