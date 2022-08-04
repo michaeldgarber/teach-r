@@ -287,7 +287,7 @@ This measure may be easier to interpret if we were to split the data into year i
 
 ### Exercise 1: Calculate cases per person-year for each state.
 
-**Exercise:** Calculate the number of incident cases per person year for each state.
+**Exercise:** Calculate the number of incident cases per person-year for each state.
 
 ### Tinker with mapview's defaults.
 
@@ -362,7 +362,7 @@ nyt_state_pop_wrangle %>%
   theme(axis.text.x = element_text(angle = 90)) #rotate text on x-axis 90 degrees
 ```
 
-### Visualize daily incidence rate cases for the continental 48 states.
+
 
 Recall incidence rate is the number of **new** cases per population per time period (day, here). We calculated it at the beginning of the code by subtracting the case count in a state on one day from the corresponding count from that state the day before.
 
@@ -422,3 +422,4 @@ nyt_state_pop_wrangle %>%
 ### Exercise 3: Calculate and graph weekly incidence rate
 
 **Exercise:** Weekly incidence rate is probably a more stable measure. How would we calculate that? Calculate weekly incidence rate and graph both overall (contiguous 48) and by state.
+

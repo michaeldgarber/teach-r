@@ -1,6 +1,6 @@
+#Title: R for spatial data wrangling: a demo of sf through an 
+#example analysis assessing population living near pharmacies in Atlanta
 #Revised August 4, 2022
-#Note to self: adapted from previous work
-#~Work/CDC/prj05983_R_for_GIS_User_Group/r_teach_4_sf_osmdata_20210709.R
 
 
 # Demo of sf using  counties and pharmacies
@@ -218,6 +218,31 @@ county_ga %>%
 
 
 # 3. Download and manipulate pharmacies in Fulton and Dekalb County--------------------
+# Key packages and functions used:
+#   
+# osmdata to download pharmacies from OpenStreetMap
+# 
+# mapview
+# 
+# sf functions used
+# st_union(): unify several features into one.
+# st_as_sf(): convert an object that is not of class sf to sf.
+# st_buffer(): create a buffer around the features in the sf object.
+# st_bbox(): create a bounding box (four vertices representing the min and max longitude and latitude of the sf object)
+# st_intersection(): return the overlapping geometry of two features.
+# st_transform(): change the coordinate reference system of an sf object
+# st_crs(): return the coordinate reference system of an object.
+# st_join(): join two simple features based on whether their geometries overlap (spatial join).
+
+#the usual dplyr verbs and some new ones:
+# bind_cols() binds two dataframes or sf objects column-wise (adding width to data). 
+  #Rows are matched by position. The binding datasets must have the same number of rows.
+  #It differs from joins like left_join in that you don't need to match on a key.
+
+#bind_rows() binds two dataframes or sf objects row-wise (adding length to the data)
+#Columns are matched by name. Any columns that appear in one dataset but not the other are filled with NA
+
+
 # Eventual goal is to gather a dataset of all pharmacies in FUlton County and Dekalb County.
 # First download all pharmacies in this bounding box that includes Fulton and Dekalb 
 #and then restrict to Fulton and Dekalb County
@@ -447,18 +472,20 @@ nrow(pharm_multipolygons_fd)
 
 # Find points that join with polygons and exclude those points..
 
-## st_buffer---------------
+## st_buffer points---------------
 # Before finding intersections, make sure the points are large enough to overlap the polygons 
 #(i.e., no false negatives).
 #This may not be necessary here but is good insurance.
 
-## Avoid duplicates.-----------------
-#Also, because st_intersection is like a join, it will link all variables from each joining datasets.
-# To avoid duplicate variable names, remove extraneous variables before joining.
+# In addition, in this step, 
+# I'm removing extraneous variable names using dplyr::select(). 
+# st_intersection() is like a join and will link all variables from each of the joining datasets. 
+# If the same variable name exists in both, it may cause issues.
 
 pharm_points_fd_buff_20m = pharm_points_fd %>% 
   st_buffer(20) %>% #create a 20 m buffer around each point.
-  rename(osm_id_point = osm_id) %>% #keep this but rename it so it doesn't create a duplicate variable name upon linking
+  #keep this but rename it so it doesn't create a duplicate variable name upon linking
+  rename(osm_id_point = osm_id) %>% 
   dplyr::select(osm_id_point, type_point, point_row_number, geometry) 
 
 #Confirm same number of rows (i.e., no new rows added or subtracted due to buffer)
@@ -468,18 +495,37 @@ names(pharm_points_fd_buff_20m)
 mapview(pharm_points_fd_buff_20m, col.regions = "orange") + mapview(pharm_points_fd)
 
 ## use st_join to perform the spatial join.--------------------
-#A few ways this could be done:
-# st_intersection (returns a geometry)
-# st_intersects (does not return geometry)
-# st_join - https://r-spatial.github.io/sf/reference/st_join.html
+#Some functions that could help with this problem:
+  
+#st_intersection() returns only the intersecting geometry, so, 
+#while we could use it, it will take a couple more steps, 
+#because we'd have to re-link the information from the overlap back with the main points dataset. 
+#That is st_intersection() acts more like an inner join.
 
-# st_join is the best for this specific problem, I think, where we essentially want a left join.
+#st_intersects() returns a matrix of true/false values indicating whether the two features intersect at 
+#that point in the dataset. This is valuable information that could theoretically be used here, 
+#but I frankly don't use st_intersects() often because I find the matrix output difficult to work with. 
+#It may be the fastest from a computational standpoint, though, because it doesn't return a geometry.
+
+#Let's use st_join() for this specific problem. We want a left join, keeping all of the points 
+#(and their geometry) and joining the information from the polygons which overlap those points. 
+#Some other important notes about st_join():
+
+#Its default behavior is a left join, which means if the points are x and the polygons are y, 
+#all of the values from x will appear in the joined version, but not necessarily all of y.
+#In addition, it's possible that multiple points overlap the same polygon. 
+#For this exercise, we only want to know if a point was overlapped by any polygon. 
+#We thus use the argument, largest=TRUE, to indicate that only the polygon with the 
+#largest overlap will join. Note that this is not the default behavior. 
+#The default behavior would be to include every combination of points and polygons, 
+#which could repeat observations for the same point.
+
 pharm_points_polygons_join = pharm_points_fd_buff_20m %>% 
   sf::st_join(
     pharm_polygons_fd, 
     left=TRUE, #yes, a left join. This is the default but good to be explicit.
-    largest=TRUE) %>%  #default is false. this is useful to avoid duplicate values, but it does take some more time.
-  
+    #default is false. this is useful to avoid duplicate values, but it does take some more time.
+    largest=TRUE) %>%    
   #create an indicator variable to visualize
   dplyr::mutate(
     point_overlaps_polygon = case_when(
@@ -491,45 +537,67 @@ names(pharm_points_polygons_join)
 #confirm it's a left join without any new rows added.
 nrow(pharm_points_polygons_join)
 nrow(pharm_points_fd_buff_20m)
+
+#A base R way to check the overlap status
 table(pharm_points_polygons_join$point_overlaps_polygon)
-mapview(pharm_points_polygons_join, zcol = "point_overlaps_polygon")
+
+#the tidyverse way:
+pharm_points_polygons_join %>% 
+  st_set_geometry(NULL) %>% #for speed, convert to tibble
+  as_tibble() %>% 
+  group_by(point_overlaps_polygon) %>% 
+  summarise(n=n())
+
+pharm_points_polygons_join %>% 
+  mapview(
+    layer.name = "point_overlaps_polygon",
+    zcol = "point_overlaps_polygon",
+    col.regions = c("red", "blue") #define palette
+  )
 
 ## Remove points that joined with polygons from the point dataset.--------------
 pharm_points_fd_nodupes = pharm_points_polygons_join %>% 
-  filter(point_overlaps_polygon==0)
+  dpylr::filter(point_overlaps_polygon==0)
 
 nrow(pharm_points_fd_nodupes)
 
 ## All of the points in one pipe---------------
-#Note: we could do all of the above  in one step.
+#Note: we could do all of the above in one step.
 pharm_points_fd_nodupes = pharm_points_fd %>% 
-  st_buffer(20) %>% #create a 20 m buffer around each point.
-  rename(osm_id_point = osm_id) %>% #keep this but rename it so it doesn't create a duplicate variable name upon linking
+  sf::st_buffer(20) %>% #create a 20 m buffer around each point.
+  dplyr::rename(osm_id_point = osm_id) %>% 
   dplyr::select(osm_id_point, type_point, point_row_number, geometry) %>% 
   sf::st_join(
     pharm_polygons_fd, 
-    left=TRUE, #yes, a left join. This is the default but good to be explicit.
-    largest=TRUE) %>%  #default is false. this is useful to avoid duplicate values, but it does take some more time.
+    left=TRUE, 
+    largest=TRUE) %>%  
   dplyr::mutate(
     point_overlaps_polygon = case_when(
       type_polygon==1 ~ 1,
       TRUE ~ 0
     )) %>% 
-  filter(point_overlaps_polygon==0)
+  dplyr::filter(point_overlaps_polygon==0)
 
 names(pharm_points_fd_nodupes)
 
-## Filter to all polygons that are not covered by the single multipolygon---------
-#could do this manually but try programatically.
+## Use a similar st_join() procedure for the one multipolygon.---- 
+names(pharm_multipolygons_fd)
 pharm_polygons_fd_no_multipolygon = pharm_polygons_fd %>% 
-  rename(osm_id_polygon = osm_id) %>% 
+  dplyr::rename(osm_id_polygon = osm_id) %>% 
   dplyr::select(osm_id_polygon, type_polygon, polygon_row_number, geometry) %>% 
-  #Here, we can be more concise with our st_join function because we know there is just the one
-  #multipolygon
-  st_join(pharm_multipolygons_fd) %>% 
-  filter(is.na(type_multipolygon)==TRUE)
+  sf::st_join(pharm_multipolygons_fd) %>% 
+  #create indicator variable for whether the polygon
+  #intersected the multipolygon
+  dplyr::mutate(
+    polygon_overlaps_multipolygon = case_when(
+      type_multipolygon==1 ~ 1,
+      TRUE ~ 0
+    )) %>% 
+  #restrict to those that didn't overlap.
+  dplyr::filter(polygon_overlaps_multipolygon==0)
 
 
+#How many did we lose?
 nrow(pharm_polygons_fd)
 nrow(pharm_polygons_fd_no_multipolygon)
 
@@ -544,18 +612,10 @@ mapview(pharm_polygons_fd, col.regions = "red") +
 #For simplicity, first find the centroid of each of buffered points, the polygons, 
 #and the multipolygon
 
-#Also in this step, link the information back in using left_join
-#that we removed from the points and polygons. Before doing so,
-#remove geometry from old data.
-pharm_points_fd_nogeo = pharm_points_fd %>% 
-  st_set_geometry(NULL) %>% 
-  as_tibble()
-pharm_polygons_fd_nogeo = pharm_polygons_fd %>% 
-  st_set_geometry(NULL)%>% 
-  as_tibble()
 
-package_version(mapview())
-
+names(pharm_points_fd_nodupes)
+names(pharm_polygons_fd_no_multipolygon)
+names(pharm_multipolygons_fd)
 pharm_points_fd_nodupes_centroid = pharm_points_fd_nodupes %>% 
   st_centroid() %>%
   dplyr::select(osm_id_point, geometry) %>% 

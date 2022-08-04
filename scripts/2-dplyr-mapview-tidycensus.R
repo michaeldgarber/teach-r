@@ -237,4 +237,116 @@ nyt_state_pop_wrangle %>%
   theme(legend.position="bottom") +
   theme(axis.text.x = element_text(angle = 90))
 
+# Exercises------------
+## Exercise 1: Calculate cases per person-year for each state.-------
+
+
+# Exercise: Calculate the number of incident cases per person year for each state.
+
+## Exercise 2: Use facet_wrap to separate plots into groups.-----------
+
+#Exercise: Divide the states into regions
+#(e.g., using the classification here,
+#and create line charts of cumulative incidence and 
+#incidence rate by state by region.
+
+## Exercise 3: Calculate and graph weekly incidence rate------
+
+# Exercise: 
+#   Weekly incidence rate is probably a more stable measure. 
+# How would we calculate that? Calculate weekly incidence rate and graph both 
+#overall (contiguous 48) and by state.
+
+
+# Solutions to exercises-------------
+## Exercise 1-------
+#not done yet
+
+## Exercise 2------
+#not done yet
+
+## Exercise 3-------
+names(nyt_state_pop_wrangle)
+#Create a look up table for date and week so that we can left-join
+#it and visualize using the date itself on the x-axis again
+lookup_year_date_week_end = nyt_state_pop_wrangle %>% 
+  group_by(year, week) %>% 
+  summarise(date_max = max(date)) %>% 
+  ungroup()
+
+lookup_year_date_week_end
+
+nyt_state_pop_wrangle_weekly = nyt_state_pop_wrangle %>% 
+  group_by(state, year, week) %>% 
+  #group by with summarise here
+  summarise(
+    #an average might also work here...possibly more stable
+    #than the max within the week showing that in a comment:
+    # cases_cumul_week = mean(cases_cumul, na.rm=TRUE),
+    # deaths_cumul_week = mean(deaths_cumul, na.rm=TRUE)
+    cases_cumul_week = max(cases_cumul, na.rm=TRUE),
+    deaths_cumul_week = max(deaths_cumul, na.rm=TRUE)
+  ) %>% 
+  ungroup() %>% #just to be sure
+  group_by(state) %>%  
+  #note we use group_by() without summarise here
+  arrange(year, week) %>% 
+  mutate(
+    cases_cumul_week_before = lag(cases_cumul_week),
+    cases_incident_week = cases_cumul_week - cases_cumul_week_before,
+    deaths_cumul_week_before = lag(deaths_cumul_week),
+    deaths_incident_week = deaths_cumul_week - deaths_cumul_week_before
+  ) %>% 
+  ungroup() %>% 
+  #link in the population data
+  left_join(pop_by_state_wrangle_nogeo, by = "state") %>% 
+  #calculate weekly cumulative incidence per population 
+  #up until that point in time in that week and the weekly incidence rate
+  mutate(
+    cases_cumul_per_pop_week = cases_cumul_week/population,
+    deaths_cumul_per_pop_week = deaths_cumul_week/population,
+    cases_incident_per_pop_week = cases_incident_week/population,
+    deaths_incident_per_pop_week = deaths_incident_week/population 
+  ) %>% 
+  #look up the date corresponding to the
+  #end of the week for the chart
+  left_join(lookup_year_date_week_end, by = c("year", "week"))
+
+
+#Explore the missing values in particular. Are they as we'd expect?
+#For a given state, the "week-before" value should be missing
+#for the state's first observation in the data, but not missing otherwise
+View(nyt_state_pop_wrangle_weekly)
+names(nyt_state_pop_wrangle_weekly)
+
+#cumulative covid incidence at week end
+nyt_state_pop_wrangle_weekly %>% 
+  filter(continental_48==1) %>%   
+  ggplot( aes(x=date_max, y=cases_cumul_per_pop_week))+
+  geom_line(aes(color = state)) +
+  ylab("Cumulative COVID-19\n incidence\n per person \n at end of week") +
+  xlab("Date")  +
+  theme_bw() +
+  labs(color = "State")+ #label legend
+  theme(legend.position="bottom") +
+  scale_x_date(date_breaks = "month" , date_labels = "%b-%y") +
+  theme(legend.position="bottom") +
+  theme(axis.text.x = element_text(angle = 90))
+
+#weekly incidence rate by week
+nyt_state_pop_wrangle_weekly %>% 
+  filter(continental_48==1) %>%   
+  ggplot( aes(x=date_max, y=cases_incident_per_pop_week))+
+  geom_line(aes(color = state)) +
+  ylab("Incidence rate of COVID-19\n per person-week") +
+  xlab("Date")  +
+  #https://ggplot2.tidyverse.org/reference/labs.html
+  labs(color = "State")+ #label legend
+  theme_bw() +
+  theme(legend.position="bottom") +
+  scale_x_date(date_breaks = "month" , date_labels = "%b-%y") +
+  theme(legend.position="bottom") +
+  theme(axis.text.x = element_text(angle = 90))
+
+
 
