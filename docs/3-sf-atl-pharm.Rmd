@@ -55,6 +55,8 @@ Specifically:
 
 -   Illustrate use of `st_buffer()` to create a buffer area around a polygon.
 
+-   Illustrate use of `ggplot2()` to map sf objects.
+
 **Background**
 
 I'd suggest reviewing all of the vignettes here:
@@ -96,7 +98,13 @@ library(here)
 
 Note: throughout this code, I'm writing out packagename::function to be more clear of the package source, but that syntax is not necessary. That is, you could write `get_acs()` rather than `tidycensus::get_acs()` because no other loaded package uses that function.
 
-This code chunk tells osmdata to save the geometry locally, which can speed up the process if you end up downloading it multiple times.
+Packages used in this section (besides dplyr and sf):
+
+-   tidycensus to download American Community Survey data
+
+-   ggplot2 to make static maps
+
+This code chunk tells tidycensus to save the geometry locally, which can speed up the process if you end up downloading it multiple times.
 
 ```{r}
 options(tigris_use_cache = TRUE) 
@@ -105,11 +113,11 @@ options(tigris_use_cache = TRUE)
 Load population data for all of Georgia's census tracts based on American Community Survey estimates (2016-2020 5-year). Recall, we can search variable names using by:
 
 ```{r, eval=FALSE}
-vars_acs_2020 = load_variables(2020, "acs5", cache = TRUE)
+vars_acs_2020 = tidycensus::load_variables(2020, "acs5", cache = TRUE)
 View(vars_acs_2019) 
 ```
 
-## Data download using `get_acs()`
+## Download data using `get_acs()`
 
 ```{r, include=FALSE, eval=TRUE, echo=FALSE}
 library(here)
@@ -329,6 +337,8 @@ county_ga %>%
   viridis::scale_fill_viridis(name = "Population")
 ```
 
+### Visualize population density
+
 ```{r}
 #Visualize population density
 county_ga %>% 
@@ -341,3 +351,199 @@ county_ga %>%
 ```
 
 # Download and manipulate pharmacies in Fulton and Dekalb Counties
+
+Packages used in this section (besides dplyr and sf):
+
+-   [osmdata](https://cran.r-project.org/web/packages/osmdata/vignettes/osmdata.html) to download pharmacies from OpenStreetMap
+
+-   mapview
+
+The eventual goal is to gather a dataset of all pharmacies in Fulton County and Dekalb County. The osmdata package takes a bounding box to define the area for which to download data.
+
+First, download all pharmacies in the bounding box defined by the min and max coordintes of Fulton and Dekalb Counties, and then restrict to the actual county boundaries.
+
+Let's first take a look at those counties using mapview:
+
+-   Fulton is 13121
+
+-   Dekalb is 13089
+
+```{r}
+county_ga %>% 
+  dplyr::filter(county_fips == "13121" | county_fips == "13089") %>% 
+  mapview::mapview()
+```
+
+Okay, in creating the bounding box, Fulton has the westernmost, northernmost, and southernmost coordinates, and Dekalb has the easternmost point. We could approximate the coordinates manually by clicking in Google Maps (maybe easier) or extract the coordinates with some sf functions, which could then generalize to other settings.
+
+## Use `st_union()` to generate a geometry file for the smushed together version of Fulton and Dekalb counties 
+
+Before we do that, let's get smash the two counties together into one single feature.
+
+```{r}
+fulton_dekalb_union = county_ga %>% 
+  dplyr::filter(county_fips == "13121" | county_fips == "13089") %>% 
+  sf::st_union() %>% #combine the two features into one.
+  sf::st_as_sf() %>% #confirm it's an sf object again.
+  sf::st_transform(4326) #be explicit about the coordinate system. step not necessary.
+```
+
+Let's take a look using mapview.
+
+Note that **several mapview layers can be combined** using plus signs
+
+Reference: <https://r-spatial.github.io/mapview/articles/mapview_02-advanced.html>
+
+This situation may be one of the few where the piped style is less useful.
+
+```{r}
+#Create sf objects of just Fulton County and of just Dekalb County
+fulton = county_ga %>%  
+  dplyr::filter(county_fips == "13121")
+dekalb = county_ga %>% 
+  dplyr::filter(county_fips == "13089")
+
+#Combine multiple mapviews
+mapview(fulton, col.regions = "yellow")+ 
+  mapview(dekalb, col.regions = "blue") + 
+  mapview(fulton_dekalb_union, col.regions = "gray50") 
+```
+
+## Use `st_bbox()` to get the bounding box of the Fulton-Dekalb sf object
+
+```{r}
+bbox_fulton_dekalb = fulton_dekalb_union %>% 
+  sf::st_bbox()      #returns the bounding box of this sf object
+```
+
+Visualize the bounding box. I'm doing some data prep beforehand to convert the bounding box, which is a list of values, back to an sf object. I use the [`st_as_sf()`](https://r-spatial.github.io/sf/reference/st_as_sf.html) function and define the coordinates for the four points of the box as columns, respectively, of longitude and latitude. And I define the coordinate reference system as 4326 per usual.
+
+```{r}
+bbox_lon = c(bbox_fulton_dekalb$xmax, 
+              bbox_fulton_dekalb$xmin, 
+              bbox_fulton_dekalb$xmax, 
+              bbox_fulton_dekalb$xmin) %>% 
+  as_tibble() %>% 
+  rename(lon = value)
+
+bbox_lat = c(bbox_fulton_dekalb$ymax, bbox_fulton_dekalb$ymax,
+             bbox_fulton_dekalb$ymin, bbox_fulton_dekalb$ymin) %>% 
+  as_tibble() %>% 
+  rename(lat = value)
+
+bbox_fulton_dekalb_sf = bbox_lat  %>% 
+  bind_cols(bbox_lon) %>% 
+  st_as_sf(coords = c("lon", "lat"), crs = 4326) 
+
+mapview(fulton_dekalb_union, col.regions = "gray50") +
+  mapview(bbox_fulton_dekalb_sf)
+```
+
+## Use osmdata to download pharmacies in the bounding box
+
+References:
+
+-   overview of package and workflow: <https://cran.r-project.org/web/packages/osmdata/vignettes/osmdata.html>
+
+-   Details on the `opq()` function, specifically: <https://www.rdocumentation.org/packages/osmdata/versions/0.1.5/topics/opq>
+
+    opq stands fro overpass query. Overpass is the name of the API used.
+
+As mentioned above, the `opq()` function takes a bounding box to know what catchment area to download data from. The `bbox` argument can either be a string of maximal and minimal latitudes for the bounding box, or it can be the name of a place, from which a bounding box will be derived. For example, we could say: `bbox = "Georgia, USA"` .
+
+The bounding box will be a rectangle based on the farthest apart corners. So we know exactly what we're getting, let's use the values from the bounding box created above. The order it expects is `c(xmin, ymin, xmax, ymax).`
+
+And the "key" and "value" correspond to the data structure of OpenStreetMap.
+
+Finally, we use `osmdata::osmdata_sf()` to return sf objects.
+
+```{r, include=FALSE, eval=TRUE, echo=FALSE}
+library(here)
+setwd(here("data-processed"))
+load("pharm.RData") #I saved August 3rd, 2022
+```
+
+```{r, eval=FALSE}
+pharm= osmdata::opq (
+   bbox = c(
+     bbox_fulton_dekalb$xmin,
+     bbox_fulton_dekalb$ymin,
+     bbox_fulton_dekalb$xmax,
+     bbox_fulton_dekalb$ymax)
+  ) %>%
+  osmdata::add_osm_feature(
+    key = "amenity",
+    value = "pharmacy") %>%
+  osmdata::osmdata_sf() #return an sf object
+```
+
+Every now and then, this function throws an error. If so, feel free to download the .RData file from my [Dropbox folder](https://www.dropbox.com/sh/ff85l058vl82wwy/AABKygH3PhQkausaxOcIgO0Sa?dl=0) so that you can run the rest of the code. You would then load it into your R environment using something like this, depending on the folder from which you load the data.
+
+```{r, eval=FALSE}
+library(here)
+#The name of your folder with the data.
+setwd(here("data-input")) 
+load("pharm.RData")
+```
+
+The result of this is an object of class osmdata, which is a special type of list comprised of elements containing the various types of geometry (points, polygons, etc.).
+
+Reference: <https://cran.r-project.org/web/packages/osmdata/vignettes/osmdata.html#3_The_osmdata_object>
+
+Because we used the `osmdata_sf()` function, each element in the list is an sf object.
+
+Let's take a look.
+
+```{r}
+pharm
+```
+
+Let's now grab the individual sf objects from the list:
+
+```{r}
+pharm_points = pharm$osm_points
+pharm_polygons = pharm$osm_points
+pharm_multipolygons = pharm$osm_multipolygons
+```
+
+Note, for reference that this could also be done using a pipe, which could be useful if we wanted to incorporate this as a part of a workflow with multiple steps. The `.` is a stand in for the object because \$ an operator and not a function.
+
+```{r}
+pharm_points = pharm %>% 
+  .$osm_points
+```
+
+### Visualize the osmdata sf objects using mapview
+
+I'm saving mapview objects so I can them layer them together.
+
+```{r}
+mv_points = mapview(
+  pharm_points,
+  col.regions = "red",
+  color = "red") 
+
+mv_polygons =   pharm_polygons %>% 
+  mapview(
+    layer.name = "pharm_polygons",
+    color = "blue",
+    col.regions = "blue")
+
+#This is at North and Piedmont.
+mv_multipolygons = mapview(
+  pharm_multipolygons,
+  color = "purple",
+  col.regions = "purple")
+
+#Compare with the bounding box and the Fulton-Dekalb county boundaries
+mv_fulton_dekalb_union = mapview(
+  fulton_dekalb_union, col.regions = "gray50")
+mv_bbox = mapview(
+  bbox_fulton_dekalb_sf, 
+  col.regions = "orange",
+                  color = "orange")
+
+#Visualize all of the layerss
+mv_points + mv_polygons + mv_multipolygons +
+  mv_fulton_dekalb_union+mv_bbox
+```

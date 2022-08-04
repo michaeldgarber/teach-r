@@ -207,7 +207,8 @@ county_ga %>%
 
 # 3. Download and manipulate pharmacies in Fulton and Dekalb County--------------------
 # Eventual goal is to gather a dataset of all pharmacies in FUlton County and Dekalb County.
-# First download all pharmacies in this bounding box that includes Fulton and Dekabl and then restrict to Fulton and Dekalb County
+# First download all pharmacies in this bounding box that includes Fulton and Dekalb 
+#and then restrict to Fulton and Dekalb County
 
 #Get a picture of Fulton and Dekalb first.
 #Fulton is 13121
@@ -244,7 +245,7 @@ mapview(fulton, col.regions = "yellow")+
   mapview(dekalb, col.regions = "blue") + 
   mapview(fulton_dekalb_union, col.regions = "gray50") 
 
-# 3.2. Use st_bbox to get the bounding box for the Fulton-Dekalb sf object.-----------
+## Use st_bbox to get the bounding box for the Fulton-Dekalb sf object--------
 bbox_fulton_dekalb = fulton_dekalb_union %>% 
   sf::st_bbox()      #returns the bounding box of this sf object
 
@@ -269,20 +270,7 @@ mapview(fulton_dekalb_union, col.regions = "gray50") +
   mapview(bbox_fulton_dekalb_sf)
 
 
-bbox_fulton_dekalb %>% 
-  st_as_sf() %>% 
-  mapview()
-
-bbox_fulton_dekalb$xmin
-bbox_fulton_dekalb$xmin
-
-#See the unioned output for the two counties, for reference.
-county_ga %>% 
-  dplyr::filter(county_fips == "13121" | county_fips == "13089") %>% 
-  sf::st_union() %>% 
-  mapview::mapview()
-
-#---------3.3. Use osmdata to download pharmacies in the bounding box-------------#####
+## Use osmdata to download pharmacies in the bounding box------------------
 #https://cran.r-project.org/web/packages/osmdata/vignettes/osmdata.html
 #Info on opq function: https://www.rdocumentation.org/packages/osmdata/versions/0.1.5/topics/opq
 #Note this code takes a while.
@@ -317,8 +305,6 @@ save(pharm, file = "pharm.RData")
 #see https://cran.r-project.org/web/packages/osmdata/vignettes/osmdata.html#3_The_osmdata_object
 #Because we used the osmdata_sf code, each element in the list is an sf object.
 pharm 
-#705 pharmacies represented as points, 67 represented as polygons, and 1 represented as a multipolygon. 
-#None represented as a line.
 class(pharm)
 #To access each sf object, we can use the dollar-sign operator.
 class(pharm$osm_points)
@@ -371,7 +357,7 @@ mv_points + mv_polygons + mv_multipolygons
 
 
 
-#------------3.4. Limit to the pharmacies in Fulton and Dekalb county----#########
+## Limit to the pharmacies in Fulton and Dekalb county---------------------
 #Use st_intersection
 #Could do this later as well but it makes sense to do it earlier so that we're working with a smaller dataset.
 #Note this requires sf objects to be in the same coordinate system.
@@ -422,7 +408,8 @@ pharm_multipolygons_fd = pharm_multipolygons %>%
   mutate(type_multipolygon=1)
 
 nrow(pharm_multipolygons_fd)
-# 4. Combine the pharmacies into a single dataset, restricted to those in Fulton and Dekalb----------------
+# 4. Combine the pharmacies into a single dataset------------ 
+#restricted to those in Fulton and Dekalb
 #Conclusion: many of the points are simply vertices of buildings which are coded as polygons.
 #Where this is the case, let's remove the points and keep the polygons.
 # There is also one coded as multipolygon. It contains much of the metadata about the pharmacy (osm_id = 11918050),
@@ -430,12 +417,12 @@ nrow(pharm_multipolygons_fd)
 
 # Find points that join with polygons and exclude those points..
 
-#---------4.1. st_buffer-----########
+## st_buffer---------------
 # Before finding intersections, make sure the points are large enough to overlap the polygons 
 #(i.e., no false negatives).
 #This may not be necessary here but is good insurance.
 
-#------4.2. Avoid duplicates.--------####### 
+## Avoid duplicates.-----------------
 #Also, because st_intersection is like a join, it will link all variables from each joining datasets.
 # To avoid duplicate variable names, remove extraneous variables before joining.
 
@@ -450,10 +437,10 @@ nrow(pharm_points_fd)
 names(pharm_points_fd_buff_20m)
 mapview(pharm_points_fd_buff_20m, col.regions = "orange") + mapview(pharm_points_fd)
 
-#--------4.3: use st_join to perform the spatial join.------------#####
+## use st_join to perform the spatial join.--------------------
 #A few ways this could be done:
-# st_intersection
-# st_intersects
+# st_intersection (returns a geometry)
+# st_intersects (does not return geometry)
 # st_join - https://r-spatial.github.io/sf/reference/st_join.html
 
 # st_join is the best for this specific problem, I think, where we essentially want a left join.
@@ -477,13 +464,13 @@ nrow(pharm_points_fd_buff_20m)
 table(pharm_points_polygons_join$point_overlaps_polygon)
 mapview(pharm_points_polygons_join, zcol = "point_overlaps_polygon")
 
-#--------4.4: Remove points that joined with polygons from the point dataset.------------#####
+## Remove points that joined with polygons from the point dataset.--------------
 pharm_points_fd_nodupes = pharm_points_polygons_join %>% 
   filter(point_overlaps_polygon==0)
 
 nrow(pharm_points_fd_nodupes)
 
-#-----4.5. All of the points in one pipe-------#######
+## All of the points in one pipe---------------
 #Note: we could do all of the above  in one step.
 pharm_points_fd_nodupes = pharm_points_fd %>% 
   st_buffer(20) %>% #create a 20 m buffer around each point.
@@ -502,7 +489,7 @@ pharm_points_fd_nodupes = pharm_points_fd %>%
 
 names(pharm_points_fd_nodupes)
 
-#-----4.6. Filter to all polygons that are not covered by the single multipolygon-----#######
+## Filter to all polygons that are not covered by the single multipolygon---------
 #could do this manually but try programatically.
 pharm_polygons_fd_no_multipolygon = pharm_polygons_fd %>% 
   rename(osm_id_polygon = osm_id) %>% 
@@ -521,9 +508,9 @@ mapview(pharm_polygons_fd, col.regions = "red") +
   mapview(pharm_multipolygons_fd, col.regions = "orange")
 
 
-#------4.7 Combine all pharmacies together in one datset.----------####
+## Combine all pharmacies together in one datset.----------------
 
-#-----4.7.1. Use st_centroid to convert all to points-----#######
+### Use st_centroid to convert all to points--------
 #For simplicity, first find the centroid of each of buffered points, the polygons, 
 #and the multipolygon
 
@@ -564,7 +551,7 @@ mapview(pharm_points_fd_nodupes_centroid, col.regions = "blue") +
   mapview(pharm_polygons_fd_no_multipolygon_centroid, col.regions = "red")+
   mapview(pharm_multipolygons_fd_centroid, col.regions = "orange")
 
-#-----4.7.2. Use bind_rows to stack them together into one dataset-----####
+### 4.7.2. Use bind_rows to stack them together into one dataset--------
 pharm_fd_combined = pharm_points_fd_nodupes_centroid %>% 
   dplyr::bind_rows(
     pharm_polygons_fd_no_multipolygon_centroid,
@@ -573,17 +560,18 @@ pharm_fd_combined = pharm_points_fd_nodupes_centroid %>%
 
 # how many pharmacies?
 nrow(pharm_fd_combined) #66
-mapview(pharm_fd_combined, zcol = "type_original") +  mapview(fulton_dekalb_union, col.regions = "gray50") 
+mapview(pharm_fd_combined, zcol = "type_original") +  
+  mapview(fulton_dekalb_union, col.regions = "gray50") 
 
 # 5. Estimate population within a .5 mile of a pharmacy------------------------
-#----5.1. Create half-mile buffer around each pharmacy----#####
+## Create half-mile buffer around each pharmacy------------
 pharm_fd_combined_halfmile = pharm_fd_combined %>% 
   sf::st_transform(2240) %>% 
   sf::st_buffer(5280/2)
 
 mapview(pharm_fd_combined_halfmile)  
 
-#----5.2. Combine into a single sf object---#####
+## Combine into a single sf object----------------------
 #for simplicity, combine into one single object using st_union
 pharm_fd_combined_halfmile_union = pharm_fd_combined_halfmile %>% 
   st_union() %>% 
@@ -591,9 +579,9 @@ pharm_fd_combined_halfmile_union = pharm_fd_combined_halfmile %>%
 
 nrow(pharm_fd_combined_halfmile_union) #1 observation
 
-#-----5.3. Assess proportion each census tract is overlapped by this object.-----######
+## Assess proportion each census tract is overlapped by this object.------------
 
-#-----5.3.1. Find part of census tracts that overlaps the pharmacy buffer areas------######
+### Find part of census tracts that overlaps the pharmacy buffer areas---------
 tract_fulton_dekalb = tract_ga_wrangle %>% 
   #Filter to census tracts in Fulton and Dekalb County
   dplyr::filter(county_fips == "13121" | county_fips == "13089") 
@@ -619,7 +607,7 @@ nrow(tract_fulton_dekalb_int_pharm_buff)
 #Map the intersected pieces of census tracts
 mapview(tract_fulton_dekalb_int_pharm_buff, zcol = "number_for_vis")
 
-#-----5.3.2. Link that overlapping part with all of the census tracts------#########
+### Link that overlapping part with all of the census tracts----------
 #Link with the unintersected version.
 #remove geometry from these intersected pieces befoe linking.
 tract_fulton_dekalb_int_pharm_buff_nogeo = tract_fulton_dekalb_int_pharm_buff %>% 
@@ -641,7 +629,7 @@ tract_fulton_dekalb_linked = tract_fulton_dekalb %>%
     pop_overlap = prop_area_overlap_ft2_linked*pop
   )
 
-#-----5.3.3. Sum over all values and calculate the total proportion of the population within a half-mile---#######
+### 5.3.3. Sum over all values and calculate proportion of the population within a half-mile---
 #Total overlapping population
 tract_fulton_dekalb_linked %>% 
   st_set_geometry(NULL) %>% 
@@ -658,7 +646,8 @@ tract_fulton_dekalb_linked %>%
 
 #10% of the population in Fulton and Dekalb County lives within a half mile of a pharmacy.
 
-#Future analysis: do this stratified by SES or social vulnerability category. 
+# Future analysis:---------
+#do this stratified by SES or social vulnerability category. 
 #Looks like lots of pharmacies in higher-SES areas
 
 
