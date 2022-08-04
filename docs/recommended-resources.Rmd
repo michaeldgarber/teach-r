@@ -30,7 +30,17 @@ The R universe has lots of helpful and free online resources. Here are some that
 
 -   For **manipulating spatial data** (sf)
 
-    -   sf home page: <https://r-spatial.github.io/sf/index.html>
+    -   sf home page and vignettes 1-4:
+
+        -   <https://r-spatial.github.io/sf/index.html>
+
+        -   <https://r-spatial.github.io/sf/articles/sf1.html>
+
+        -   <https://r-spatial.github.io/sf/articles/sf2.html>
+
+        -   <https://r-spatial.github.io/sf/articles/sf3.html>
+
+        -   <https://r-spatial.github.io/sf/articles/sf4.html>
 
     -   Geocomputation with R (Lovelace, Nowosad, Muenchow) : <https://geocompr.robinlovelace.net/>
 
@@ -76,11 +86,13 @@ The R universe has lots of helpful and free online resources. Here are some that
 
     -   RStudio cheatsheets on dplyr, ggplot2, and more: <https://www.rstudio.com/resources/cheatsheets/>
 
-    -   Downloading census data: <https://walker-data.com/tidycensus/>
+    -   For downloading free or open-source data into R:
 
-    -   Downloading OpenStreetMap data: <https://github.com/ropensci/osmdata>
+        -   Downloading census data (tidycensus): <https://walker-data.com/tidycensus/>
 
-    -   RMarkdown:
+        -   Downloading OpenStreetMap data (osmdata): <https://cran.r-project.org/web/packages/osmdata/vignettes/osmdata.html>
+
+    -   R Markdown:
 
         -   R Markdown, the Definitive Guide: <https://bookdown.org/yihui/rmarkdown/>
 
