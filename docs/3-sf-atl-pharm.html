@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Michael Garber, PhD MPH" />
+
+
+<title>R for spatial data wrangling: a demo of sf using pharmacies in Atlanta</title>
+
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="https://michaeldgarber.github.io/">
+    <span class="fa fa-home"></span>
+     
+    MDG
+  </a>
+</li>
+<li>
+  <a href="index.html">R course</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">R for spatial data wrangling: a demo of sf using pharmacies in Atlanta</h1>
+<h4 class="author">Michael Garber, PhD MPH</h4>
+<h4 class="date">Revised August 3rd, 2022</h4>
+
+</div>
+
+
+<div id="objective-and-background" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> Objective and background</h1>
+<p>Outline of the different sf object types: <a href="https://r-spatial.github.io/sf/articles/sf1.html" class="uri">https://r-spatial.github.io/sf/articles/sf1.html</a></p>
+<ul>
+<li><p>point</p></li>
+<li><p>linestring</p></li>
+<li><p>polygon</p></li>
+<li><p>multipoint</p></li>
+<li><p>multilinestring</p></li>
+<li><p>multipolygon</p></li>
+<li><p>geometry collection - set of geomtries of any type</p></li>
+</ul>
+<p><strong>Overall goal</strong>: Illustrate use of sf through some example analyses using spatially referenced pharmacy data downloaded from OpenStreetMap and spatially referenced population data in the Atlanta area downloaded from the US Census.</p>
+<p>Specifically:</p>
+<ol style="list-style-type: decimal">
+<li><p>Count the number of pharmacies in Fulton and Dekalb counties (Atlanta area), according to OpenStreetMap.</p></li>
+<li><p>How many people live within 1/2 mile of these pharmacies in these counties?</p></li>
+<li><p>How is residential proximity to a pharmacy distributed socioeconomically?</p></li>
+</ol>
+<p><strong>Miscellaneous methods used and things to note:</strong></p>
+<ul>
+<li><p>Note that dplyr and sf functions can be used in the same pipe.</p></li>
+<li><p>Illustrate use of the <code>st_area()</code> function to measure area.</p></li>
+<li><p>Illustrate use of <code>st_union()</code>, which smushes together multiple sf features into one single feature.</p></li>
+<li><p>Similarly, we can dissolve (ArcGIS word) census tracts into counties using the <code>group_by()</code> and <code>summarise()</code> syntax from dplyr.</p></li>
+<li><p>Illustrate use of <code>st_intersection()</code>, which returns the geometry covered by overlapping features.</p></li>
+<li><p>Illustrate use of <code>st_join()</code>, which allows for a spatial left join.</p></li>
+<li><p>Illustrate use of <code>st_centroid()</code>, which finds the <a href="https://en.wikipedia.org/wiki/Centroid">centroid</a> (weighted average middle) of an sf object.</p></li>
+<li><p>Illustrate use of <code>st_buffer()</code> to create a buffer area around a polygon.</p></li>
+</ul>
+<p><strong>Background</strong></p>
+<p>I’d suggest reviewing all of the vignettes here:</p>
+<p><a href="https://r-spatial.github.io/sf/articles/sf1.html" class="uri">https://r-spatial.github.io/sf/articles/sf1.html</a></p>
+<p><a href="https://r-spatial.github.io/sf/articles/sf2.html" class="uri">https://r-spatial.github.io/sf/articles/sf2.html</a></p>
+<p><a href="https://r-spatial.github.io/sf/articles/sf3.html" class="uri">https://r-spatial.github.io/sf/articles/sf3.html</a></p>
+<p><a href="https://r-spatial.github.io/sf/articles/sf3.html">https://r-spatial.github.io/sf/articles/sf4.html</a></p>
+<div id="install-and-load-packages" class="section level2" number="1.1">
+<h2><span class="header-section-number">1.1</span> Install and load packages</h2>
+<pre class="r"><code>#Packages needed for downloading data
+install.packages(&quot;osmdata&quot;)
+install.packages(&quot;tidycensus&quot;)
+
+#Other packages used
+install.packages(&quot;tidyverse&quot;) #always
+install.packages(&quot;sf&quot;) #focus of session; spatial data wrangling
+install.packages(&quot;mapview&quot;) #interactive mapping
+install.packages(&quot;viridis&quot;) #for color scales.
+install.packages(&quot;here&quot;) #working-directory management</code></pre>
+<pre class="r"><code>library(osmdata)
+library(tidycensus)
+library(tidyverse)
+library(sf)
+library(mapview)
+library(viridis)
+library(here)</code></pre>
+</div>
+</div>
+<div id="download-prepare-and-visualize-census-tract-data-for-georgia" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Download, prepare, and visualize census tract data for Georgia</h1>
+<p>Note: throughout this code, I’m writing out packagename::function to be more clear of the package source, but that syntax is not necessary. That is, you could write <code>get_acs()</code> rather than <code>tidycensus::get_acs()</code> because no other loaded package uses that function.</p>
+<p>This code chunk tells osmdata to save the geometry locally, which can speed up the process if you end up downloading it multiple times.</p>
+<pre class="r"><code>options(tigris_use_cache = TRUE) </code></pre>
+<p>Load population data for all of Georgia’s census tracts based on American Community Survey estimates (2016-2020 5-year). Recall, we can search variable names using by:</p>
+<pre class="r"><code>vars_acs_2020 = load_variables(2020, &quot;acs5&quot;, cache = TRUE)
+View(vars_acs_2019) </code></pre>
+<div id="data-download-using-get_acs" class="section level2" number="2.1">
+<h2><span class="header-section-number">2.1</span> Data download using <code>get_acs()</code></h2>
+<pre class="r"><code>tract_ga =tidycensus::get_acs(
+  year=2020,
+  #make it wide form (rather than long-form, default) so variable names are in columns
+  # https://cran.r-project.org/web/packages/tidycensus/tidycensus.pdf
+  output = &quot;wide&quot;,  
+  geography = &quot;tract&quot;,
+  state =&quot;GA&quot;,
+  geometry = TRUE, #omit geometry for speed
+  variables = c(
+    pop  = &quot;B01001_001&quot;)
+)</code></pre>
+</div>
+<div id="wrangle-data-using-dplyr-and-sf-functions-including-st_area-st_transform" class="section level2" number="2.2">
+<h2><span class="header-section-number">2.2</span> Wrangle data using dplyr and sf functions, including <code>st_area()</code>, <code>st_transform()</code></h2>
+<p>Here are our first sf functions. We measure the area of each census tract using <code>sf::st_area()</code>, and we go back and forth between coordinate reference systems (CRS) using <code>sf::st_transform()</code>. I typically use WGS84, a <a href="https://en.wikipedia.org/wiki/World_Geodetic_System#WGS84">commonly used</a> CRS, which has the <a href="https://en.wikipedia.org/wiki/EPSG_Geodetic_Parameter_Dataset">EPSG</a> code of 4326. The main practical consideration in deciding which CRS to use is its system of measurement (meters or feet).</p>
+<p>Overview resources on coordinate reference systems:</p>
+<ul>
+<li><p><a href="https://rspatial.org/raster/spatial/6-crs.html" class="uri">https://rspatial.org/raster/spatial/6-crs.html</a></p>
+<ul>
+<li><p><a href="https://en.wikipedia.org/wiki/Spatial_reference_system" class="uri">https://en.wikipedia.org/wiki/Spatial_reference_system</a></p></li>
+<li><p><a href="https://www.nceas.ucsb.edu/sites/default/files/2020-04/OverviewCoordinateReferenceSystems.pdf" class="uri">https://www.nceas.ucsb.edu/sites/default/files/2020-04/OverviewCoordinateReferenceSystems.pdf</a></p></li>
+</ul></li>
+<li><p>List of coordinate reference systems:</p>
+<ul>
+<li><p><a href="https://www.spatialreference.org/ref/epsg/2239/">https://www.spatialreference.org/ref</a> - “bad gateway” - hopefully that resolves, as this page has a nice list of EPSG codes with output units (feet or meters)</p></li>
+<li><p><a href="https://epsg.org/search/by-name" class="uri">https://epsg.org/search/by-name</a></p></li>
+</ul></li>
+<li><p>Other topics in this code chunk:</p>
+<ul>
+<li><p>FIPS codes:</p>
+<ul>
+<li><p>overview: <a href="https://www.census.gov/library/reference/code-lists/ansi.html" class="uri">https://www.census.gov/library/reference/code-lists/ansi.html</a></p></li>
+<li><p>county look-up: <a href="https://www.nrcs.usda.gov/wps/portal/nrcs/detail/ga/home/?cid=nrcs143_013697" class="uri">https://www.nrcs.usda.gov/wps/portal/nrcs/detail/ga/home/?cid=nrcs143_013697</a></p></li>
+</ul></li>
+<li><p><code>stringr::str_sub()</code> to extract a string by position.</p></li>
+</ul></li>
+</ul>
+<pre class="r"><code>tract_ga_wrangle = tract_ga %&gt;% 
+  dplyr::rename(
+    geo_id= GEOID,
+    name_tract_county = NAME,
+    pop = popE
+  ) %&gt;% 
+  sf::st_transform(4326) %&gt;% #
+  dplyr::mutate(
+    #Extract county 5-digit FIPS code
+    #first 2 digits of the FIPS code
+    #correspond to state. Then the next 3 indicate the county.
+    # Note Fulton is 13121
+    # Dekalb is 13089
+    #stringr is a tidyverse package
+    county_fips = stringr::str_sub(geo_id, start=1, 5),
+    area_4326 = sf::st_area(geometry), #returns area of type &quot;units&quot;. 
+    #measured in meters squared because of the coordinate system.
+    area_m2 = as.numeric(area_4326), #convert to numeric. strip units
+    
+    #indicator for major Atlanta Metro Counties
+    atlanta_metro = case_when(
+      #character format even though they&#39;re numbers, so quote
+      county_fips %in% c(
+        &quot;13121&quot;,#fulton 
+        &quot;13089&quot;,#dekalb
+        &quot;13135&quot;,#gwinnett
+        &quot;13067&quot;, #cobb
+        &quot;13063&quot;, #clayton
+        &quot;13097&quot;  #douglas
+        ) ~1,
+      TRUE ~0)  
+    ) %&gt;% 
+  #For fun, convert it to a coordinate system that will output in feet.
+  #https://www.spatialreference.org/ref/epsg/2239/
+  #NAD83 / Georgia West (ftUS)
+  sf::st_transform(2240) %&gt;% 
+  dplyr::mutate(
+    area_2240 = sf::st_area(geometry), #square feet
+    area_ft2 = as.numeric(area_2240),
+    area_mi2 = area_ft2/27878400, #convert to square miles
+    #calculate population density
+    pop_dens_per_mi2 = pop/area_mi2
+  ) %&gt;% 
+  #Remove the population margin of error
+  dplyr::select(-popM) </code></pre>
+<p>Note that we could have included the above code as part of the one above it (i.e., where <code>tract_ga</code> was created) all in one pipe. That would have made the code a bit more concise. When downloading from an external source, though, it can be better to limit the number of times the you call on the external source, both for computing speed (it can take a while) and because some sources (e.g., OpenStreetMap) have limits on the number of times you can download in a short period of time, as it strains their resources. So, in this case, assuming we may have to re-run the wrangling steps a few times before we’ve made our final decision, we prioritize courtesy over brevity.</p>
+<p>Take a look at the data:</p>
+<pre class="r"><code>tract_ga_wrangle</code></pre>
+<pre><code>## Simple feature collection with 2796 features and 11 fields (with 5 geometries empty)
+## Geometry type: MULTIPOLYGON
+## Dimension:     XY
+## Bounding box:  xmin: 1865698 ymin: 135730 xmax: 3327905 ymax: 1821090
+## Projected CRS: NAD83 / Georgia West (ftUS)
+## First 10 features:
+##         geo_id                            name_tract_county  pop county_fips
+## 1  13101880100    Census Tract 8801, Echols County, Georgia 1486       13101
+## 2  13185011100    Census Tract 111, Lowndes County, Georgia 3229       13185
+## 3  13277960700      Census Tract 9607, Tift County, Georgia 4735       13277
+## 4  13299950200      Census Tract 9502, Ware County, Georgia 7948       13299
+## 5  13087970600   Census Tract 9706, Decatur County, Georgia 5649       13087
+## 6  13095010500  Census Tract 105, Dougherty County, Georgia 1962       13095
+## 7  13089021908  Census Tract 219.08, DeKalb County, Georgia 4829       13089
+## 8  13089020400     Census Tract 204, DeKalb County, Georgia 2743       13089
+## 9  13089023410  Census Tract 234.10, DeKalb County, Georgia 3903       13089
+## 10 13051010601 Census Tract 106.01, Chatham County, Georgia 4182       13051
+##          area_4326   area_m2 atlanta_metro                     area_2240
+## 1  875538524 [m^2] 875538524             0 9416742013 [US_survey_foot^2]
+## 2    1953410 [m^2]   1953410             0   21005591 [US_survey_foot^2]
+## 3   24582497 [m^2]  24582497             0  264352359 [US_survey_foot^2]
+## 4  331278674 [m^2] 331278674             0 3564136476 [US_survey_foot^2]
+## 5   39107954 [m^2]  39107954             0  420480485 [US_survey_foot^2]
+## 6   25153201 [m^2]  25153201             0  270470479 [US_survey_foot^2]
+## 7    3462981 [m^2]   3462981             1   37255224 [US_survey_foot^2]
+## 8    1021595 [m^2]   1021595             1   10990443 [US_survey_foot^2]
+## 9    3238562 [m^2]   3238562             1   34840255 [US_survey_foot^2]
+## 10   5939994 [m^2]   5939994             0   64007603 [US_survey_foot^2]
+##      area_ft2    area_mi2 pop_dens_per_mi2                       geometry
+## 1  9416742013 337.7791413         4.399324 MULTIPOLYGON (((2645879 227...
+## 2    21005591   0.7534719      4285.494865 MULTIPOLYGON (((2567702 313...
+## 3   264352359   9.4823361       499.349521 MULTIPOLYGON (((2477474 537...
+## 4  3564136476 127.8458045        62.168642 MULTIPOLYGON (((2754721 458...
+## 5   420480485  15.0826620       374.536007 MULTIPOLYGON (((2168049 329...
+## 6   270470479   9.7017935       202.230650 MULTIPOLYGON (((2273112 547...
+## 7    37255224   1.3363473      3613.581609 MULTIPOLYGON (((2284578 138...
+## 8    10990443   0.3942279      6957.904409 MULTIPOLYGON (((2241109 136...
+## 9    34840255   1.2497222      3123.094127 MULTIPOLYGON (((2256695 135...
+## 10   64007603   2.2959568      1821.462829 MULTIPOLYGON (((3225163 784...</code></pre>
+<pre class="r"><code>class(tract_ga_wrangle$area_4326) #note units</code></pre>
+<pre><code>## [1] &quot;units&quot;</code></pre>
+<pre class="r"><code>class(tract_ga_wrangle$area_m2) #numeric</code></pre>
+<pre><code>## [1] &quot;numeric&quot;</code></pre>
+<pre class="r"><code>class(tract_ga_wrangle$area_2240) #units</code></pre>
+<pre><code>## [1] &quot;units&quot;</code></pre>
+<pre class="r"><code>class(tract_ga_wrangle$area_ft) #numeric</code></pre>
+<pre><code>## [1] &quot;numeric&quot;</code></pre>
+</div>
+<div id="map-census-tracts-using-ggplot" class="section level2" number="2.3">
+<h2><span class="header-section-number">2.3</span> Map census tracts using ggplot</h2>
+<div id="visualize-population" class="section level3" number="2.3.1">
+<h3><span class="header-section-number">2.3.1</span> Visualize population</h3>
+<p>Use the viridis palette, which is built into ggplot2:</p>
+<p><a href="https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html" class="uri">https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html</a></p>
+<p><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="uri">https://ggplot2.tidyverse.org/reference/scale_viridis.html</a></p>
+<p>Note <code>ggplot2::scale_fill_viridis_b()</code> automatically discretizes (breaks into groups) the color scale. The _b stands for bin for binning continuous data before the mapping.</p>
+<pre class="r"><code>tract_ga_wrangle %&gt;% 
+  ggplot2::ggplot(aes(fill = pop, color = pop))+ 
+  ggplot2::geom_sf()+ 
+  ggplot2::scale_fill_viridis_b()+ #fill color of the polygons
+  ggplot2::scale_colour_viridis_b() #line (border) color of the polygons</code></pre>
+<p><img src="3-sf-atl-pharm_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+</div>
+<div id="visualize-population-density" class="section level3" number="2.3.2">
+<h3><span class="header-section-number">2.3.2</span> Visualize population density</h3>
+<p>Here I’d like to keep the scale in continuous form rather than in bins, as above, so I’m going to use the palettes directly from <a href="https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html">viridis</a>.</p>
+<pre class="r"><code>tract_ga_wrangle %&gt;% 
+  ggplot2::ggplot(aes(fill = pop_dens_per_mi2, color = pop_dens_per_mi2))+
+  ggplot2::geom_sf()+
+#easier to see with a continuous scale rather than the breaks
+  viridis::scale_fill_viridis() + 
+  viridis::scale_color_viridis()</code></pre>
+<p><img src="3-sf-atl-pharm_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p>Try filtering to Atlanta Metro Counties and removing very high-population-dense census tracts, which are skewing the scale. The scale rises linearly, but the vast majority of census tracts have low density, and a select few have high density, as the histogram shows:</p>
+<pre class="r"><code>tract_ga_wrangle %&gt;% 
+  ggplot2::ggplot(aes(pop_dens_per_mi2))+
+  geom_histogram()</code></pre>
+<p><img src="3-sf-atl-pharm_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<pre class="r"><code>tract_ga_wrangle %&gt;% 
+  filter(atlanta_metro==1) %&gt;% 
+  filter(pop_dens_per_mi2 &lt;25000) %&gt;% 
+  ggplot2::ggplot(aes(fill = pop_dens_per_mi2, color = pop_dens_per_mi2))+
+  ggplot2::geom_sf()+
+  viridis::scale_fill_viridis() + 
+  viridis::scale_color_viridis()</code></pre>
+<p><img src="3-sf-atl-pharm_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p>What about a different viridis color palette? And a nicer label for the legend? And can we make the coordinates look better?</p>
+<p>Reference: <a href="http://www.cookbook-r.com/Graphs/Legends_(ggplot2)/">http://www.cookbook-r.com/Graphs/Legends_(ggplot2)/</a></p>
+<pre class="r"><code>tract_ga_wrangle %&gt;% 
+  filter(atlanta_metro==1) %&gt;% 
+  filter(pop_dens_per_mi2 &lt;25000) %&gt;% 
+  ggplot2::ggplot(aes(fill = pop_dens_per_mi2, color = pop_dens_per_mi2))+
+  ggplot2::geom_sf()+
+  #Write the same name in both, and it won&#39;t repeat.
+  #\n for line break (carriage return)
+  viridis::scale_fill_viridis(
+    option=&quot;magma&quot;,
+    name = &quot;Pop. density \n(people per square mile)&quot;) + 
+  viridis::scale_color_viridis(
+    option=&quot;magma&quot;,
+    name = &quot;Pop. density \n(people per square mile)&quot; 
+    ) +
+  theme_minimal()</code></pre>
+<p><img src="3-sf-atl-pharm_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+</div>
+</div>
+<div id="summarize-by-county-to-create-an-sf-object-of-counties" class="section level2" number="2.4">
+<h2><span class="header-section-number">2.4</span> Summarize by county to create an sf object of counties</h2>
+<p>Like a “dissolve” in ArcGIS</p>
+<p>Summarize over county and keep geometry of counties. The “features” of the sf object will become counties rather than census tracts.</p>
+<pre class="r"><code>county_ga  = tract_ga_wrangle %&gt;% 
+  dplyr::group_by(county_fips) %&gt;% 
+  #any summary operation (e.g., average, standard deviation) will do to collapse the geometry. sum makes sense here.
+  dplyr::summarise(pop= sum(pop, na.rm=TRUE)) %&gt;% 
+  dplyr::ungroup() %&gt;% #so we&#39;re no longer doing grouped operations
+  sf::st_transform(2240) %&gt;% 
+  dplyr::mutate(
+    #Measure the area of each county
+    area_2240 = st_area(geometry),
+    area_ft2 = as.numeric(area_2240),
+    area_mi2 = area_ft2/27878400, #convert to square miles
+    pop_dens_per_mi2 = pop/area_mi2     #calculate population density
+  ) </code></pre>
+</div>
+<div id="map-census-tracts-using-ggplot-1" class="section level2" number="2.5">
+<h2><span class="header-section-number">2.5</span> Map census tracts using ggplot</h2>
+<p>Now, rather than keeping the lines and the fill the same color, I’m coloring the lines white so that they stand out more.</p>
+<div id="visualize-population-1" class="section level3" number="2.5.1">
+<h3><span class="header-section-number">2.5.1</span> Visualize population</h3>
+<p>I’m using the continuous palette.</p>
+<pre class="r"><code>county_ga %&gt;% 
+  ggplot2::ggplot(aes(fill = pop))+
+  ggplot2::geom_sf(color = &quot;white&quot;)+
+  viridis::scale_fill_viridis(name = &quot;Population&quot;)</code></pre>
+<p><img src="3-sf-atl-pharm_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<pre class="r"><code>#Visualize population density
+county_ga %&gt;% 
+  ggplot(aes(fill = pop_dens_per_mi2))+
+  geom_sf(color = &quot;white&quot;)+
+  viridis::scale_fill_viridis(
+    option=&quot;magma&quot;,
+    name = &quot;Pop. density \n(people per square mile)&quot; ) +
+  theme_minimal()</code></pre>
+<p><img src="3-sf-atl-pharm_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+</div>
+</div>
+</div>
+<div id="download-and-manipulate-pharmacies-in-fulton-and-dekalb-counties" class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Download and manipulate pharmacies in Fulton and Dekalb Counties</h1>
+</div>
+
+<br>
+<br>
+<p>Copyright &copy; 2022 Michael D. Garber </p>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3,h4",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

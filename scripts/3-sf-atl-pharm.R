@@ -1,8 +1,7 @@
-#Revised 7/7/21 by Michael Garber
+#Revised August 4, 2022
 #Note to self: adapted from previous work
 #~Work/CDC/prj05983_R_for_GIS_User_Group/r_teach_4_sf_osmdata_20210709.R
-#Comment August 3, 2022: I used this again August 2022 and updated the formatting, but
-#otherwise the content is similar.
+
 
 # Demo of sf using  counties and pharmacies
 
@@ -245,7 +244,7 @@ mapview(fulton, col.regions = "yellow")+
   mapview(dekalb, col.regions = "blue") + 
   mapview(fulton_dekalb_union, col.regions = "gray50") 
 
-#--------3.2. Use st_bbox to get the bounding box for the Fulton-Dekalb sf object.------#########
+# 3.2. Use st_bbox to get the bounding box for the Fulton-Dekalb sf object.-----------
 bbox_fulton_dekalb = fulton_dekalb_union %>% 
   sf::st_bbox()      #returns the bounding box of this sf object
 
