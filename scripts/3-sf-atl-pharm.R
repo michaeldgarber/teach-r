@@ -68,22 +68,22 @@ library(viridis) #for its color scales
 options(tigris_use_cache = TRUE) 
 
 #Load population data for all of Georgia's census tracts
-tract_ga =tidycensus::get_acs(
-  year=2020,
-  #make it wide form (rather than long-form, otherwise default) so variable names are in columns
-  # https://cran.r-project.org/web/packages/tidycensus/tidycensus.pdf
-  output = "wide",  
-  geography = "tract",
-  state ="GA",
-  geometry = TRUE, #omit geometry for speed
-  variables = c(
-    pop  = "B01001_001")
-) 
+# tract_ga =tidycensus::get_acs(
+#   year=2020,
+#   #make it wide form (rather than long-form, otherwise default) so variable names are in columns
+#   # https://cran.r-project.org/web/packages/tidycensus/tidycensus.pdf
+#   output = "wide",  
+#   geography = "tract",
+#   state ="GA",
+#   geometry = TRUE, #omit geometry for speed
+#   variables = c(
+#     pop  = "B01001_001")
+# ) 
 
 library(here)
 setwd(here("data-processed"))
-save(tract_ga, file = "tract_ga.RData")
-
+#save(tract_ga, file = "tract_ga.RData")
+load("tract_ga.RData")
 tract_ga 
 ## Use st_transform and st_area---------------
 #Make a new dataset so don't have to load data from API multiple times during workflow.
@@ -106,7 +106,19 @@ tract_ga_wrangle = tract_ga %>%
     county_fips = stringr::str_sub(geo_id, start=1, 5),
     area_4326 = sf::st_area(geometry), #returns area of type "units". 
     #measured in meters squared because of the coordinate system.
-    area_m2 = as.numeric(area_4326) #convert to numeric. strip units
+    area_m2 = as.numeric(area_4326) ,#convert to numeric. strip units
+    #indicator for major Atlanta Metro Counties
+    atlanta_metro = case_when(
+      #character format even though they're numbers, so quote
+      county_fips %in% c(
+        "13121",#fulton 
+        "13089",#dekalb
+        "13135",#gwinnett
+        "13067", #cobb
+        "13063", #clayton
+        "13097"  #douglas
+      ) ~1,
+      TRUE ~0)  
   ) %>% 
   #remove the population margin of error
   #For fun, convert it to a coordinate system that will output in feet.
@@ -275,30 +287,31 @@ mapview(fulton_dekalb_union, col.regions = "gray50") +
 #Info on opq function: https://www.rdocumentation.org/packages/osmdata/versions/0.1.5/topics/opq
 #Note this code takes a while.
 #I'm commenting out. I ran August 3, 2022
-pharm= osmdata::opq (
-  #Note the bbox argument can either be a string of maximal and minimal latitudes for the bounding box, or
-  #it can be the name of a place, from which a bounding box will be derived.
-  #For example, we could say:
-#  bbox = "Georgia, USA" #the bounding box will be a rectangle based on the farthest apart corners.
-
-  #So we know exactly what we're getting, let's use the values from the bounding box computed above.
-  #The order it expects is c(xmin, ymin, xmax, ymax). 
-  #Note it can be a character vector or a numeric vector.
-  #Here, we are using a numeric vector:
-   bbox = c(
-     bbox_fulton_dekalb$xmin,
-     bbox_fulton_dekalb$ymin,
-     bbox_fulton_dekalb$xmax,
-     bbox_fulton_dekalb$ymax)
-  ) %>%
-  osmdata::add_osm_feature(
-    key = "amenity",
-    value = "pharmacy") %>%
-  osmdata::osmdata_sf() #return an sf object
+# pharm= osmdata::opq (
+#   #Note the bbox argument can either be a string of maximal and minimal latitudes for the bounding box, or
+#   #it can be the name of a place, from which a bounding box will be derived.
+#   #For example, we could say:
+# #  bbox = "Georgia, USA" #the bounding box will be a rectangle based on the farthest apart corners.
+# 
+#   #So we know exactly what we're getting, let's use the values from the bounding box computed above.
+#   #The order it expects is c(xmin, ymin, xmax, ymax). 
+#   #Note it can be a character vector or a numeric vector.
+#   #Here, we are using a numeric vector:
+#    bbox = c(
+#      bbox_fulton_dekalb$xmin,
+#      bbox_fulton_dekalb$ymin,
+#      bbox_fulton_dekalb$xmax,
+#      bbox_fulton_dekalb$ymax)
+#   ) %>%
+#   osmdata::add_osm_feature(
+#     key = "amenity",
+#     value = "pharmacy") %>%
+#   osmdata::osmdata_sf() #return an sf object
 
 library(here)
-setwd(here("data-processed"))
-save(pharm, file = "pharm.RData")
+# setwd(here("data-processed"))
+# save(pharm, file = "pharm.RData")
+load("pharm.RData")
 
 #The result of this is an object of class osmdata, which is a special type of list 
 #comprised of elements containing the various types of geometry (points, polygons, etc.).
@@ -318,48 +331,64 @@ pharm_points = pharm$osm_points
 pharm_points = pharm %>% 
   .$osm_points 
 
-#Visualize all of the points and compare with Fulton and Dekalb
-mv_points = mapview(
-  pharm_points,
-  col.regions = "red",
-  color = "red") 
-
-mv_points+mapview(fulton_dekalb_union) #compare with fulton and dekalb
-
 #-----Polygons-------#
 pharm_polygons = pharm %>% .$osm_polygons
 #north and piedmont and ponce and the beltline, and a few other places
 # in southwest atlanta
-mv_polygons =   pharm_polygons %>% 
-  mapview(
-    layer.name = "pharm_polygons",
-    color = "blue",
-    col.regions = "blue")
 
 #-----MultiPolygons-------#
 pharm_multipolygons = pharm %>% 
   .$osm_multipolygons
+
+
+### Visualize all three to see if there is overlap.--------------
+mv_points =   pharm_points %>% 
+  mapview(
+    layer.name = "points",
+    col.regions = "red",
+    color = "red") 
+
+mv_polygons =   pharm_polygons %>% 
+  mapview(
+    layer.name = "polygons",
+    color = "blue",
+    col.regions = "blue")
+
 #This is at North and Piedmont.
-mv_multipolygons = mapview(
-  pharm_multipolygons,
-  color = "purple",
-  col.regions = "purple")
+mv_multipolygons = pharm_multipolygons %>% 
+  mapview(
+    layer.name = "multipolygons",
+    color = "purple",
+    col.regions = "purple")
 
+#Compare with the bounding box and the Fulton-Dekalb county boundaries
+mv_fulton_dekalb_union = fulton_dekalb_union %>% 
+  mapview(
+    layer.name = "fulton_dekalb_union",
+    col.regions = "gray50")
 
-#------Visualize all three to see if there is overlap.------## 
-mv_points + mv_polygons + mv_multipolygons
+mv_bbox = bbox_fulton_dekalb_sf %>% 
+  mapview(
+    layer.name = "bounding box",
+    col.regions = "orange",
+    color = "orange")
+
+#Visualize all of the layerss
+mv_points + mv_polygons+mv_multipolygons+
+  mv_fulton_dekalb_union+
+  mv_bbox
 
 #Conclusion: many of the points are simply vertices of buildings which are coded as polygons.
 #Where this is the case, let's remove the points and keep the polygons.
-#It also seems to be the case that where there is overlap, the polygon contains the more valuable metadata.
-#  There is also one coded as multipolygon.  It contains much of the metadata about the pharmacy (osm_id = 11918050), 
+#It also seems to be the case that where there is overlap, 
+#the polygon contains the more valuable metadata.
+#  There is also one coded as multipolygon. 
+#It contains much of the metadata about the pharmacy (osm_id = 11918050), 
 #which is at North and Piedmont. So for that one, let's keep the multipolygon and remove the polygon.
 
 
-
-## Limit to the pharmacies in Fulton and Dekalb county---------------------
+## Restrict to the pharmacies in Fulton and Dekalb county---------------------
 #Use st_intersection
-#Could do this later as well but it makes sense to do it earlier so that we're working with a smaller dataset.
 #Note this requires sf objects to be in the same coordinate system.
 #Check that first.
 sf::st_crs(pharm_points)
@@ -385,8 +414,7 @@ mapview(fulton_dekalb_union, col.regions = "gray50") + mv_points + mv_points_fd
 nrow(pharm_points_fd)
 nrow(pharm_points)
 
-#Do the same for the polygons. We  know the one multipolygon is in Fulton County based on our data exploration,
-#but run the code anyway to be consistent.
+#Do the same for the polygons. 
 pharm_polygons_fd = pharm_polygons %>% 
   #Return the intersection between the polygons and the unioned Fulton and Dekalb counties
   sf::st_intersection(fulton_dekalb_union) %>% 
@@ -394,8 +422,9 @@ pharm_polygons_fd = pharm_polygons %>%
     type_polygon = 1, #indicator for the spatial join
     polygon_row_number = row_number())   # an identifier for subsequent linking
 
-# pharm_multipolygons_fd = pharm_multipolygons %>%
-#   st_intersection(fulton_dekalb_union)  #hmm, that gave an error.
+pharm_polygons_fd %>% mapview()
+#We  know the one multipolygon is in Fulton County based on our data exploration,
+#but run the code anyway to be consistent.
 
 #Googling suggests we need to adjust the precision... 
 # https://github.com/r-spatial/sf/issues/1710
@@ -412,7 +441,8 @@ nrow(pharm_multipolygons_fd)
 #restricted to those in Fulton and Dekalb
 #Conclusion: many of the points are simply vertices of buildings which are coded as polygons.
 #Where this is the case, let's remove the points and keep the polygons.
-# There is also one coded as multipolygon. It contains much of the metadata about the pharmacy (osm_id = 11918050),
+# There is also one coded as multipolygon.
+#It contains much of the metadata about the pharmacy (osm_id = 11918050),
 #so let's keep that one and remove the polygons.
 
 # Find points that join with polygons and exclude those points..
@@ -524,6 +554,7 @@ pharm_polygons_fd_nogeo = pharm_polygons_fd %>%
   st_set_geometry(NULL)%>% 
   as_tibble()
 
+package_version(mapview())
 
 pharm_points_fd_nodupes_centroid = pharm_points_fd_nodupes %>% 
   st_centroid() %>%

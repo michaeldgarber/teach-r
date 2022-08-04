@@ -139,7 +139,7 @@ tract_ga =tidycensus::get_acs(
 )
 ```
 
-## Wrangle data using dplyr and sf functions, including `st_area()`, `st_transform()` 
+## Wrangle data using dplyr and sf functions, including `st_area()`, `st_transform()`
 
 Here are our first sf functions. We measure the area of each census tract using `sf::st_area()`, and we go back and forth between coordinate reference systems (CRS) using `sf::st_transform()`. I typically use WGS84, a [commonly used](https://en.wikipedia.org/wiki/World_Geodetic_System#WGS84) CRS, which has the [EPSG](https://en.wikipedia.org/wiki/EPSG_Geodetic_Parameter_Dataset) code of 4326. The main practical consideration in deciding which CRS to use is its system of measurement (meters or feet).
 
@@ -227,7 +227,7 @@ class(tract_ga_wrangle$area_2240) #units
 class(tract_ga_wrangle$area_ft) #numeric
 ```
 
-## Map census tracts using ggplot 
+## Map census tracts using ggplot
 
 ### Visualize population
 
@@ -376,7 +376,7 @@ county_ga %>%
 
 Okay, in creating the bounding box, Fulton has the westernmost, northernmost, and southernmost coordinates, and Dekalb has the easternmost point. We could approximate the coordinates manually by clicking in Google Maps (maybe easier) or extract the coordinates with some sf functions, which could then generalize to other settings.
 
-## Use `st_union()` to generate a geometry file for the smushed together version of Fulton and Dekalb counties 
+## Use `st_union()` to generate a geometry file for the smushed together version of Fulton and Dekalb counties
 
 Before we do that, let's get smash the two counties together into one single feature.
 
@@ -517,33 +517,130 @@ pharm_points = pharm %>%
 
 I'm saving mapview objects so I can them layer them together.
 
+(A bug in mapview is mis-assigning the colors in the html.)
+
 ```{r}
-mv_points = mapview(
-  pharm_points,
-  col.regions = "red",
-  color = "red") 
+mv_points =   pharm_points %>% 
+  dplyr::select(osm_id, name, geometry) %>% #restrict data for parsimony
+  mapview(
+    layer.name = "points",
+    col.regions = "red",
+    color = "red") 
 
 mv_polygons =   pharm_polygons %>% 
+  dplyr::select(osm_id, name, geometry) %>% 
   mapview(
-    layer.name = "pharm_polygons",
+    layer.name = "polygons",
     color = "blue",
     col.regions = "blue")
 
 #This is at North and Piedmont.
-mv_multipolygons = mapview(
-  pharm_multipolygons,
+mv_multipolygons = pharm_multipolygons %>% 
+  dplyr::select(osm_id, name, geometry) %>% 
+  mapview(
+    layer.name = "multipolygons",
   color = "purple",
   col.regions = "purple")
 
 #Compare with the bounding box and the Fulton-Dekalb county boundaries
-mv_fulton_dekalb_union = mapview(
-  fulton_dekalb_union, col.regions = "gray50")
-mv_bbox = mapview(
-  bbox_fulton_dekalb_sf, 
-  col.regions = "orange",
-                  color = "orange")
+mv_fulton_dekalb_union = fulton_dekalb_union %>% 
+  mapview(
+  layer.name = "fulton_dekalb_union",
+  col.regions = "gray50")
+
+mv_bbox = bbox_fulton_dekalb_sf %>% 
+  mapview(
+    layer.name = "bounding box",
+    col.regions = "orange",
+    color = "orange")
 
 #Visualize all of the layerss
-mv_points + mv_polygons + mv_multipolygons +
-  mv_fulton_dekalb_union+mv_bbox
+mv_points + mv_polygons+mv_multipolygons+
+  mv_fulton_dekalb_union+
+  mv_bbox
 ```
+
+Conclusion on how to handle pharmacies represented as points vs polygons vs multipolygons: after browsing around in mapview, many of the points are simply vertices of buildings which are coded as polygons. Where this is the case, let's remove the points and keep the polygons.
+
+There is also one coded as multipolygon. It contains much of the metadata about the pharmacy (osm_id = 11918050), which is at North and Piedmont. So for that one, let's keep the multipolygon and remove the polygon.
+
+## Restrict to the pharmacies in Fulton and Dekalb county
+
+Use `st_intersection()`. Note this requires sf objects to be in the same coordinate system. Check that first. They're both 4326.
+
+```{r, eval=FALSE}
+sf::st_crs(pharm_points)
+sf::st_crs(fulton_dekalb_union)
+```
+
+### `st_intersection()` with points
+
+Return the intersection between the points and the unioned Fulton and Dekalb counties.
+
+```{r}
+pharm_points_fd = pharm_points %>%  #fd for Fulton and Dekalb.
+  sf::st_intersection(fulton_dekalb_union) %>% 
+  dplyr::mutate(
+    type_point = 1, #indicator for point
+    point_row_number = row_number())   # an identifier
+```
+
+Check the `st_intersection()`. Are all points inside the polygon?
+
+```{r}
+mv_points_fd = pharm_points_fd %>% 
+  mapview(
+    layer.name = "Points - in FD boundaries",
+  col.regions = "orange",
+  color = "orange") 
+
+mapview(fulton_dekalb_union, col.regions = "gray50") + 
+  mv_points +
+  mv_points_fd
+
+```
+
+Can also check by examining the number of rows in the original dataset of points and the new one that's restricted to the county boundaries:
+
+```{r}
+nrow(pharm_points_fd)
+nrow(pharm_points)
+```
+
+### `st_intersection()` with polygons
+
+Return the intersection between the polygons and the unioned Fulton and Dekalb counties.
+
+```{r}
+pharm_polygons_fd = pharm_polygons %>% 
+  sf::st_intersection(fulton_dekalb_union) %>% 
+  dplyr::mutate(
+    type_polygon = 1, #indicator for the forthcoming spatial join
+    polygon_row_number = row_number())
+```
+
+### `st_intersection()` with the 1 multipolygon
+
+We know the one multipolygon is in Fulton County based on our data exploration, but run the code anyway to be consistent and future proof.
+
+```{r}
+pharm_multipolygons_fd = pharm_multipolygons %>% 
+  sf::st_make_valid() %>% 
+  st_buffer(0) %>% #a trick if there's invalid geometry (loops)
+  sf::st_intersection(fulton_dekalb_union) %>% 
+  mutate(type_multipolygon=1)
+```
+
+How many do we have of each type within the county boundaries?
+
+```{r}
+nrow(pharm_points_fd)
+nrow(pharm_polygons_fd)
+nrow(pharm_multipolygons_fd)
+```
+
+# Combine the three types into a single dataset.
+
+The goal here is to create a single dataset of pharmacies without duplicate entries.
+
+As we discovered, many of the points are simply vertices of buildings which are coded as polygons. Where this is the case, remove the points and keep the polygons. And keep the one multipolygon as well.
