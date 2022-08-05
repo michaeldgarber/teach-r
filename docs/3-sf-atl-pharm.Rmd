@@ -11,22 +11,6 @@ output:
 
 # Objective and background
 
-Outline of the different sf object types: <https://r-spatial.github.io/sf/articles/sf1.html>
-
--   point
-
--   linestring
-
--   polygon
-
--   multipoint
-
--   multilinestring
-
--   multipolygon
-
--   geometry collection - set of geomtries of any type
-
 **Overall goal**: Illustrate use of sf through some example analyses using spatially referenced pharmacy data downloaded from OpenStreetMap and spatially referenced population data in the Atlanta area downloaded from the US Census.
 
 Specifically:
@@ -36,6 +20,42 @@ Specifically:
 2.  How many people live within 1/2 mile of these pharmacies in these counties?
 
 3.  How is residential proximity to a pharmacy distributed socioeconomically?
+
+<br />
+
+**Background**
+
+-   **sf** object types: <https://r-spatial.github.io/sf/articles/sf1.html>
+
+    -   point
+
+    -   linestring
+
+    -   polygon
+
+    -   multipoint
+
+    -   multilinestring
+
+    -   multipolygon
+
+    -   geometry collection - set of geomtries of any type
+
+-   I'd suggest reviewing these vignettes from the sf home page:
+
+    -   <https://r-spatial.github.io/sf/articles/sf1.html>
+
+    -   <https://r-spatial.github.io/sf/articles/sf2.html>
+
+    -   <https://r-spatial.github.io/sf/articles/sf3.html>
+
+    -   [https://r-spatial.github.io/sf/articles/sf4.html](https://r-spatial.github.io/sf/articles/sf3.html)
+
+-   And sf is covered in these two chapters of Geocomputation with R:
+
+    -   <https://geocompr.robinlovelace.net/spatial-operations.html>
+
+    -   <https://geocompr.robinlovelace.net/geometric-operations.html>
 
 **Miscellaneous methods used and things to note:**
 
@@ -56,24 +76,6 @@ Specifically:
 -   Illustrate use of `st_buffer()` to create a buffer area around a polygon.
 
 -   Illustrate use of `ggplot2()` to map sf objects.
-
-**Background**
-
--   I'd suggest reviewing these vignettes from the sf home page:
-
-    -   <https://r-spatial.github.io/sf/articles/sf1.html>
-
-    -   <https://r-spatial.github.io/sf/articles/sf2.html>
-
-    -   <https://r-spatial.github.io/sf/articles/sf3.html>
-
-    -   [https://r-spatial.github.io/sf/articles/sf4.html](https://r-spatial.github.io/sf/articles/sf3.html)
-
--   And sf is covered in these two chapters of Geocomputation with R:
-
-    -   <https://geocompr.robinlovelace.net/spatial-operations.html>
-
-    -   <https://geocompr.robinlovelace.net/geometric-operations.html>
 
 ## Install and load packages
 
@@ -120,7 +122,7 @@ Load population data for all of Georgia's census tracts based on American Commun
 
 ```{r, eval=FALSE}
 vars_acs_2020 = tidycensus::load_variables(2020, "acs5", cache = TRUE)
-View(vars_acs_2019) 
+#View(vars_acs_2019) 
 ```
 
 ## Download data using `get_acs()`
@@ -923,4 +925,4 @@ mapview(pharm_fd_combined, zcol = "type_original") +
   mapview(fulton_dekalb_union, col.regions = "gray50") 
 ```
 
-Next session: estimate population living within a certain radius of these pharmacies.
+**Next session**: estimate population living within a certain radius of these pharmacies.
