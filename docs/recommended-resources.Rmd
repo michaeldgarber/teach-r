@@ -10,7 +10,7 @@ output:
 
 [**Key resources I would recommend:**]{.underline}
 
-I mostly use packages that are a part of the tidyverse or which work well with the tidyverse (e.g., sf). The R universe is brimming with helpful and free online resources on those topics. Here are some resources that I'd recommend:
+I mostly use packages that are a part of the tidyverse or which work well with the tidyverse (e.g., sf). The R universe has lots and lots of helpful and free online resources on those topics. Here are some resources that I'd recommend:
 
 -   For **general data wrangling** and other data management in the tidyverse (dplyr and other tidyverse packages)
 

@@ -1,7 +1,7 @@
 ---
 title: "First things first: background and setup before dplyr"
 author: "Michael Garber "
-date: "Revised August 3rd, 2022"
+date: "Revised August 5, 2022"
 output:
   html_document:
     toc: true
@@ -44,7 +44,7 @@ Okay, but there are other programming tools for data analysis (e.g., SAS, STATA,
 1.  It's free. SAS and STATA cost money.
 2.  It has an active, helpful, and friendly user community. Googling a topic along with "R" often leads to useful public discussion on forums like [stackoverflow](https://stackoverflow.com/questions/tagged/r) or [RStudio community](https://community.rstudio.com/).
 3.  It can manipulate spatial data and make maps. No need to switch software for GIS. In an analysis with a spatial component, this is **very** important.
-4.  As noted above, R can do a lot of cool stuff. For example, with RMarkdown, you can make websites like this [one](https://michaeldgarber.github.io/), create [interactive dashboards](https://rmarkdown.rstudio.com/gallery.html), and do lots more amazing [talk](https://www.youtube.com/watch?v=qLEkUjxk7e8) by RMarkdown creator).
+4.  R can do a lot of cool stuff beyond data wrangling and analysis. For example, with RMarkdown, you can generate html files to make websites like this [one](https://michaeldgarber.github.io/), create [interactive dashboards](https://rmarkdown.rstudio.com/gallery.html), and do lots more (amazing [talk](https://www.youtube.com/watch?v=qLEkUjxk7e8) by RMarkdown creator).
 5.  For some of the reasons above, having used SAS for years, I personally think R is simply more fun.
 
 I know many people use and like Python, which is also free and shares many of R's advantages. I don't have much Python experience, so I can't really comment on it. Every now and then, I encounter a situation where I wish I had some Python skills (e.g., to use this [package](https://github.com/gboeing/osmnx) to compute measures on street networks from OpenStreetMap), but those situations are rare.
@@ -130,19 +130,27 @@ The folder in which R reads (loads) and writes (saves) files is called the worki
 2.  Typing file paths is prone to error. (How do I type the back-slash, \\ or /? Do I need the :?)
 3.  It's hard-coded: If you were to change computers or share your code with someone, those working directories won't work.
 
-Fortunately, there's a very simple solution to these issues: Use the [here](https://here.r-lib.org/) package. This package creates a working directory [relative]{.underline} to the location of the R project you are working in. This means that wherever your project is in the folder structure of your computer, the `here()` function to define your working directory and thus any read/write commands that rely on it will just work.
+Fortunately, there's a very simple solution to these issues: Use the [here](https://here.r-lib.org/) package. This package creates a working directory [relative]{.underline} to the location of the R project (described below) you are working in. This means that wherever your project is in the folder structure of your computer, the `here()` function to define your working directory and thus any read/write commands that rely on it will just work.
 
 (Jenny Bryan's [ode](https://github.com/jennybc/here_here) to the here package is a great read.)
 
-**What is a Project?** A [Project](https://support.rstudio.com/hc/en-us/articles/200526207-Using-RStudio-Projects) is an RStudio file associated with a working directory that facilitates organization of files (code, data, other documents) and particular settings relevant for one, well, project. For example, to create this course, I created a project called teach-r.
+**What is a Project?** A [Project](https://support.rstudio.com/hc/en-us/articles/200526207-Using-RStudio-Projects) is an RStudio file (.rproj) associated with a working directory that facilitates organization of files (code, data, other documents) and particular settings relevant for one, well, project. For example, to create this course, I created a project called teach-r. You can create a new project by either navigating to the top right of the RStudio interface, as in,
 
 ![](images/project-teach-r-screenshot.png)
 
-Note that all of folders in the same folder as the .Rproj file will conveniently appear in the "Files" tab.
+or by using the "File" as in,
 
-It's worth giving some thought to the project's folder structure. There are no hard-and-fast rules, but I have taken [this advice](https://chrisvoncsefalvay.com/2018/08/09/structuring-r-projects/) and, minimally, create separate folders for code, input data that should never be modified, and processed data that is a result of code.
+![](images/Screen%20Shot%202022-08-05%20at%207.48.52%20AM.png)
 
-![](images/teach-r-files.png){width="500"}
+Note that in the screenshot below, all of folders in the same folder as the **.Rproj** file will conveniently appear in the "Files" tab (bottom right pane of a default RStudio session).
+
+![](images/Screen%20Shot%202022-08-05%20at%207.46.14%20AM.png){width="500"}
+
+This folder structure mirrors the folder structure of your computer; it's a convenient way to access and manage files from directly within the RStudio interface. Here's my corresponding Finder window (Mac):
+
+![](images/Screen%20Shot%202022-08-05%20at%207.47.36%20AM.png){width="500"}
+
+It's worth giving some thought to the project's folder structure. There are no hard-and-fast rules, but I have taken [this advice](https://chrisvoncsefalvay.com/2018/08/09/structuring-r-projects/) and, minimally, create separate folders for code (folder called scripts), input data that should never be modified (data-input), and processed data that is a result of code (data-processed).
 
 You don't have to use projects to use R or RStudio, but I've [been convinced](https://www.tidyverse.org/blog/2017/12/workflow-vs-script/) that it's a good idea, in part because of how well projects pair with the **here** package.
 
@@ -184,12 +192,13 @@ Okay, as mentioned, the tidyverse contains lots of packages. One of them is **da
 
 ![](images/description-lake-huron-data.png){width="500"}
 
-The below code chunk simply creates a copy of the LakeHuron dataset and calls it lake_huron_raw that is. In the next line of code, we print the object by typing its name.
+The below code chunk simply creates a copy of the LakeHuron dataset and calls it lake_huron_raw. In the next line of code, we print the object by typing its name: `lake_huron_raw.`
 
-Side-note: the `package_name::object` syntax, as in `datasets::LakeHuron`, is R's way of explicitly stating which package the object is coming from. We could have equally have written `lake_huron_raw = LakeHuron`, but sometimes it can be clearer to be explicit. And sometimes we *must* state the package name if the same word is used by multiple packages.
+Side-note: the `package_name::object` syntax, as in `datasets::LakeHuron`, is R's way of explicitly stating which package the object is coming from. We could have equally have written `lake_huron_raw = LakeHuron`, but, for clarity, it can help to be explicit. This is especially important if the same word is used by multiple packages.
 
 ```{r}
-lake_huron_raw = datasets::LakeHuron #Define new object called lake_huron_raw.
+#Define new object called lake_huron_raw.
+lake_huron_raw = datasets::LakeHuron 
 
 lake_huron_raw #Take a look at it.
 ```
@@ -200,9 +209,9 @@ Don't sweat the dplyr code itself just yet (introduced next session), but, as an
 
 ```{r}
 lake_huron_transformed = lake_huron_raw %>% #use the object defined above
-  as_tibble() %>% 
-  rename(level_ft =x) %>% #rename variable to "level_ft"
-  mutate(year = row_number()-1+1875) #add a column for year
+  dplyr::as_tibble() %>% 
+  dplyr::rename(level_ft =x) %>% #rename variable to "level_ft"
+  dplyr::mutate(year = row_number()-1+1875) #add a column for year
 
 lake_huron_transformed #look at the transformed data
 ```

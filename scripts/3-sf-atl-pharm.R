@@ -68,23 +68,24 @@ library(viridis) #for its color scales
 options(tigris_use_cache = TRUE) 
 
 #Load population data for all of Georgia's census tracts
-# tract_ga =tidycensus::get_acs(
-#   year=2020,
-#   #make it wide form (rather than long-form, otherwise default) so variable names are in columns
-#   # https://cran.r-project.org/web/packages/tidycensus/tidycensus.pdf
-#   output = "wide",  
-#   geography = "tract",
-#   state ="GA",
-#   geometry = TRUE, #omit geometry for speed
-#   variables = c(
-#     pop  = "B01001_001")
-# ) 
+tract_ga =tidycensus::get_acs(
+  year=2020,
+  #make it wide form (rather than long-form, otherwise default) so variable names are in columns
+  # https://cran.r-project.org/web/packages/tidycensus/tidycensus.pdf
+  output = "wide",
+  geography = "tract",
+  state ="GA",
+  geometry = TRUE, #omit geometry for speed
+  variables = c(
+    pop  = "B01001_001")
+)
 
 library(here)
 setwd(here("data-processed"))
 #save(tract_ga, file = "tract_ga.RData")
 load("tract_ga.RData")
 tract_ga 
+
 ## Use st_transform and st_area---------------
 #Make a new dataset so don't have to load data from API multiple times during workflow.
 #once done editing, could link together in one pipe to simplify.
@@ -184,6 +185,7 @@ tract_ga_wrangle %>%
     option="magma",
     name = "Pop. density \n(people per square mile)" 
   )+  theme_minimal()
+
 ## Summarize by county to create a geometry of counties----------------------
 #Like a "dissolve" in ArcGIS
 #summarize over county and keep geometry of counties
@@ -206,7 +208,7 @@ county_ga  = tract_ga_wrangle %>%
 #Visualize population
 county_ga %>% 
   ggplot2::ggplot(aes(fill = pop))+
-  ggplot2::geom_sf(color = "white")+
+  ggplot2::geom_sf(color = "white")+ #correspnds to the polygon border
   viridis::scale_fill_viridis(name = "Population") 
 
 #Visualize population density
@@ -312,37 +314,40 @@ mapview(fulton_dekalb_union, col.regions = "gray50") +
 #Info on opq function: https://www.rdocumentation.org/packages/osmdata/versions/0.1.5/topics/opq
 #Note this code takes a while.
 #I'm commenting out. I ran August 3, 2022
-# pharm= osmdata::opq (
-#   #Note the bbox argument can either be a string of maximal and minimal latitudes for the bounding box, or
-#   #it can be the name of a place, from which a bounding box will be derived.
-#   #For example, we could say:
-# #  bbox = "Georgia, USA" #the bounding box will be a rectangle based on the farthest apart corners.
-# 
-#   #So we know exactly what we're getting, let's use the values from the bounding box computed above.
-#   #The order it expects is c(xmin, ymin, xmax, ymax). 
-#   #Note it can be a character vector or a numeric vector.
-#   #Here, we are using a numeric vector:
-#    bbox = c(
-#      bbox_fulton_dekalb$xmin,
-#      bbox_fulton_dekalb$ymin,
-#      bbox_fulton_dekalb$xmax,
-#      bbox_fulton_dekalb$ymax)
-#   ) %>%
-#   osmdata::add_osm_feature(
-#     key = "amenity",
-#     value = "pharmacy") %>%
-#   osmdata::osmdata_sf() #return an sf object
+pharm= osmdata::opq (
+  #Note the bbox argument can either be a string of maximal and minimal latitudes for the bounding box, or
+  #it can be the name of a place, from which a bounding box will be derived.
+  #For example, we could say:
+#  bbox = "Georgia, USA" #the bounding box will be a rectangle based on the farthest apart corners.
+
+  #So we know exactly what we're getting, let's use the values from the bounding box computed above.
+  #The order it expects is c(xmin, ymin, xmax, ymax).
+  #Note it can be a character vector or a numeric vector.
+  #Here, we are using a numeric vector:
+   bbox = c(
+     bbox_fulton_dekalb$xmin,
+     bbox_fulton_dekalb$ymin,
+     bbox_fulton_dekalb$xmax,
+     bbox_fulton_dekalb$ymax)
+  ) %>%
+  osmdata::add_osm_feature(
+    key = "amenity",
+    value = "pharmacy") %>%
+  osmdata::osmdata_sf() #return an sf object
 
 library(here)
 # setwd(here("data-processed"))
 # save(pharm, file = "pharm.RData")
 load("pharm.RData")
 
+pharm
+
 #The result of this is an object of class osmdata, which is a special type of list 
 #comprised of elements containing the various types of geometry (points, polygons, etc.).
 #see https://cran.r-project.org/web/packages/osmdata/vignettes/osmdata.html#3_The_osmdata_object
 #Because we used the osmdata_sf code, each element in the list is an sf object.
 pharm 
+class(pharm$osm_points)
 class(pharm)
 #To access each sf object, we can use the dollar-sign operator.
 class(pharm$osm_points)
@@ -356,8 +361,10 @@ pharm_points = pharm$osm_points
 pharm_points = pharm %>% 
   .$osm_points 
 
+pharm_points %>% mapview()
 #-----Polygons-------#
 pharm_polygons = pharm %>% .$osm_polygons
+pharm_polygons %>% mapview()
 #north and piedmont and ponce and the beltline, and a few other places
 # in southwest atlanta
 
@@ -372,6 +379,8 @@ mv_points =   pharm_points %>%
     layer.name = "points",
     col.regions = "red",
     color = "red") 
+
+mv_points
 
 mv_polygons =   pharm_polygons %>% 
   mapview(
@@ -425,7 +434,9 @@ pharm_points_fd = pharm_points %>%  #fd for Fulton and Dekalb.
     type_point = 1, #indicator
     point_row_number = row_number())   # an identifier for subsequent linking
 
-#Again note the use of an sf function (st_intersection) and a dplyr function (mutate) in the same pipe.
+
+#Again note the use of an sf function (st_intersection) 
+#and a dplyr function (mutate) in the same pipe.
 
 # Visualize to check
 mv_points_fd = mapview(
@@ -520,6 +531,7 @@ mapview(pharm_points_fd_buff_20m, col.regions = "orange") + mapview(pharm_points
 #The default behavior would be to include every combination of points and polygons, 
 #which could repeat observations for the same point.
 
+names(pharm_polygons_fd)
 pharm_points_polygons_join = pharm_points_fd_buff_20m %>% 
   sf::st_join(
     pharm_polygons_fd, 
@@ -533,6 +545,8 @@ pharm_points_polygons_join = pharm_points_fd_buff_20m %>%
       TRUE ~ 0
     ))
 
+pharm_points_polygons_join
+
 #Save these locally because for some reason this isn't working in RMarkdown
 library(here)
 setwd(here("data-processed"))
@@ -543,11 +557,9 @@ save(pharm_polygons_fd, file = "pharm_polygons_fd.RData")
 
 
 nrow(pharm_points_fd_buff_20m) #original version of points
-nrow() #polygons
+nrow(pharm_points_polygons_join)
 names(pharm_points_polygons_join)
 #confirm it's a left join without any new rows added.
-nrow(pharm_points_polygons_join)
-nrow(pharm_points_fd_buff_20m)
 
 #A base R way to check the overlap status
 table(pharm_points_polygons_join$point_overlaps_polygon)
@@ -659,6 +671,7 @@ pharm_fd_combined = pharm_points_fd_nodupes_centroid %>%
 nrow(pharm_fd_combined) 
 mapview(pharm_fd_combined, zcol = "type_original") +  
   mapview(fulton_dekalb_union, col.regions = "gray50") 
+
 
 # 5. Estimate population within a .5 mile of a pharmacy------------------------
 ## Create half-mile buffer around each pharmacy------------

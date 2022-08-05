@@ -40,15 +40,20 @@ nyt_state_wrangle %>%
 #View(nyt_state_wrangle)
 # Load state-level census data using tidycensus-------
 nyt_state_data
+install.packages("sf")
+install.packages("tidycensus")
+library(tidycensus)
+tidycensus::census_api_key("key")
+census_api_key("your_census_key_here", install=TRUE) #Note I've done this in a separate file.
 
-#census_api_key("your_census_key_here", install=TRUE) #Note I've done this in a separate file.
 ## Load state-level population data---------
 
 #Run this to save the data locally for speed.
 options(tigris_use_cache = TRUE) 
 
-#One way I keep track of whether an object has geometry associated with it to add a _geo suffix to the name.
-pop_by_state_geo =get_acs(
+#One way I keep track of whether an object has geometry 
+#associated with it to add a _geo suffix to the name.
+pop_by_state_geo =tidycensus::get_acs(
   year=2019,
   variables = "B01001_001", #total population
   geography = "state",
