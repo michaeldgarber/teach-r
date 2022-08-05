@@ -59,11 +59,11 @@ Google Drive [folder](https://drive.google.com/drive/folders/125F0jIChEAPEqTKQx5
 
 *Session 3 (August 4, 2022)*
 
--   Session [recording](https://www.dropbox.com/s/eitst7w7kytl7bm/r-course-session-2-video.mp4?dl=0) on Dropbox
+-   Session [recording](https://www.dropbox.com/s/3vvvb24e0k64ont/r-course-session-3-video.mp4?dl=0) on Dropbox
 
--   Session [recording](https://drive.google.com/file/d/11M9PlQJTO8PGgFX7dJm5OytRYMUBQYdS/view?usp=sharing) on Google Drive
+-   Session [recording](https://drive.google.com/file/d/1W0kDHMFHqLp0ZCd9U2stzBauMCQQJ2XV/view?usp=sharing) on Google Drive
 
--   Module covered: <https://michaeldgarber.github.io/teach-r/2-dplyr-mapview-tidycensus.html>
+-   Module covered: <https://michaeldgarber.github.io/teach-r/3-sf-atl-pharm.html>
 
 -   R script used during session: <https://github.com/michaeldgarber/teach-r/blob/main/scripts/3-sf-atl-pharm.R>
 
@@ -89,7 +89,7 @@ Google Drive [folder](https://drive.google.com/drive/folders/125F0jIChEAPEqTKQx5
 
     Link: <https://michaeldgarber.github.io/teach-r/2-dplyr-mapview-tidycensus.html>
 
-3.  **Working with spatial data in R: using spatial operations from the sf package through an example of pharmacies downloaded from OpenStreetMap**
+3.  **Working with spatial data in R: applying spatial operations from the sf package to an example analysis of pharmacies downloaded from OpenStreetMap**
 
     The sf package and its corresponding object class has become standard tools for managing and representing (vector-based) spatial data in R. An appealing aspect of the sf object class is that it behaves like regular rectangular data and is thus amenable to common data manipulation techniques. In this module, we will work through an example analysis of pharmacies downloaded from OpenStreetMap in the Atlanta area. Through the example, we describe several operations in the sf ecosystem, including ways to merge spatial data, manipulate coordinate systems, and create buffers.
 
