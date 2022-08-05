@@ -368,7 +368,7 @@ div.tocify {
 </div>
 <div id="target-audience" class="section level2" number="2.2">
 <h2><span class="header-section-number">2.2</span> Target audience</h2>
-<p>The target audience for this demo is someone with little to no experience using R. I will also assume no experience with any statistical programming language, although some experience with SAS or STATA would certainly not hurt. I imagine the target audience will have familiarity with the basics of data management in a spreadsheet-based program like Excel and may want to try out using a programming-oriented tool for data management. For an excellent overview of why it can be preferable to analyze and manage data with a programming language rather than spreadsheet tools, see here the preliminary module of this series (<a href="https://michaeldgarber.github.io/teach-r/0-pre-reqs" class="uri">https://michaeldgarber.github.io/teach-r/0-pre-reqs</a>) or this great <a href="https://www.jessesadler.com/post/excel-vs-r/">blog post</a> by Jesse Adler.</p>
+<p>The target audience for this demo is someone with little to no experience using R. I will also assume no experience with any statistical programming language, although some experience with SAS or STATA would certainly not hurt. I imagine the target audience will have familiarity with the basics of data management in a spreadsheet-based program like Excel and may want to try using a programming-oriented tool for data management. For an excellent overview of why it can be preferable to analyze and manage data with a programming language rather than spreadsheet tools, please see the preliminary module of this series (<a href="https://michaeldgarber.github.io/teach-r/0-pre-reqs" class="uri">https://michaeldgarber.github.io/teach-r/0-pre-reqs</a>) or this great <a href="https://www.jessesadler.com/post/excel-vs-r/">blog post</a> by Jesse Adler.</p>
 </div>
 <div id="what-is-dplyr" class="section level2" number="2.3">
 <h2><span class="header-section-number">2.3</span> What is dplyr?</h2>
@@ -402,7 +402,7 @@ div.tocify {
 <ul>
 <li><a href="https://dplyr.tidyverse.org/" class="uri">https://dplyr.tidyverse.org/</a> - The main webpage contains a short overview of the package and describes the key functions, aka verbs, as we will also do here.</li>
 <li><a href="https://dplyr.tidyverse.org/articles/dplyr.html" class="uri">https://dplyr.tidyverse.org/articles/dplyr.html</a> - The vignette expands upon the main landing page with some examples.</li>
-<li><a href="https://r4ds.had.co.nz/transform.html" class="uri">https://r4ds.had.co.nz/transform.html</a> - Chapter 5 of the online book, <a href="https://r4ds.had.co.nz/">R for Data Science</a>, by Wickham and Grolemund, is another intro to dplyr. This book is the go-to resource for programming in the tidyverse in general.</li>
+<li><a href="https://r4ds.had.co.nz/transform.html" class="uri">https://r4ds.had.co.nz/transform.html</a> - This <a href="https://r4ds.had.co.nz/">book</a> by Wickham and Grolemund is the authoritative guide to learning the tidyverse. The chapter on <a href="https://r4ds.had.co.nz/transform.html">data transformation</a> chapter covers dplyr, specifically.</li>
 </ul>
 </div>
 </div>
@@ -415,7 +415,7 @@ div.tocify {
 <pre class="r"><code>library(tidyverse)</code></pre>
 <pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
 ## ✔ ggplot2 3.3.6     ✔ purrr   0.3.4
-## ✔ tibble  3.1.7     ✔ dplyr   1.0.9
+## ✔ tibble  3.1.8     ✔ dplyr   1.0.9
 ## ✔ tidyr   1.2.0     ✔ stringr 1.4.0
 ## ✔ readr   2.1.2     ✔ forcats 0.5.1
 ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
@@ -470,7 +470,8 @@ nyt_state_data = read_csv(url(nyt_state_url))</code></pre>
 ##  8 2020-01-25 Washington 53        1      0
 ##  9 2020-01-26 Arizona    04        1      0
 ## 10 2020-01-26 California 06        2      0
-## # … with 48,828 more rows</code></pre>
+## # … with 48,828 more rows
+## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 <pre class="r"><code>class(nyt_state_data$state) #character</code></pre>
 <pre><code>## [1] &quot;character&quot;</code></pre>
 </div>
@@ -558,7 +559,8 @@ nyt_state_data = read_csv(&quot;nyt_state_data_downloaded.csv&quot;)</code></pre
 ##  8 2020-01-25 Washington 53        1      0            2
 ##  9 2020-01-26 Arizona    04        1      0            2
 ## 10 2020-01-26 California 06        2      0            3
-## # … with 48,828 more rows</code></pre>
+## # … with 48,828 more rows
+## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 <pre class="r"><code>nyt_state_data_2_pipe</code></pre>
 <pre><code>## # A tibble: 48,838 × 6
 ##    date       state      fips  cases deaths cases_plus_1
@@ -573,7 +575,8 @@ nyt_state_data = read_csv(&quot;nyt_state_data_downloaded.csv&quot;)</code></pre
 ##  8 2020-01-25 Washington 53        1      0            2
 ##  9 2020-01-26 Arizona    04        1      0            2
 ## 10 2020-01-26 California 06        2      0            3
-## # … with 48,828 more rows</code></pre>
+## # … with 48,828 more rows
+## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 <p>Note, also that two new variables can be created in the same <code>mutate()</code> call. Each new variable is separated by a comma. For those familiar with SAS, this begins to look like a SAS data step.</p>
 <pre class="r"><code>nyt_state_data_2vars  = nyt_state_data %&gt;% 
   mutate(
@@ -594,7 +597,8 @@ nyt_state_data_2vars</code></pre>
 ##  8 2020-01-25 Washington 53        1      0            2            3
 ##  9 2020-01-26 Arizona    04        1      0            2            3
 ## 10 2020-01-26 California 06        2      0            3            4
-## # … with 48,828 more rows</code></pre>
+## # … with 48,828 more rows
+## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 </div>
 <div id="filter" class="section level2" number="4.3">
 <h2><span class="header-section-number">4.3</span> filter</h2>
@@ -672,20 +676,22 @@ names(nyt_state_data)</code></pre>
 
 nyt_state_wrangle</code></pre>
 <pre><code>## # A tibble: 48,838 × 9
-##    date       state   fips  cases_cumul deaths_cumul cases_cumul_day_before
-##    &lt;date&gt;     &lt;chr&gt;   &lt;chr&gt;       &lt;dbl&gt;        &lt;dbl&gt;                  &lt;dbl&gt;
-##  1 2020-03-13 Alabama 01              6            0                     NA
-##  2 2020-03-14 Alabama 01             12            0                      6
-##  3 2020-03-15 Alabama 01             23            0                     12
-##  4 2020-03-16 Alabama 01             29            0                     23
-##  5 2020-03-17 Alabama 01             39            0                     29
-##  6 2020-03-18 Alabama 01             51            0                     39
-##  7 2020-03-19 Alabama 01             78            0                     51
-##  8 2020-03-20 Alabama 01            106            0                     78
-##  9 2020-03-21 Alabama 01            131            0                    106
-## 10 2020-03-22 Alabama 01            157            0                    131
-## # … with 48,828 more rows, and 3 more variables: cases_incident &lt;dbl&gt;,
-## #   deaths_cumul_day_before &lt;dbl&gt;, deaths_incident &lt;dbl&gt;</code></pre>
+##    date       state   fips  cases_cumul deaths…¹ cases…² cases…³ death…⁴ death…⁵
+##    &lt;date&gt;     &lt;chr&gt;   &lt;chr&gt;       &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+##  1 2020-03-13 Alabama 01              6        0      NA      NA      NA      NA
+##  2 2020-03-14 Alabama 01             12        0       6       6       0       0
+##  3 2020-03-15 Alabama 01             23        0      12      11       0       0
+##  4 2020-03-16 Alabama 01             29        0      23       6       0       0
+##  5 2020-03-17 Alabama 01             39        0      29      10       0       0
+##  6 2020-03-18 Alabama 01             51        0      39      12       0       0
+##  7 2020-03-19 Alabama 01             78        0      51      27       0       0
+##  8 2020-03-20 Alabama 01            106        0      78      28       0       0
+##  9 2020-03-21 Alabama 01            131        0     106      25       0       0
+## 10 2020-03-22 Alabama 01            157        0     131      26       0       0
+## # … with 48,828 more rows, and abbreviated variable names ¹​deaths_cumul,
+## #   ²​cases_cumul_day_before, ³​cases_incident, ⁴​deaths_cumul_day_before,
+## #   ⁵​deaths_incident
+## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 <div id="group_by-continued" class="section level3" number="4.6.1">
 <h3><span class="header-section-number">4.6.1</span> group_by (continued)</h3>
 <p><code>group_by()</code> is often but not always used in combination with <code>summarise()</code>. We can use <code>group_by()</code> without <code>summarise()</code> to extract the total number of cases and deaths for each state, as the last day of data for each state contains the cumulative total.In the next code chunk, we’ll calculate the same cumulative total using the incident totals calculated above.</p>
@@ -698,20 +704,22 @@ nyt_state_wrangle</code></pre>
 nyt_last_day_by_state</code></pre>
 <pre><code>## # A tibble: 56 × 9
 ## # Groups:   state [56]
-##    date       state              fips  cases_cumul deaths_cumul cases_cumul_day…
-##    &lt;date&gt;     &lt;chr&gt;              &lt;chr&gt;       &lt;dbl&gt;        &lt;dbl&gt;            &lt;dbl&gt;
-##  1 2022-08-01 Alabama            01        1424411        19891          1424411
-##  2 2022-08-01 Alaska             02         286793         1270           286793
-##  3 2022-08-01 American Samoa     60           7471           33             7471
-##  4 2022-08-01 Arizona            04        2196429        30768          2196429
-##  5 2022-08-01 Arkansas           05         904513        11719           903931
-##  6 2022-08-01 California         06       10713333        93651         10700053
-##  7 2022-08-01 Colorado           08        1605858        13198          1603625
-##  8 2022-08-01 Connecticut        09         854934        11102           854582
-##  9 2022-08-01 Delaware           10         294908         3024           294041
-## 10 2022-08-01 District of Colum… 11         162692         1364           162519
-## # … with 46 more rows, and 3 more variables: cases_incident &lt;dbl&gt;,
-## #   deaths_cumul_day_before &lt;dbl&gt;, deaths_incident &lt;dbl&gt;</code></pre>
+##    date       state        fips  cases…¹ death…² cases…³ cases…⁴ death…⁵ death…⁶
+##    &lt;date&gt;     &lt;chr&gt;        &lt;chr&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+##  1 2022-08-01 Alabama      01     1.42e6   19891  1.42e6       0   19891       0
+##  2 2022-08-01 Alaska       02     2.87e5    1270  2.87e5       0    1270       0
+##  3 2022-08-01 American Sa… 60     7.47e3      33  7.47e3       0      33       0
+##  4 2022-08-01 Arizona      04     2.20e6   30768  2.20e6       0   30768       0
+##  5 2022-08-01 Arkansas     05     9.05e5   11719  9.04e5     582   11719       0
+##  6 2022-08-01 California   06     1.07e7   93651  1.07e7   13280   93613      38
+##  7 2022-08-01 Colorado     08     1.61e6   13198  1.60e6    2233   13194       4
+##  8 2022-08-01 Connecticut  09     8.55e5   11102  8.55e5     352   11102       0
+##  9 2022-08-01 Delaware     10     2.95e5    3024  2.94e5     867    3024       0
+## 10 2022-08-01 District of… 11     1.63e5    1364  1.63e5     173    1364       0
+## # … with 46 more rows, and abbreviated variable names ¹​cases_cumul,
+## #   ²​deaths_cumul, ³​cases_cumul_day_before, ⁴​cases_incident,
+## #   ⁵​deaths_cumul_day_before, ⁶​deaths_incident
+## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 <pre class="r"><code>#How many rows does the data have? The data should contain one row for each state or territory, since we grouped by state.
 nrow(nyt_last_day_by_state)</code></pre>
 <pre><code>## [1] 56</code></pre>
@@ -764,7 +772,8 @@ dim(nyt_cases_summary)</code></pre>
 ##  8 Connecticut                           976.            854933           854934
 ##  9 Delaware                              338.            294907           294908
 ## 10 District of Columbia                  186.            162691           162692
-## # … with 46 more rows</code></pre>
+## # … with 46 more rows
+## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 <p>The number of rows is equal to the number of groups (55; some territories are included). The data used to include date, but we have collapsed over date here. When <code>group_by()</code> and <code>summarise()</code> are used together, the number of rows in the data will be equal to the number of groups.</p>
 <p>The number of variables is four: the grouping variable (<code>state</code>) and each of the summary measures we calculated for each state.</p>
 <p>Note that the two cumulative values differ slightly for some of the states. This discrepancy could be explained by the <a href="https://github.com/nytimes/covid-19-data/blob/master/PROBABLE-CASES-NOTE.md">nuances of the NYT’s reporting system</a>, which contains a mix of both probable and confirmed cases. The most trustworthy value is probably <code>cases_cumul_way2</code>, which takes the most recent reported cumulative value.</p>

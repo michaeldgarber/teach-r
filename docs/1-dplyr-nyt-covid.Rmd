@@ -62,7 +62,7 @@ knitr::include_graphics(here("docs", "images", "script-screenshot.png"))
 
 -   <https://dplyr.tidyverse.org/> - The main webpage contains a short overview of the package and describes the key functions, aka verbs, as we will also do here.
 -   <https://dplyr.tidyverse.org/articles/dplyr.html> - The vignette expands upon the main landing page with some examples.
--   <https://r4ds.had.co.nz/transform.html> - Chapter 5 of the online book, [R for Data Science](https://r4ds.had.co.nz/), by Wickham and Grolemund, is another intro to dplyr. This book is the go-to resource for using the tidyverse in general.
+-   <https://r4ds.had.co.nz/transform.html> - This [book](https://r4ds.had.co.nz/) by Wickham and Grolemund is the authoritative guide to learning the tidyverse. The chapter on [data transformation](https://r4ds.had.co.nz/transform.html) chapter covers dplyr, specifically.
 
 # Install packages and download the data
 

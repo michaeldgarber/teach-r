@@ -20,7 +20,7 @@ I mostly use packages that are a part of the tidyverse or which work well with t
 
     -   R for Data Science: <https://r4ds.had.co.nz/>.
 
-        -   This book by Hadley Wickham and Garrett Grolemund seems to be the "go-to" book for learning dplyr and other tidyverse packages.
+        -   This book by Hadley Wickham and Garrett Grolemund is the authoritative guide for learning dplyr and other tidyverse packages.
 
         -   The chapter on **dplyr** specifically is <https://r4ds.had.co.nz/transform.html>.
 
@@ -30,17 +30,9 @@ I mostly use packages that are a part of the tidyverse or which work well with t
 
 -   For **manipulating spatial data** (sf)
 
-    -   sf home page and vignettes 1-4:
+    -   sf home page: <https://r-spatial.github.io/sf/index.html>
 
-        -   <https://r-spatial.github.io/sf/index.html>
-
-        -   <https://r-spatial.github.io/sf/articles/sf1.html>
-
-        -   <https://r-spatial.github.io/sf/articles/sf2.html>
-
-        -   <https://r-spatial.github.io/sf/articles/sf3.html>
-
-        -   <https://r-spatial.github.io/sf/articles/sf4.html>
+    -   vignettes (1-5), e.g., <https://r-spatial.github.io/sf/articles/sf1.html>
 
     -   Geocomputation with R (Lovelace, Nowosad, Muenchow) : <https://geocompr.robinlovelace.net/>
 
@@ -72,7 +64,7 @@ I mostly use packages that are a part of the tidyverse or which work well with t
 
         -   Its home page is <https://r-spatial.github.io/mapview/>
 
-        -   Several vignettes are available on that page, e.g.,: <https://r-spatial.github.io/mapview/articles/mapview_01-basics.html>
+        -   Several vignettes are available on that page, e.g., <https://r-spatial.github.io/mapview/articles/mapview_01-basics.html>
 
     -   Tmap is another widely used mapping package and can create both static and interactive maps.
 
@@ -92,7 +84,7 @@ I mostly use packages that are a part of the tidyverse or which work well with t
 
         -   viridis: <https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html>
 
-            -   Note this is often the default option in mapview.
+            -   Note viridis is often the default option in mapview.
 
             -   Note viridis is built into some ggplot2 functions.
 
@@ -125,3 +117,9 @@ I mostly use packages that are a part of the tidyverse or which work well with t
         -   Jenny Bryan's Ode to the here package: <https://github.com/jennybc/here_here>
 
         -   Folder structure of R projects: <https://chrisvoncsefalvay.com/2018/08/09/structuring-r-projects/>
+
+    -   The Epidemiologist R Handbook: <https://epirhandbook.com/en/index.html>
+
+        -   This is an online book whose target audience is public-health professionals and epidemiologists.
+
+        -   It has a chapter on transitioning to R targeting thosewho primarily use Excel, SAS, or STATA: <https://epirhandbook.com/en/transition-to-r.html>
