@@ -380,8 +380,7 @@ div.tocify {
 <li>It’s free. SAS and STATA cost money.</li>
 <li>It has an active, helpful, and friendly user community. Googling a topic along with “R” often leads to useful public discussion on forums like <a href="https://stackoverflow.com/questions/tagged/r">stackoverflow</a> or <a href="https://community.rstudio.com/">RStudio community</a>.</li>
 <li>It can manipulate spatial data and make maps. No need to switch software for GIS. In an analysis with a spatial component, this is <strong>very</strong> important.</li>
-<li>R can do a lot of cool stuff beyond data wrangling and analysis. For example, with RMarkdown, you can generate html files to make websites like this <a href="https://michaeldgarber.github.io/">one</a>, create <a href="https://rmarkdown.rstudio.com/gallery.html">interactive dashboards</a>, and do lots more (amazing <a href="https://www.youtube.com/watch?v=qLEkUjxk7e8">talk</a> by RMarkdown creator).</li>
-<li>For some of the reasons above, having used SAS for years, I personally think R is simply more fun.</li>
+<li>R can do a lot of cool stuff beyond the usual data wrangling and analysis. For example, with RMarkdown, you can generate html files to make websites like this <a href="https://michaeldgarber.github.io/">one</a>, create <a href="https://rmarkdown.rstudio.com/gallery.html">interactive dashboards</a>, and do lots more (see this amazing <a href="https://www.youtube.com/watch?v=qLEkUjxk7e8">talk</a> by R Markdown’s creator).</li>
 </ol>
 <p>I know many people use and like Python, which is also free and shares many of R’s advantages. I don’t have much Python experience, so I can’t really comment on it. Every now and then, I encounter a situation where I wish I had some Python skills (e.g., to use this <a href="https://github.com/gboeing/osmnx">package</a> to compute measures on street networks from OpenStreetMap), but those situations are rare.</p>
 </div>
@@ -453,13 +452,13 @@ div.tocify {
 <p>Fortunately, there’s a very simple solution to these issues: Use the <a href="https://here.r-lib.org/">here</a> package. This package creates a working directory <u>relative</u> to the location of the R project (described below) you are working in. This means that wherever your project is in the folder structure of your computer, the <code>here()</code> function to define your working directory and thus any read/write commands that rely on it will just work.</p>
 <p>(Jenny Bryan’s <a href="https://github.com/jennybc/here_here">ode</a> to the here package is a great read.)</p>
 <p><strong>What is a Project?</strong> A <a href="https://support.rstudio.com/hc/en-us/articles/200526207-Using-RStudio-Projects">Project</a> is an RStudio file (.rproj) associated with a working directory that facilitates organization of files (code, data, other documents) and particular settings relevant for one, well, project. For example, to create this course, I created a project called teach-r. You can create a new project by either navigating to the top right of the RStudio interface, as in,</p>
-<p><img src="images/project-teach-r-screenshot.png" /></p>
+<p><img src="images/open-project-rstudio-top-right.png" width="300" /></p>
 <p>or by using the “File” as in,</p>
-<p><img src="images/Screen%20Shot%202022-08-05%20at%207.48.52%20AM.png" /></p>
+<p><img src="images/open-project-rstudio-file.png" /></p>
 <p>Note that in the screenshot below, all of folders in the same folder as the <strong>.Rproj</strong> file will conveniently appear in the “Files” tab (bottom right pane of a default RStudio session).</p>
-<p><img src="images/Screen%20Shot%202022-08-05%20at%207.46.14%20AM.png" width="500" /></p>
-<p>This folder structure mirrors the folder structure of your computer; it’s a convenient way to access and manage files from directly within the RStudio interface. Here’s my corresponding Finder window (Mac):</p>
-<p><img src="images/Screen%20Shot%202022-08-05%20at%207.47.36%20AM.png" width="500" /></p>
+<p><img src="images/project-teach-r-screenshot-rstudio.png" width="500" /></p>
+<p>This folder structure mirrors the folder structure of your computer; it’s simply a convenient way to access and manage files from directly within the RStudio interface. Here’s my corresponding Finder window (Mac):</p>
+<p><img src="images/project-teach-r-screenshot-finder.png" width="500" /></p>
 <p>It’s worth giving some thought to the project’s folder structure. There are no hard-and-fast rules, but I have taken <a href="https://chrisvoncsefalvay.com/2018/08/09/structuring-r-projects/">this advice</a> and, minimally, create separate folders for code (folder called scripts), input data that should never be modified (data-input), and processed data that is a result of code (data-processed).</p>
 <p>You don’t have to use projects to use R or RStudio, but I’ve <a href="https://www.tidyverse.org/blog/2017/12/workflow-vs-script/">been convinced</a> that it’s a good idea, in part because of how well projects pair with the <strong>here</strong> package.</p>
 </div>
@@ -526,7 +525,8 @@ lake_huron_transformed #look at the transformed data</code></pre>
 ##  8     581.  1882
 ##  9     581.  1883
 ## 10     581.  1884
-## # … with 88 more rows</code></pre>
+## # … with 88 more rows
+## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 <p>Now we have an easier-to-comprehend dataset called <code>lake_huron</code> with two columns. I’d like to save it to the folder called “data-processed,” which is one level beneath the project file. The <a href="https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/save"><code>save()</code></a> function takes the object to be saved as its first argument and what it will be named on the computer as its second arguments. <a href="https://bookdown.org/ndphillips/YaRrr/rdata-files.html">A good</a> (not the only) file format with which to save R objects locally is <code>.Rdata.</code></p>
 <pre class="r"><code>library(here)
 setwd(here(&quot;data-processed&quot;))

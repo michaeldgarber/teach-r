@@ -93,6 +93,6 @@ Google Drive [folder](https://drive.google.com/drive/folders/125F0jIChEAPEqTKQx5
 
 [**Key resources I would recommend:**]{.underline}
 
-I mostly use packages that are a part of the tidyverse or which work well with the tidyverse (e.g., sf). The R universe is brimming with helpful and free online resources on those topics. Here are some resources that I'd recommend:
+I mostly use packages that are a part of the tidyverse or which work well with the tidyverse (e.g., sf). The R universe has lots of helpful and free online resources on those and other topics. Here are some that I'd recommend:
 
 <https://michaeldgarber.github.io/teach-r/recommended-resources.html>
