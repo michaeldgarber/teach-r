@@ -29,6 +29,9 @@
        h6 {font-size: 12px;}
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
@@ -224,6 +227,69 @@ $(document).ready(function () {
 
 
 
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
 
 </head>
 
@@ -231,6 +297,16 @@ $(document).ready(function () {
 
 
 <div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -271,7 +347,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">R course</h1>
 <h4 class="author">Michael Garber, PhD MPH</h4>
-<h4 class="date">Revised August 4, 2022</h4>
+<h4 class="date">Revised August 7, 2022</h4>
 
 </div>
 
@@ -279,10 +355,37 @@ $(document).ready(function () {
 <p>This is the main landing page for the course, <strong><em>Introduction to managing and visualizing data in R: a short course on spatial and non-spatial data</em></strong>.</p>
 <p>Page url: <a href="https://michaeldgarber.github.io/teach-r/" class="uri">https://michaeldgarber.github.io/teach-r/</a></p>
 <p>My background using R: <a href="https://michaeldgarber.github.io/teach-r/who-am-i.html" class="uri">https://michaeldgarber.github.io/teach-r/who-am-i.html</a></p>
-<p><u><strong>Course summary</strong></u></p>
+<div id="course-summary" class="section level1">
+<h1>Course summary</h1>
 <p>This course will introduce participants to popular tools in R for manipulating (“wrangling”) and visualizing data through public-health-focused examples. Specifically, students will become familiar with ways to wrangle and visualize both aspatial (i.e., common spreadsheet-like) data and spatial data. The course will focus on tools that are a part of and that work well with the tidyverse, a set of packages with a common philosophy that, in my opinion, makes R intuitive and fun. Packages covered will include dplyr and sf for manipulating data, and ggplot2, mapview, and tmap for visualizing data. Many examples will transition back and forth between data with and without a spatial component, showing that working with spatial data need not require separate specialized geographic information systems (GIS) software. The course will conclude with a somewhat advanced but important topic, creating functions and iterating over them using the purrr toolkit.</p>
 <p><br /></p>
-<p><u><strong>Sessions</strong></u></p>
+</div>
+<div id="modules" class="section level1">
+<h1>Modules</h1>
+<ol start="0" style="list-style-type: decimal">
+<li><p><strong>Background and set-up</strong></p>
+<p>This module briefly describes key terms, shows how to install R and RStudio, and offers some other setup tips, like using the here package.</p>
+<p>Link: <a href="https://michaeldgarber.github.io/teach-r/0-pre-reqs" class="uri">https://michaeldgarber.github.io/teach-r/0-pre-reqs</a></p></li>
+<li><p><strong>Introduction to R and data wrangling: learning the basics of dplyr with publicly available COVID-19 data.</strong></p>
+<p>Dplyr, as stated on its documentation page, “is a grammar of data manipulation providing a consistent set of verbs that help you solve the most common data manipulation challenges.” In this module, we learn the fundamentals of dplyr in the context of an applied example with publicly available COVID-19 data from the <em>New York Times</em>.</p>
+<p>Link: <a href="https://michaeldgarber.github.io/teach-r/1-dplyr-nyt-covid.html" class="uri">https://michaeldgarber.github.io/teach-r/1-dplyr-nyt-covid.html</a></p></li>
+<li><p><strong>R for data wrangling 2: more dplyr with tidycensus, mapview, and ggplot2</strong></p>
+<p>In this module, we continue with the COVID-19 example from the first tutorial and introduce four additional packages throughout the example: tidycensus, mapview, sf, and ggplot2. Tidycensus allows you to conveniently download census data into R. Mapview lets you make an interactive map with one line of code, sf is a toolbox for managing and manipulating spatial data, and ggplot2 is a prominent package for making graphs and figures. The next sessions elaborate on sf and mapview.</p>
+<p>Link: <a href="https://michaeldgarber.github.io/teach-r/2-dplyr-mapview-tidycensus.html" class="uri">https://michaeldgarber.github.io/teach-r/2-dplyr-mapview-tidycensus.html</a></p></li>
+<li><p><strong>Working with spatial data in R: applying spatial operations from the sf package to an example analysis of pharmacies downloaded from OpenStreetMap</strong></p>
+<p>The sf package and its corresponding object class has become standard tools for managing and representing (vector-based) spatial data in R. An appealing aspect of the sf object class is that it behaves like regular rectangular data and is thus amenable to common data manipulation techniques. In this module, we will work through an example analysis of pharmacies downloaded from OpenStreetMap in the Atlanta area. Through the example, we describe several operations in the sf ecosystem, including ways to merge spatial data, manipulate coordinate systems, and create buffers.</p>
+<p>Link: <a href="https://michaeldgarber.github.io/teach-r/3-sf-atl-pharm.html" class="uri">https://michaeldgarber.github.io/teach-r/3-sf-atl-pharm.html</a></p></li>
+<li><p><strong>Making static and interactive maps in R</strong></p>
+<p>This module will elaborate upon the capabilities of some of R’s mapping tools covered in previous sessions. Specifically, it will illustrate tools for both static maps (as in an image) and interactive maps (as in zooming in and out like Google Maps). Mapview and ggplot2 will again be covered, and tmap will be introduced. This module will also cover color palettes available in R for visualizing continuous and categorical data.</p>
+<p>Link TBD</p></li>
+<li><p><strong>Making your own functions in R and bootstrapping with purrr</strong></p>
+<p>Creating your own functions can help reduce tedious and error-prone repetition in code. Functions can also be used to iteratively modify steps in the data analysis to estimate uncertainty of results via the statistical technique called bootstrapping. This module will introduce the basics of creating simple functions in R in a data-processing workflow. It will then illustrate how to use functions and the purrr toolkit to do basic bootstrapping.</p>
+<p>Link TBD</p></li>
+</ol>
+<p><br /></p>
+</div>
+<div id="sessions-and-recordings" class="section level1">
+<h1>Sessions and recordings</h1>
 <p>Dropbox <a href="https://www.dropbox.com/sh/rpqerzm0ukawhuk/AAAFN4FVfLsq9m4pBvdH83JCa?dl=0">folder</a> with all recordings</p>
 <p>Google Drive <a href="https://drive.google.com/drive/folders/125F0jIChEAPEqTKQx5VdFpKHe4xOOKYP?usp=sharing">folder</a> with all recordings</p>
 <p><br /></p>
@@ -316,37 +419,20 @@ $(document).ready(function () {
 <li><p>R script used during session: <a href="https://github.com/michaeldgarber/teach-r/blob/main/scripts/3-sf-atl-pharm.R" class="uri">https://github.com/michaeldgarber/teach-r/blob/main/scripts/3-sf-atl-pharm.R</a></p></li>
 </ul>
 <p><br /></p>
-<p><u><strong>Modules:</strong></u></p>
-<ol start="0" style="list-style-type: decimal">
-<li><p><strong>Background and set-up</strong></p>
-<p>This module briefly describes key terms, shows how to install R and RStudio, and offers some other setup tips, like using the here package.</p>
-<p>Link: <a href="https://michaeldgarber.github.io/teach-r/0-pre-reqs" class="uri">https://michaeldgarber.github.io/teach-r/0-pre-reqs</a></p></li>
-<li><p><strong>Introduction to R and data wrangling: learning the basics of dplyr with publicly available COVID-19 data.</strong></p>
-<p>Dplyr, as stated on its documentation page, “is a grammar of data manipulation providing a consistent set of verbs that help you solve the most common data manipulation challenges.” In this module, we learn the fundamentals of dplyr in the context of an applied example with publicly available COVID-19 data from the <em>New York Times</em>.</p>
-<p>Link: <a href="https://michaeldgarber.github.io/teach-r/1-dplyr-nyt-covid.html" class="uri">https://michaeldgarber.github.io/teach-r/1-dplyr-nyt-covid.html</a></p></li>
-<li><p><strong>R for data wrangling 2: more dplyr with tidycensus, mapview, and ggplot2</strong></p>
-<p>In this module, we continue with the COVID-19 example from the first tutorial and introduce four additional packages throughout the example: tidycensus, mapview, sf, and ggplot2. Tidycensus allows you to conveniently download census data into R. Mapview lets you make an interactive map with one line of code, sf is a toolbox for managing and manipulating spatial data, and ggplot2 is a prominent package for making graphs and figures. The next sessions elaborate on sf and mapview.</p>
-<p>Link: <a href="https://michaeldgarber.github.io/teach-r/2-dplyr-mapview-tidycensus.html" class="uri">https://michaeldgarber.github.io/teach-r/2-dplyr-mapview-tidycensus.html</a></p></li>
-<li><p><strong>Working with spatial data in R: applying spatial operations from the sf package to an example analysis of pharmacies downloaded from OpenStreetMap</strong></p>
-<p>The sf package and its corresponding object class has become standard tools for managing and representing (vector-based) spatial data in R. An appealing aspect of the sf object class is that it behaves like regular rectangular data and is thus amenable to common data manipulation techniques. In this module, we will work through an example analysis of pharmacies downloaded from OpenStreetMap in the Atlanta area. Through the example, we describe several operations in the sf ecosystem, including ways to merge spatial data, manipulate coordinate systems, and create buffers.</p>
-<p>Link: <a href="https://michaeldgarber.github.io/teach-r/3-sf-atl-pharm.html" class="uri">https://michaeldgarber.github.io/teach-r/3-sf-atl-pharm.html</a></p></li>
-<li><p><strong>Making static and interactive maps in R</strong></p>
-<p>This module will elaborate upon the capabilities of some of R’s mapping tools covered in previous sessions. Specifically, it will illustrate tools for both static maps (as in an image) and interactive maps (as in zooming in and out like Google Maps). Mapview and ggplot2 will again be covered, and tmap will be introduced. This module will also cover color palettes available in R for visualizing continuous and categorical data.</p>
-<p>Link TBD</p></li>
-<li><p><strong>Making your own functions in R and bootstrapping with purrr</strong></p>
-<p>Creating your own functions can help reduce tedious and error-prone repetition in code. Functions can also be used to iteratively modify steps in the data analysis to estimate uncertainty of results via the statistical technique called bootstrapping. This module will introduce the basics of creating simple functions in R in a data-processing workflow. It will then illustrate how to use functions and the purrr toolkit to do basic bootstrapping.</p>
-<p>Link TBD</p></li>
-</ol>
-<p><br /></p>
-<p><u><strong>Resources I would recommend:</strong></u></p>
+</div>
+<div id="recommended-resources" class="section level1">
+<h1>Recommended resources</h1>
 <p>I mostly use packages that are a part of the tidyverse or which work well with the tidyverse (e.g., sf). The R universe has lots of great resources on those and other topics. Here are some that I’d recommend:</p>
 <p><a href="https://michaeldgarber.github.io/teach-r/recommended-resources.html" class="uri">https://michaeldgarber.github.io/teach-r/recommended-resources.html</a></p>
+</div>
 
 <br>
 <br>
 <p>Copyright &copy; 2022 Michael D. Garber </p>
 
 
+</div>
+</div>
 
 </div>
 
@@ -379,6 +465,35 @@ $(document).ready(function () {
 
 <!-- code folding -->
 
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3,h4",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>
