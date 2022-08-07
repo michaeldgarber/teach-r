@@ -8,9 +8,7 @@ output:
       after_body: footer.html
 ---
 
-[**Key resources I would recommend:**]{.underline}
-
-I mostly use packages that are a part of the tidyverse or which work well with the tidyverse (e.g., sf). The R universe has lots of helpful and free online resources on those and other topics. Here are some that I'd recommend:
+I mostly use packages that are a part of the tidyverse or which work well with the tidyverse (e.g., sf). The R universe has lots of great resources on those and other topics. Here are some that I'd recommend:
 
 -   For **general data wrangling** and other data management in the tidyverse (dplyr and other tidyverse packages)
 
@@ -24,7 +22,7 @@ I mostly use packages that are a part of the tidyverse or which work well with t
 
         -   The chapter on **dplyr** specifically is <https://r4ds.had.co.nz/transform.html>.
 
-    -   Tips for using by Dr. Michael Kramer, an Emory colleague, as part of his course on Spatial Epidemiology: <https://mkram01.github.io/EPI563-SpatialEPI/dplyr.html>
+    -   Tips for using dplyr by Dr. Michael Kramer, an Emory colleague, as part of his course on Spatial Epidemiology: <https://mkram01.github.io/EPI563-SpatialEPI/dplyr.html>
 
     -   For importing rectangular data (e.g., CSV) using readr: <https://readr.tidyverse.org/>
 
@@ -130,7 +128,7 @@ I mostly use packages that are a part of the tidyverse or which work well with t
 
         -   This is an online book whose target audience is public-health professionals and epidemiologists.
 
-        -   It has a chapter on transitioning to R targeting thosewho primarily use Excel, SAS, or STATA: <https://epirhandbook.com/en/transition-to-r.html>
+        -   It has a chapter on transitioning to R targeting those who primarily use Excel, SAS, or STATA: <https://epirhandbook.com/en/transition-to-r.html>
 
     -   RStudio keyboard shortcuts:
 
