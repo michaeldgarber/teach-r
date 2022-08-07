@@ -1,6 +1,6 @@
 ---
 title: "Recommended resources"
-date: "Revised August 4, 2022"
+date: "Revised August 7, 2022"
 output: 
   bookdown::html_document2:
     toc: FALSE #overwrite the _yml
@@ -24,15 +24,19 @@ I mostly use packages that are a part of the tidyverse or which work well with t
 
         -   The chapter on **dplyr** specifically is <https://r4ds.had.co.nz/transform.html>.
 
+    -   Tips for using by Dr. Michael Kramer, an Emory colleague, as part of his course on Spatial Epidemiology: <https://mkram01.github.io/EPI563-SpatialEPI/dplyr.html>
+
     -   For importing rectangular data (e.g., CSV) using readr: <https://readr.tidyverse.org/>
 
     -   For explanation of more "under-the-hood" technical topics, I would suggest <https://adv-r.hadley.nz/>
 
--   For **manipulating spatial data** (sf)
+-   For **manipulating (vector-based) spatial data** (sf)
 
     -   sf home page: <https://r-spatial.github.io/sf/index.html>
 
-    -   vignettes (1-5), e.g., <https://r-spatial.github.io/sf/articles/sf1.html>
+    -   sf vignettes (1-5), e.g., <https://r-spatial.github.io/sf/articles/sf1.html>
+
+    -   sf cheatsheet: <https://github.com/rstudio/cheatsheets/blob/main/sf.pdf>
 
     -   Geocomputation with R (Lovelace, Nowosad, Muenchow) : <https://geocompr.robinlovelace.net/>
 
@@ -45,6 +49,8 @@ I mostly use packages that are a part of the tidyverse or which work well with t
         -   This book also covers raster data and corresponding packages (terra and raster).
 
     -   Chapter on sf in Spatial Data Science (Pebesma, Bivand): <https://keen-swartz-3146c4.netlify.app/sf.html#sfintro>
+
+    -   Tips for working with sf by Dr. Michael Kramer: <https://mkram01.github.io/EPI563-SpatialEPI/sf-overview.html>
 
 -   For **making charts and figures** (ggplot2)
 
@@ -73,6 +79,8 @@ I mostly use packages that are a part of the tidyverse or which work well with t
         -   <https://r-tmap.github.io/tmap/articles/tmap-getstarted.html>
 
         -   <https://cengel.github.io/R-spatial/mapping.html#choropleth-with-tmap>
+
+        -   <https://mkram01.github.io/EPI563-SpatialEPI/intro-tmap.html>
 
     -   ggplot2 can also be used to make static maps of sf objects:
 
@@ -123,3 +131,14 @@ I mostly use packages that are a part of the tidyverse or which work well with t
         -   This is an online book whose target audience is public-health professionals and epidemiologists.
 
         -   It has a chapter on transitioning to R targeting thosewho primarily use Excel, SAS, or STATA: <https://epirhandbook.com/en/transition-to-r.html>
+
+    -   RStudio keyboard shortcuts:
+
+        -   <https://support.rstudio.com/hc/en-us/articles/200711853-Keyboard-Shortcuts-in-the-RStudio-IDE>
+
+        -   The two keyboard shortcuts I use the most are:
+
+            | Operation                    | Mac          | Windows & Linux |
+            |------------------------------|--------------|-----------------|
+            | Run current line / selection | cmd+return   | ctrl+enter      |
+            | Insert pipe (`%>%`)          | cmd+shift+m  | ctrl+shift+m    |

@@ -39,6 +39,7 @@ library(mapview) #for interactive mapping
 library(sf) #simple features for working with spatial (vector) data
 library(viridis) #used to change color palettes
 library(scales) #Used to help with the ggplot date axis below.
+library(here) #working-directory mgmt in case we need to load data locally
 ```
 
 ```{r "mapviewspecial2", eval=FALSE, include=FALSE, eval=TRUE, echo=FALSE}
@@ -88,9 +89,9 @@ nyt_state_wrangle = nyt_state_data %>%
     deaths_cumul_day_before = lag(deaths_cumul),
     deaths_incident = deaths_cumul - deaths_cumul_day_before,
     
-    year=year(date),
-    month=month(date),
-    week = week(date) #week of the year (i.e, 1-52)
+    year = lubridate::year(date),
+    month =lubridate::month(date),
+    week = lubridate::week(date) #week of the year (i.e, 1-52)
   ) %>% 
   ungroup() %>% 
   arrange(state, date)
@@ -105,7 +106,7 @@ nyt_state_wrangle %>%
 
 # Load state-level census data using tidycensus
 
-**Tidycensus** is a convenience package that allows census data to be downloaded into R at various geographic scales (e.g., state, county, census tract). The online material on tidycensus has great examples: <https://walker-data.com/tidycensus/>.
+**Tidycensus** is a convenient package that allows census data to be downloaded into R at various geographic scales (e.g., state, county, census tract). The online material by the package author has great examples: <https://walker-data.com/tidycensus/>.
 
 Use of tidycensus requires a key to access the U.S. Census API, which can be obtained for free here: <https://api.census.gov/data/key_signup.html>.
 
@@ -130,7 +131,7 @@ Tidycensus lets the user specify
 
 ## Brief introduction to sf
 
-By specifying `geometry=TRUE`, an **sf object** will be returned representing the object for the chosen geography. If `geometry=FALSE`, then only the aspatial data will be returned. sf (or [simple feature](https://r-spatial.github.io/sf/articles/sf1.html)) objects have become the standard data structure for managing spatial data in R. We will cover sf objects more in a separate tutorial (link TBD). I would also encourage you to review the excellent and free online material on sf:
+By specifying `geometry=TRUE`, an **sf object** will be returned representing the object for the chosen geography. If `geometry=FALSE`, then only the aspatial data will be returned. sf (or [simple feature](https://r-spatial.github.io/sf/articles/sf1.html)) objects have become the standard data structure for managing spatial data in R. We will cover sf objects more in a separate tutorial (<https://michaeldgarber.github.io/teach-r/3-sf-atl-pharm.html>). I would also encourage you to review these resources on sf:
 
 -   The main landing page maintained by the package author, Edzer Pebesma: <https://r-spatial.github.io/sf/>
 
@@ -140,17 +141,16 @@ By specifying `geometry=TRUE`, an **sf object** will be returned representing th
 
 One great aspect of `sf` objects--as compared with the sp package, the previous standard--is that spatial data can be handled as you would any other rectangular dataframe. An `sf` object is like a `data.frame` or `tibble` with an added column representing the geometry for that observation. The data structure of sf makes it straightforward to integrate spatial data into a typical data-wrangling workflow, during which you might add new variables, filter on a variable, or merge with additional data.
 
-## Load state-level population data
+## Get state-level population data
 
 Without further adieu, let's run the tidycensus function `get_acs()` to return state-level population data from ACS:
 
-```{r get states, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
-
+```{r get states, eval=FALSE, echo=TRUE, warning=FALSE, message=TRUE}
 #Run this to save the data locally for speed.
 options(tigris_use_cache = TRUE) 
 
 #One way I keep track of whether an object has geometry associated with it to add a _geo suffix to the name.
-pop_by_state_geo =get_acs(
+pop_by_state_geo =tidycensus::get_acs(
   year=2019,
   variables = "B01001_001", #total population
   geography = "state",
@@ -161,11 +161,22 @@ pop_by_state_geo =get_acs(
 A convenient way to search through the census variables is to use the `load_variables` function, as described here: <https://walker-data.com/tidycensus/articles/basic-usage.html>.
 
 ```{r loadcensusvars, eval=FALSE, echo=TRUE, warning=FALSE, message=TRUE}
-vars_acs_2019 = load_variables(2019, "acs5", cache = TRUE)
+vars_acs_2019 = tidycensus::load_variables(2019, "acs5", cache = TRUE)
 View(vars_acs_2019)
 ```
 
-Confirm the data are an sf object (simple feature) and explore the variable names.
+### If `tidycensus::get_acs()` did not work, load the data another way
+
+**Note**: if `tidycensus::get_acs()` returned an error because the Census key did not work, tidycensus did not load, or for any other reason, please feel free to download a version of **pop_by_state_geo** from this [Dropbox folder](https://www.dropbox.com/sh/ff85l058vl82wwy/AABKygH3PhQkausaxOcIgO0Sa?dl=0):
+
+I would then suggest saving the file (pop_by_state_geo.RData) to a folder within your R Studio project's directory. For example, I would save save it to a folder called 'data-input' one level beneath the folder containing the .Rproj file for this project and would then load the data like this. I use the `here::here()` to set the working directory.
+
+```{r}
+setwd(here("data-input"))
+load("pop_by_state_geo.RData")
+```
+
+Confirm the data are an sf object (simple feature) and explore the data.
 
 ```{r confirmstatus, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
 class(pop_by_state_geo)
@@ -176,7 +187,7 @@ pop_by_state_geo
 
 Another essential package in the **sf** workflow is **mapview** (<https://r-spatial.github.io/mapview/index.html>), which creates quick interactive maps. In just one line, we can interactively map the ACS state-level population data we just loaded.
 
-The `zcol` argument colors the polygons (states, here) based on the value of the variable, "estimate", which corresponds to the state's population, as obtained from tidycensus. The default color palette for the visualization is [viridis](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html).
+The `zcol` argument colors the polygons (states, here) based on the value of the variable, `estimate`, which corresponds to the state's population, as obtained from tidycensus. The default color palette for the visualization is [viridis](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html).
 
 ```{r mapview, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
 mapview(pop_by_state_geo, zcol = "estimate")
@@ -198,13 +209,13 @@ Let's clean up the output from tidycensus to make it easier to link with the sta
 names(pop_by_state_geo)
 ```
 
-The variable corresponding to the state name is called 'NAME' in the tidycensus output. Rename it to 'state' so it can be more easily joined with the NYT data. Also note that there is a column with the variable name ('variable') and another column for its 'estimate'. It's formatted this way because the default output from tidycensus is long-form data. That is, we could have downloaded several variables for each state, and each variable-state combination would receive its own row. We can consolidate these fields by dropping the variable column and renaming 'estimate' to 'population'. Finally, because GEOID may vary depending on the geographic unit, let's explicitly remember it's a two-digit FIPS code and call it 'fips_2digit.'
+The variable corresponding to the state name is called `NAME` in the tidycensus output. Rename it to `state` so it can be more easily joined with the NYT data. Also note that there is a column with the variable name `variable` and another column for its `estimate`. It's formatted this way because the default output from tidycensus is long-form data. That is, we could have downloaded several variables for each state, and each variable-state combination would receive its own row. We can consolidate these fields by dropping the `variable` column using `dplyr::select()` and renaming `estimate` to `population`. Finally, because GEOID may vary depending on the geographic unit, let's explicitly remember it's a two-digit FIPS code and call it `fips_2digit`.
 
 ```{r nameconfirm2, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
 names(nyt_state_wrangle)
 ```
 
-We can wrangle this **sf** object the same way we would a tibble. For example, here we use a pipe (`%>%`) and the **dplyr** verbs `rename()`, `select()`, and `mutate()`. Within the `select()` function, we use the - sign to drop variables from our dataset.
+Importantly, we can wrangle this **sf** object the same way we would a tibble. For example, here we use a pipe (`%>%`) and the **dplyr** verbs `dplyr::rename()`, `dplyr::select()`, and `dplyr::mutate()`. Within the `select()` function, we use the `-` sign to drop variables from our dataset.
 
 ```{r wranglepop, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
 pop_by_state_wrangle_geo = pop_by_state_geo %>%
@@ -227,9 +238,9 @@ names(pop_by_state_wrangle_geo)
 
 ## Use mapview to visualize population.
 
-To confirm the population data are as we expect, let's map the state's populations using **mapview**. The pipe operator, `%>%`, can also be used before a `mapview()` call. In this code, the sf object, `pop_by_state_geo`, and all subsequent changes we make it to it, e.g., after having used `filter()` here, are "piped" into the `mapview()` function. Another advantage of the pipe when using mapview is you can visualize various subsets (or other variations) of your data without having to createa a new object if you don't intend to use that variation later.
+To confirm the population data are as we expect, let's map the state's populations using **mapview**. The pipe operator, `%>%`, can also be used before a `mapview()` call. In this code, the sf object, `pop_by_state_geo`, and all subsequent changes we make it to it, e.g., after having used `filter()` here, are "piped" into the `mapview()` function. Another advantage of the pipe when using mapview is that you can visualize various subsets (or other variations) of your data without having to create a new object if you don't intend to use that variation later.
 
-The `zcol` argument specifies which variable to be visualized. As you may notice, [mapview defaults](https://r-spatial.github.io/mapview/articles/articles/mapview_02-advanced.html) to the viridis palette.
+The `zcol` argument specifies which variable to be visualized. As you may notice, [mapview defaults](https://r-spatial.github.io/mapview/articles/articles/mapview_02-advanced.html) to the viridis color palette.
 
 ```{r mapview1, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
 pop_by_state_wrangle_geo %>%
@@ -242,15 +253,15 @@ pop_by_state_wrangle_geo %>%
 
 Let's link the NYTimes COVID-19 data with the census data two ways.
 
-We will first map an overall summary of cumulative incidence per state population. To do that, we will re-run some of our summary estimates from the [previous tutorial](https://rpubs.com/michaeldgarber/dplyr_1) to calculate the total number of cumulative cases. We will then link the census population data to the NYTimes data by state using `left_join`. We will calculate a rate (cumulative cases per population) and visualize it using mapview.
+We will first map an overall summary of cumulative incidence per state population. To do that, we will re-run some of our summary estimates from the [previous tutorial](https://rpubs.com/michaeldgarber/dplyr_1) to calculate the total number of cumulative cases. We will then link the census population data to the NYTimes data by state using `dplyr::left_join()`. We will calculate a rate (cumulative cases per population) and visualize it using mapview.
 
 ## Summarize NYT COVID-19 data by state and link with census data.
 
-Recall, we went through several ways to calculate the cumulative number of cases by state in our previous code. Let's group by state and take the max value using `summarise()`. Using the pipe, we can do these steps without having to create intermediate datasets.
+Recall, we went through several ways to calculate the cumulative number of cases by state in our previous code. Let's group by state and take the max value using `dplyr::summarise()`. Using the pipe, we can do these steps without having to create intermediate datasets.
 
 `left_join()` takes three arguments: the data frame (or tibble) on the left side (piped through here), the data frame it's merging with on the right side (`pop_by_state_wrangle_geo`), and the key variable on which the two tibbles will be merged, which is state. Note `left_join()` can also join on a vector of (two or more) variables if your key is represented by a combination of variables: `by = c("var1", "var2")`. Here we need just one key variable.
 
-We use `st_as_sf()` to force the dataframe to be an sf object. We finally use `mutate()` to create new variables which calcualte the cumulative incidence of both cases and deaths per population.
+We use `sf::st_as_sf()` to force the dataframe to be an sf object. We finally use `mutate()` to create new variables which calcualte the cumulative incidence of both cases and deaths per population.
 
 ```{r wranglenytlink, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
 nyt_by_state_w_pop_geo = nyt_state_wrangle %>% 
@@ -262,7 +273,7 @@ nyt_by_state_w_pop_geo = nyt_state_wrangle %>%
   #Recall, after we use group_by and summarise, the data go from a very big dataset 
   #with a row for each day-state combination to a smaller dataset with just a row for every state.
   left_join(pop_by_state_wrangle_geo, by = "state") %>% #This contains the geometry
-  st_as_sf() %>% 
+  sf::st_as_sf() %>% 
   mutate(
     cases_cumul_per_pop = cases_cumul/population,
     deaths_cumul_per_pop = deaths_cumul/population
@@ -281,11 +292,11 @@ nyt_by_state_w_pop_geo %>%
     zcol = "cases_cumul_per_pop")
 ```
 
-The variable `cases_cumul_per_pop` is visualized, and it looks like North Dakota has had a particularly high incidence rate. Note that this measure should not be interpreted as a proportion, as the same person can be counted as a case multiple times. That is, this measure is no not the percentage of the population that has had Covid-19; that proportion would probably be lower. We have counts of cases, not person-level data, so we can't determine what proportion of people have been a case.
+The variable `cases_cumul_per_pop` is visualized, and it looks like North Dakota has had a particularly high incidence rate. Note that this measure should not be interpreted as a proportion. The same person can be counted as a case multiple times and thus it would theoretically be possible for this measure to take values greater than 1. That is, this measure is no not the percentage of the population that has had Covid-19; that proportion would probably be lower. We have counts of cases, not person-level data, so we can't determine what proportion of people have been a case.
 
-This measure may be easier to interpret if we were to split the data into year increments, so we could then calculate cases per person-year.
+This measure may be easier to interpret if we were to split the data into year increments, so we could then calculate incident cases per person-year.
 
-### Exercise 1: Calculate cases per person-year for each state.
+### Exercise 1: Calculate incident cases per person-year for each state.
 
 **Exercise:** Calculate the number of incident cases per person-year for each state.
 
@@ -293,7 +304,7 @@ This measure may be easier to interpret if we were to split the data into year i
 
 Mapview's main raison d'etre is as a quick workflow check, but it can also be used to make more refined maps. One can, for example, change the label of the visualized variable in the legend (`layer.name=`) or change the color palette (`col.regions=`). See options here: <https://r-spatial.github.io/mapview/articles/articles/mapview_02-advanced.html>. In the below map, I made those changes and flipped the direction of the viridis color palette using the `direction` argument so that dark purple is high incidence and yellow is low. Check out the viridis color palettes here: <https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html>. B corresponds to the inferno palette: <https://rdrr.io/cran/scales/man/viridis_pal.html>.
 
-The output is not bad, and I have used mapview in public-facing documents. Some people prefer tmap, though, for publication-ready maps, [**tmap**](https://cran.r-project.org/web/packages/tmap/vignettes/tmap-getstarted.html). We will discuss tmap more in a subsequent sesssion. (Also see this tmap demo by my colleague, Lance Owen: <https://rpubs.com/lancerowen/ElegantCartography_1>).
+The output is not bad, and I have used mapview in public-facing documents. Some people prefer [tmap](https://cran.r-project.org/web/packages/tmap/vignettes/tmap-getstarted.html), though, for publication-ready maps, as it more flexible. We will discuss tmap more in a subsequent session. (Also see this tmap demo by a colleague, Lance Owen: <https://rpubs.com/lancerowen/ElegantCartography_1>).
 
 ```{r mapview_cases_perpop2, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
 nyt_by_state_w_pop_geo %>%
@@ -325,14 +336,14 @@ nyt_by_state_w_pop_geo %>%
 
 In the above analysis, we collapsed over time. We might also be interested in time trends. In this section, we'll keep the data in its daily format and link in the population data again.
 
-Sometimes, there can be computer-processing benefits to dropping the geometry column, as the geometry column can make the file size quite a bit bigger. Since the daily data are thousands of observations, linking each day's data with a corresponding geometry might be slow to work with. Let's create a new state-population dataset without the geometry column before we link the population data to the daily COVID-19 data. Drop the geometry using the `st_set_geometry(NULL)` function from **sf**.
+Sometimes, there can be computer-processing benefits to dropping the geometry column, as it can make the file size quite a bit bigger. Since the daily data are thousands of observations, linking each day's data with a corresponding geometry might be slow to work with. Let's create a new state-population dataset without the geometry column before we link the population data to the daily COVID-19 data. Drop the geometry using the `st_set_geometry(NULL)` function from **sf**.
 
 ```{r dropgeo, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
 pop_by_state_wrangle_nogeo = pop_by_state_wrangle_geo %>% 
-  st_set_geometry(NULL)
+  sf::st_set_geometry(NULL)
 ```
 
-Now, link the state-level population data to the daily COVID-19 data. Recall, the key variable for our `left_jon()` is 'state'. Calculate daily cumulative incidence of each outcome per population and the daily incidence rate of each outcome.
+Now, link the state-level population data to the daily COVID-19 data. Recall, the key variable for our `dplyr::left_jon()` is `state`. Calculate daily cumulative incidence of each outcome per population and the daily incidence rate of each outcome.
 
 ```{r dailycovidpop, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
 nyt_state_pop_wrangle = nyt_state_wrangle %>% 
@@ -362,14 +373,12 @@ nyt_state_pop_wrangle %>%
   theme(axis.text.x = element_text(angle = 90)) #rotate text on x-axis 90 degrees
 ```
 
-
-
 Recall incidence rate is the number of **new** cases per population per time period (day, here). We calculated it at the beginning of the code by subtracting the case count in a state on one day from the corresponding count from that state the day before.
 
 ```{r statelinegraphs2, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
 nyt_state_pop_wrangle %>% 
   filter(continental_48==1) %>%   
-  ggplot( aes(x=date, y=cases_incident_per_pop))+
+  ggplot2::ggplot( aes(x=date, y=cases_incident_per_pop))+
   geom_line(aes(color = state)) +
   scale_x_date(date_breaks = "months" , date_labels = "%b-%y") +
   ylab("COVID-19\n incidence rate\n per population") +
@@ -422,4 +431,3 @@ nyt_state_pop_wrangle %>%
 ### Exercise 3: Calculate and graph weekly incidence rate
 
 **Exercise:** Weekly incidence rate is probably a more stable measure. How would we calculate that? Calculate weekly incidence rate and graph both overall (contiguous 48) and by state.
-

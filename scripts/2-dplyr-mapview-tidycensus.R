@@ -64,7 +64,6 @@ library(here)
 setwd(here("data-processed"))
 save(pop_by_state_geo, file = "pop_by_state_geo.RData")
 
-
 #A convenient way to search through the census variables is to use the `load_variables` function, 
 #as described here: https://walker-data.com/tidycensus/articles/basic-usage.html.
 vars_acs_2019 = load_variables(2019, "acs5", cache = TRUE)

@@ -61,6 +61,8 @@ Specifically:
 
 -   Note that dplyr and sf functions can be used in the same pipe.
 
+-   sf is "sticky", meaning the geometry column "sticks around" unless you explicitly remove it, e.g., using `st_set_geometry(NULL).` For example, even if you use `dplyr::select()` and don't include geometry as one of the columns to select, the geometry column will remain.
+
 -   Illustrate use of the `st_area()` function to measure area.
 
 -   Illustrate use of `st_union()`, which smushes together multiple sf features into one single feature.

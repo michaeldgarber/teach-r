@@ -429,14 +429,14 @@ div.tocify {
 <div id="load-the-data-directly-from-their-github-repository" class="section level3" number="3.2.1">
 <h3><span class="header-section-number">3.2.1</span> Load the data directly from their Github repository</h3>
 <p>First, let’s try the fancy way, loading it directly from GitHub. Below, the first line of code defines an object, <code>nyt_state_url</code> to be the URL where the NYT data are located. The second line of code uses a base R function, <code>url()</code>, to parse that URL as a CSV. We then convert it from a CSV to an R object using <code>read_csv()</code>. <code>read_csv()</code> is a function in <em>readr</em>, another package in the <strong>tidyverse.</strong> Accordingly, the resulting output of these few lines of code will be a <a href="https://r4ds.had.co.nz/tibbles.html"><strong>tibble</strong></a>, tidyverse speak for a “tidy table.” Basically, a tibble is a table, or data frame, with some opinionated formatting advantages that make it easy to work with.</p>
-<p>Of note, the code below includes our first use of the <code>%&gt;%</code> (read: <a href="https://magrittr.tidyverse.org/reference/pipe.html">pipe</a>) operator. The pipe operator is part of the <strong>magrittr</strong> package and is a key element of the tidyverse. The pipe separates the action-oriented functions, <code>read_csv()</code> and <code>url()</code> from the object, <code>nyt_state_url</code>. In my opinion, this separation makes it easier to read, as I’ll discuss more in the next section.</p>
+<p>Of note, the code below includes our first use of the <code>%&gt;%</code> (read: <a href="https://magrittr.tidyverse.org/reference/pipe.html">pipe</a>; keyboard shortcut: cmd+shift+m on Mac; ctrl+shift+m on PC) operator. The pipe operator is part of the <strong>magrittr</strong> package and is a key element of the tidyverse. The pipe separates the action-oriented functions, <code>read_csv()</code> and <code>url()</code> from the object, <code>nyt_state_url</code>. In my opinion, this separation makes it easier to read, as I’ll discuss more in the next section.</p>
 <p>Another side-note: I use the equals sign, <code>=</code>, when assigning new objects, because I think it’s easier to read type than R’s <a href="https://stat.ethz.ch/R-manual/R-devel/library/base/html/assignOps.html">traditional assignment operator</a>, <code>&lt;-</code>. I’ve heard <code>&lt;-</code> has advantages, but I’ve never had an issue using <code>=</code>.</p>
 <pre class="r"><code>nyt_state_url = &quot;https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv&quot;
 
 nyt_state_data = nyt_state_url %&gt;% 
-  url() %&gt;% 
-  read_csv()</code></pre>
-<pre><code>## Rows: 48838 Columns: 5
+  base::url() %&gt;% 
+  readr::read_csv() </code></pre>
+<pre><code>## Rows: 49118 Columns: 5
 ## ── Column specification ────────────────────────────────────────────────────────
 ## Delimiter: &quot;,&quot;
 ## chr  (2): state, fips
@@ -448,16 +448,16 @@ nyt_state_data = nyt_state_url %&gt;%
 <p>An alternative, equivalent, way to write that code is use the traditional nested parentheses. The nested parentheses aren’t so bad when just a few functions are used, but, as the number of functions increases, the nested parentheses become difficult to read.</p>
 <pre class="r"><code>nyt_state_url = &quot;https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv&quot;
 nyt_state_data = read_csv(url(nyt_state_url))</code></pre>
-<p>Either way we write it, we get a resulting dataset, <code>nyt_state_data</code>, which should be visible in the “Environment” pane of RStudio. It tells us that the data have 48,838 observations and 5 variables. (Again, I called this dataset on August 2, 2022; the number of observations will be higher in the future.)</p>
+<p>Either way we write it, we get a resulting dataset, <code>nyt_state_data</code>, which should be visible in the “Environment” pane (top right) of RStudio. It tells us that the data have 48,838 observations and 5 variables. (Again, I called this dataset on August 2, 2022; the number of observations will be higher in the future.)</p>
 <p><img src="images/module-1-nyt-data-environment-screenshot.png" width="500" /></p>
 <p>As noted above, <code>read_csv()</code> is part of the <strong>readr</strong> package and returns a “<a href="https://r4ds.had.co.nz/tibbles.html">tibble</a>”. One benefit of using tibbles, as noted <a href="https://r4ds.had.co.nz/tibbles.html">here</a>, is that they can be printed without overwhelming the console. (This is not necessarily true of data frames more generally).</p>
 <p>Let’s first confirm that <code>nyt_state_data</code> is a tibble using the base-R <code>class()</code> function, which returns the object’s class. The tibble object class is indicated by <code>tbl_df</code>. And then we can print the tibble by typing its name to get a sense of its dimensions (rows and columns) and what the variables look like.</p>
-<p>At this writing, there are 48,838 observations and 5 columns. The variable type is denoted below the variable names.</p>
+<p>At this writing, there are 48,838 observations and 5 columns. In the tibble print-out, the variable type (e.g., character, date, numeric) is listed in brackets just below the variable names.</p>
 <p>We can also use the <code>class()</code> function from base R to return the type for a single column. The <code>$</code> is a base-R function that <a href="https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/Extract">extracts</a> an element of an object by name.</p>
 <pre class="r"><code>class(nyt_state_data) #what type of object is it?</code></pre>
 <pre><code>## [1] &quot;spec_tbl_df&quot; &quot;tbl_df&quot;      &quot;tbl&quot;         &quot;data.frame&quot;</code></pre>
 <pre class="r"><code>nyt_state_data #print the tibble</code></pre>
-<pre><code>## # A tibble: 48,838 × 5
+<pre><code>## # A tibble: 49,118 × 5
 ##    date       state      fips  cases deaths
 ##    &lt;date&gt;     &lt;chr&gt;      &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
 ##  1 2020-01-21 Washington 53        1      0
@@ -470,7 +470,7 @@ nyt_state_data = read_csv(url(nyt_state_url))</code></pre>
 ##  8 2020-01-25 Washington 53        1      0
 ##  9 2020-01-26 Arizona    04        1      0
 ## 10 2020-01-26 California 06        2      0
-## # … with 48,828 more rows
+## # … with 49,108 more rows
 ## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 <pre class="r"><code>class(nyt_state_data$state) #character</code></pre>
 <pre><code>## [1] &quot;character&quot;</code></pre>
@@ -482,7 +482,7 @@ nyt_state_data = read_csv(url(nyt_state_url))</code></pre>
 <p>Then, use <code>read_csv()</code> to <a href="https://r4ds.had.co.nz/data-import.html">import</a> the csv into R. As discussed in the <a href="https://michaeldgarber.github.io/teach-r/0-pre-reqs">last module</a>, we can use the here package for this. So, if the .csv is in a folder in this project directory called, “data-input”, then this code should work to read it in:</p>
 <pre class="r"><code>library(here)
 setwd(here(&quot;data-input&quot;))
-nyt_state_data = read_csv(&quot;nyt_state_data_downloaded.csv&quot;)</code></pre>
+nyt_state_data = readr::read_csv(&quot;nyt_state_data_downloaded.csv&quot;)</code></pre>
 </div>
 <div id="further-explore-the-data-using-view-before-manipulation-with-dplyr-verbs." class="section level3" number="3.2.3">
 <h3><span class="header-section-number">3.2.3</span> Further explore the data using View() before manipulation with dplyr verbs.</h3>
@@ -535,7 +535,7 @@ nyt_state_data = read_csv(&quot;nyt_state_data_downloaded.csv&quot;)</code></pre
 <p>(For the record, <code>filter()</code>, <code>arrange()</code>, <code>select()</code>, <code>mutate()</code>, and <code>summarise()</code> are considered to be the <a href="https://r4ds.had.co.nz/transform.html#introduction-2">five key dplyr functions</a>. I’ve added <code>group_by()</code> and <code>left_join()</code> because I use them so often.)</p>
 </div>
 <div id="mutate" class="section level2" number="4.2">
-<h2><span class="header-section-number">4.2</span> mutate</h2>
+<h2><span class="header-section-number">4.2</span> mutate()</h2>
 <p>For a demo of <code>mutate()</code>, let’s create a new variable called <code>cases_plus_1</code>, which is simply the number of cases plus 1. The first argument inside the <code>mutate()</code> call is the object to be operated on. And the second argument creates the new variable as a function of the old variable and, in this example, the number 1.</p>
 <pre class="r"><code>nyt_state_data_2 = mutate(nyt_state_data, cases_plus_1 = cases+1)</code></pre>
 <p>Adding the number 1 to the <code>cases</code> variable works because <code>cases</code> is a <strong>numeric</strong> variable. If <code>cases</code> were a <strong>character</strong> variable, it would not work.</p>
@@ -601,7 +601,7 @@ nyt_state_data_2vars</code></pre>
 ## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 </div>
 <div id="filter" class="section level2" number="4.3">
-<h2><span class="header-section-number">4.3</span> filter</h2>
+<h2><span class="header-section-number">4.3</span> filter()</h2>
 <p>What if we only care about one state? Use <code>filter()</code> to subset values to Michigan. Again, we’ll do this with and without the pipe operator.</p>
 <pre class="r"><code>nyt_state_data_mi = filter(nyt_state_data, state == &quot;Michigan&quot;)
 
@@ -615,9 +615,9 @@ nyt_state_data_mi_pipe = nyt_state_data %&gt;%
 <pre><code>## [1] 875</code></pre>
 </div>
 <div id="select" class="section level2" number="4.4">
-<h2><span class="header-section-number">4.4</span> select</h2>
+<h2><span class="header-section-number">4.4</span> select()</h2>
 <p>Let’s use <code>select()</code> to grab only the <em>date</em> variable. The syntax is to simply state the columns we want.</p>
-<p>Side-note: <code>select()</code> is used by some other packages. To tell R that we want to use the <code>select()</code> function from <strong>dplyr</strong>, specifically, we write <code>dplyr::select()</code>. We can use this syntax for any dplyr verb, e.g. <code>dplyr::mutate()</code> or <code>dplyr::filter()</code>, but <code>select()</code> is the only one where I’ve run into trouble with ambiguity, so I usually leave it off the other ones. The non-piped version:</p>
+<p>Side-note: <code>select()</code> is used by some other packages. To tell R that we want to use the <code>select()</code> function from <strong>dplyr</strong>, specifically, we write <code>dplyr::select()</code>. We can use this syntax for any dplyr verb, e.g. <code>dplyr::mutate()</code> or <code>dplyr::filter()</code>, but <code>select()</code> is the only one where I’ve run into trouble with ambiguity, so I usually leave it off the other ones for brevity. The non-piped version:</p>
 <pre class="r"><code>date = dplyr::select(nyt_state_data, date)</code></pre>
 <p>And the piped version:</p>
 <pre class="r"><code>date_pipe = nyt_state_data %&gt;% 
@@ -636,12 +636,12 @@ names(nyt_state_data)</code></pre>
 <pre><code>## [1] &quot;date&quot;  &quot;state&quot; &quot;fips&quot;  &quot;cases&quot;</code></pre>
 </div>
 <div id="arrange" class="section level2" number="4.5">
-<h2><span class="header-section-number">4.5</span> arrange</h2>
+<h2><span class="header-section-number">4.5</span> arrange()</h2>
 <p>Arrange does not change values of the dataset. It just sorts the data. As a reminder, the NYT data include <em>cumulative</em> cases and <em>cumulative</em> deaths on that day in that state. We might also be interested in <em>incident</em> (i.e., new) cases or deaths by state. Let’s use arrange to help calculate daily cases and deaths using the <code>lag()</code> function.</p>
 <p>In this code chunk, we’ll combine a few operations sequentially using the pipe, foregoing the nested parentheses approach. When many data-manipulation tasks are chained together, the value of the pipe becomes especially evident. From now on, I’ll adopt the <a href="http://varianceexplained.org/r/teach-tidyverse/">teach-the-tidyverse-first</a> philosophy and stick to its conventions, including the pipe.</p>
 </div>
 <div id="group_by" class="section level2" number="4.6">
-<h2><span class="header-section-number">4.6</span> group_by</h2>
+<h2><span class="header-section-number">4.6</span> group_by()</h2>
 <p>This code also uses <code>group_by()</code>, which does not sort the data, but it tells R to do any subsequent calculations “by group.”</p>
 <p><u>Bonus question</u>:</p>
 <ul>
@@ -658,7 +658,7 @@ names(nyt_state_data)</code></pre>
   #Then calculate the number of incident deaths and incident cases on that day by subtracting the corresponding value from the day before.
   #Calculate the value from the day before using the lag() function, which grabs the value of one row up the data.
   #(We could have equivalently sorted descending and then used the lead() function.)
-  #To explicitly differentiate between cumulative and incident deaths, let&#39;s rename the cases and deaths variables first. 
+  #To explicitly differentiate between cumulative and incident deaths, let&#39;s rename the cases and deaths variables first using dplyr::rename()
   rename(
     cases_cumul = cases,
     deaths_cumul = deaths
@@ -693,8 +693,8 @@ nyt_state_wrangle</code></pre>
 ## #   ⁵​deaths_incident
 ## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 <div id="group_by-continued" class="section level3" number="4.6.1">
-<h3><span class="header-section-number">4.6.1</span> group_by (continued)</h3>
-<p><code>group_by()</code> is often but not always used in combination with <code>summarise()</code>. We can use <code>group_by()</code> without <code>summarise()</code> to extract the total number of cases and deaths for each state, as the last day of data for each state contains the cumulative total.In the next code chunk, we’ll calculate the same cumulative total using the incident totals calculated above.</p>
+<h3><span class="header-section-number">4.6.1</span> group_by() (continued)</h3>
+<p><code>group_by()</code> is often but not always used in combination with <code>summarise()</code>. We can use <code>group_by()</code> without <code>summarise()</code> to extract the total number of cases and deaths for each state. The last day of data for each state contains the cumulative total. After having sorted the data descending by date using <code>dplyr::arrange(desc(date))</code>, we use <code>dplyr::group_by(state)</code> to group the data by state and then <code>dplyr::slice()</code> to take the first row of data by group. In the next code chunk, we calculate the same cumulative total using the incident totals calculated above.</p>
 <p>To incorporate our changes to the data modified above, first set the new dataset (<code>nyt_last_day_by_state</code>) equal to <code>nyt_state_wrangle</code>.</p>
 <pre class="r"><code>nyt_last_day_by_state = nyt_state_wrangle %&gt;% 
   arrange(desc(date)) %&gt;% #Use desc() to sort it by date descending, meaning the most recent day will be on the top of the dataset.
@@ -723,7 +723,7 @@ nyt_last_day_by_state</code></pre>
 <pre class="r"><code>#How many rows does the data have? The data should contain one row for each state or territory, since we grouped by state.
 nrow(nyt_last_day_by_state)</code></pre>
 <pre><code>## [1] 56</code></pre>
-<p>To see the difference between using and not using <code>group_by()</code>, try this code chunk. It will just grab the top row.</p>
+<p>To see the difference between using and not using <code>group_by()</code>, try this code chunk. It will just grab the top row of the whole dataset, not the top row of each group.</p>
 <pre class="r"><code>nyt_last_day  = nyt_state_wrangle %&gt;% 
   arrange(desc(date)) %&gt;% 
 #  group_by(state) %&gt;% #This comments out the code so this part doesn&#39;t run.
@@ -732,16 +732,16 @@ nrow(nyt_last_day_by_state)</code></pre>
 nrow(nyt_last_day)</code></pre>
 </div>
 <div id="group_by-and-summarise" class="section level3" number="4.6.2">
-<h3><span class="header-section-number">4.6.2</span> group_by and summarise</h3>
+<h3><span class="header-section-number">4.6.2</span> group_by() and summarise()</h3>
 <p>Now, let’s use <code>group_by()</code> and <code>summarise()</code> together. The syntax of <code>summarise()</code> is similar to <code>mutate()</code> in that it creates a new variable with each equals sign. As with <code>mutate()</code>, several new variables can be created in a single <code>summarise()</code>, with each equality separated by a comma.</p>
-<p>Let’s calculate three group-by summaries:</p>
+<p>Let’s calculate three grouped summaries:</p>
 <ul>
 <li>the average number of incident cases per day by state,</li>
 <li>the cumulative number of cases by state (way 1) by summing incident cases,</li>
 <li>the cumulative number of cases by state (way 2) by taking the maximum value of the number of cumulative cases.</li>
 </ul>
 <p>Note that we have already found the cumulative number of cases above using <code>arrange()</code>, <code>group_by()</code>, and <code>slice()</code>. So here are two more options.</p>
-<p><code>sum()</code>, <code>mean()</code>, and <code>max()</code> are arithmetic functions in base R. In these functions, it’s good practice state <code>na.rm=TRUE</code> unless there’s a good reason not to. This argument stands for “remove missings equals true”. The default behavior of these arithmetic functions is to include missing values in the calculation (<code>na.rm = FALSE</code>), which means the arithmetic summary will also return a missing (2+missing=missing), and that is typically not the desired outcome.</p>
+<p><code>sum()</code>, <code>mean()</code>, and <code>max()</code> are arithmetic functions in base R. In these functions, it’s good practice state <code>na.rm=TRUE</code> unless there’s a good reason not to. This argument stands for “remove missings equals true”. The default behavior of these arithmetic functions is to include missing values in the calculation (<code>na.rm = FALSE</code>), which means the arithmetic summary will also return a missing (e.g., 2+missing=missing), and that is typically not the desired outcome.</p>
 <pre class="r"><code>names(nyt_state_wrangle) #To remember the variable names.</code></pre>
 <pre><code>## [1] &quot;date&quot;                    &quot;state&quot;                  
 ## [3] &quot;fips&quot;                    &quot;cases_cumul&quot;            
@@ -774,13 +774,13 @@ dim(nyt_cases_summary)</code></pre>
 ## 10 District of Columbia                  186.            162691           162692
 ## # … with 46 more rows
 ## # ℹ Use `print(n = ...)` to see more rows</code></pre>
-<p>The number of rows is equal to the number of groups (55; some territories are included). The data used to include date, but we have collapsed over date here. When <code>group_by()</code> and <code>summarise()</code> are used together, the number of rows in the data will be equal to the number of groups.</p>
+<p>The number of rows is equal to the number of groups. Washington D.C. and some territories are included, so the number of groups is above 50. The data used to include the column <code>date</code>, but we have collapsed over date here. When <code>group_by()</code> and <code>summarise()</code> are used together, the number of rows in the data will be equal to the number of groups.</p>
 <p>The number of variables is four: the grouping variable (<code>state</code>) and each of the summary measures we calculated for each state.</p>
 <p>Note that the two cumulative values differ slightly for some of the states. This discrepancy could be explained by the <a href="https://github.com/nytimes/covid-19-data/blob/master/PROBABLE-CASES-NOTE.md">nuances of the NYT’s reporting system</a>, which contains a mix of both probable and confirmed cases. The most trustworthy value is probably <code>cases_cumul_way2</code>, which takes the most recent reported cumulative value.</p>
 </div>
 <div id="group_by-and-summarise-continued" class="section level3" number="4.6.3">
 <h3><span class="header-section-number">4.6.3</span> group_by and summarise (continued)</h3>
-<p>Another application of the group-by-summarise syntax is if one wants to calculate overall summary estimates of the whole dataset. For example, as a double check, we can check to confirm the data we’re using lines up with what the NYT is reporting on their website for the total number of cumulative cases to date.</p>
+<p>The group-by-summarise syntax can also be applied if we want to calculate overall summary estimates of the whole dataset. For example, as a double check, we can check to confirm the data we’re using lines up with what the NYT is reporting on their website for the total number of cumulative cases to date.</p>
 <p>At this writing (8/2/22), NYT reports a total of ~91.3 million cases (<a href="https://www.nytimes.com/interactive/2021/us/covid-cases.html" class="uri">https://www.nytimes.com/interactive/2021/us/covid-cases.html</a>). Can we reproduce that? To summarize over the whole dataset, create a dummy variable with the same value for every observation and then sum over that variable.</p>
 <pre class="r"><code>nyt_cases_overall = nyt_state_wrangle %&gt;% 
   group_by(state) %&gt;% 
@@ -806,7 +806,7 @@ nyt_cases_overall</code></pre>
 <p>Also note the use of the “or” operator, <code>|</code>.</p>
 <p>Filtering the data to the subset of states in the Great Lakes Region could be done a few different ways. With complicated subsets, I prefer to create an indicator variable and then filter values based on that indicator variable, rather than putting all of the subset information into the <code>filter()</code> function.</p>
 <p>So the code below uses <code>mutate()</code> to create a variable called <code>great_lakes</code>, which is equal to 1 if the state is in the Great Lakes region and 0 if not.</p>
-<p>I also define this variable, <code>great_lakes_alt</code>, an alternative way, which is more concise but arguably less readable, using the <a href="https://stat.ethz.ch/R-manual/R-devel/library/base/html/match.html"><code>%in%</code></a> operator. That operator returns TRUE if an element belongs to a vector. A quick example to show this:</p>
+<p>I also define this variable, <code>great_lakes_alt</code>, an alternative way, which is more concise but arguably less readable, using the <a href="https://stat.ethz.ch/R-manual/R-devel/library/base/html/match.html"><code>%in%</code></a> operator. That operator returns TRUE if an element belongs to a vector. A quick example to illustrate what <code>%in%</code> does:</p>
 <pre class="r"><code>x=c(1,2,3,4,5)
 5%in%x</code></pre>
 <pre><code>## [1] TRUE</code></pre>
@@ -827,8 +827,7 @@ nyt_cases_overall</code></pre>
       TRUE ~ 0),  #The parentheses closes this case_when function.
     #The comma outside the parentheses implies we have another variable to be created in the mutate function
     
-    #Alternative way using the %in% operator:A more concise way to state that may arguably be less readable is to use %in%    
-    #The case_when function assigns a 1 wherever it&#39;s true.
+    #Alternative way using the %in% operator: More but arguably less readable. The case_when function assigns a 1 wherever it&#39;s true.
     great_lakes_alt = case_when(
       state %in% c(
         &quot;Illinois&quot;, &quot;Indiana&quot;, &quot;Michigan&quot;, 
@@ -843,7 +842,7 @@ nyt_cases_overall</code></pre>
   summarise(
     deaths_cumul = max(deaths_cumul, na.rm=TRUE)
   )</code></pre>
-<p>It should be a small dataset (8 rows (one for each state) by 2 columns (<code>state</code> and <code>deaths_cumul</code>)), so let’s print it to check:</p>
+<p>It should be a small dataset of 8 rows (one for each state) by 2 columns. Let’s print to check:</p>
 <pre class="r"><code>deaths_cumul_by_state_greatlakes</code></pre>
 <pre><code>## # A tibble: 8 × 2
 ##   state        deaths_cumul
@@ -856,7 +855,7 @@ nyt_cases_overall</code></pre>
 ## 6 Ohio                39035
 ## 7 Pennsylvania        46205
 ## 8 Wisconsin           14936</code></pre>
-<p>That concludes this tutorial. In our next tutorial, we’ll continue using dplyr and we’ll introduce <strong>tidycensus</strong>, <strong>mapview</strong>, and <strong>ggplot</strong> to use census data to visualize Covid-19 incidence per population.</p>
+<p>That concludes this tutorial. In our next tutorial (<a href="https://michaeldgarber.github.io/teach-r/2-dplyr-mapview-tidycensus.html" class="uri">https://michaeldgarber.github.io/teach-r/2-dplyr-mapview-tidycensus.html</a>), we’ll continue using dplyr and we’ll introduce <strong>tidycensus</strong>, <strong>mapview</strong>, and <strong>ggplot</strong> to use census data to visualize Covid-19 incidence per population.</p>
 </div>
 </div>
 
