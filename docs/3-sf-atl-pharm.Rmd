@@ -563,7 +563,9 @@ pharm= osmdata::opq (
   osmdata::osmdata_sf() #return an sf object
 ```
 
-Every now and then, this function throws an error. If so, feel free to download the .RData file from my [Dropbox folder](https://www.dropbox.com/sh/ff85l058vl82wwy/AABKygH3PhQkausaxOcIgO0Sa?dl=0) so that you can run the rest of the code. You would then load it into your R environment using something like this, depending on the folder from which you load the data.
+### Load the data from a local folder in case `osmdata::opq()` did not work.
+
+Every now and then, this function throws an error. If this function did not work, please download the .RData file from this [Dropbox folder](https://www.dropbox.com/sh/ff85l058vl82wwy/AABKygH3PhQkausaxOcIgO0Sa?dl=0) so that you can run the rest of the code. You would then load it into your R environment using something like this, depending on the folder from which you load the data.
 
 ```{r, eval=FALSE}
 library(here)

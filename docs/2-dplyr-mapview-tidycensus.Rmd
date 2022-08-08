@@ -165,7 +165,7 @@ vars_acs_2019 = tidycensus::load_variables(2019, "acs5", cache = TRUE)
 View(vars_acs_2019)
 ```
 
-### If `tidycensus::get_acs()` did not work, load the data another way
+### Load the data from a local folder in case `tidycensus::get_acs()` did not work.
 
 **Note**: if `tidycensus::get_acs()` returned an error because the Census key did not work, tidycensus did not load, or for any other reason, please feel free to download a version of **pop_by_state_geo** from this [Dropbox folder](https://www.dropbox.com/sh/ff85l058vl82wwy/AABKygH3PhQkausaxOcIgO0Sa?dl=0):
 

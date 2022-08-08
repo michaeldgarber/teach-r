@@ -98,7 +98,7 @@ tract_ga_wrangle = tract_ga %>%
   dplyr::rename(
     geo_id= GEOID,
     name_tract_county = NAME,
-    pop = popE
+    pop = popE #to avoid confusion
   ) %>% 
   #Some resources on coordinate systems:
   #  https://www.nceas.ucsb.edu/sites/default/files/2020-04/OverviewCoordinateReferenceSystems.pdf
@@ -682,21 +682,21 @@ save(pharm_fd_combined, file = "pharm_fd_combined.RData")
 
 # 5. Estimate population within a .5 mile of a pharmacy------------------------
 ## Create half-mile buffer around each pharmacy------------
-pharm_fd_combined_halfmile = pharm_fd_combined %>% 
+pharm_fd_combined_buff_halfmile = pharm_fd_combined %>% 
   sf::st_transform(2240) %>% 
   sf::st_buffer(5280/2)
 
-mapview(pharm_fd_combined_halfmile)  
+mapview(pharm_fd_combined_buff_halfmile)  
 
 ## Combine into a single sf object----------------------
 #for simplicity, combine into one single object using st_union
-pharm_fd_combined_halfmile_union = pharm_fd_combined_halfmile %>% 
+pharm_fd_combined_buff_halfmile_union = pharm_fd_combined_buff_halfmile %>% 
   st_union() %>% 
   st_as_sf() 
 
-nrow(pharm_fd_combined_halfmile_union) #1 observation
+nrow(pharm_fd_combined_buff_halfmile_union) #1 observation
 
-## Assess proportion each census tract is overlapped by this object.------------
+
 
 ### Find part of census tracts that overlaps the pharmacy buffer areas---------
 tract_fulton_dekalb = tract_ga_wrangle %>% 
@@ -705,7 +705,7 @@ tract_fulton_dekalb = tract_ga_wrangle %>%
 
 tract_fulton_dekalb_int_pharm_buff = tract_fulton_dekalb %>% 
   sf::st_transform(2240) %>% #coordinate system in feet.
-  st_intersection(pharm_fd_combined_halfmile_union) %>% 
+  st_intersection(pharm_fd_combined_buff_halfmile_union) %>% 
   #measure the overlapping area for each census tract.
   mutate(
     area_overlap_ft2 = as.numeric(st_area(geometry)),
