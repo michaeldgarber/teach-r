@@ -52,7 +52,7 @@ I know many people use and like Python, which is also free and shares many of R'
 
 Let's get up and running with R now.
 
-1.  **Install R and RStudio.** R can be used as a stand-alone program, but RStudio (an [IDE](https://en.wikipedia.org/wiki/Integrated_development_environment)) adds several helpful features that make coding in R easier.
+1.  **Install R and RStudio.** R can be used as a stand-alone program, but RStudio, an integrated development environment ([IDE](https://en.wikipedia.org/wiki/Integrated_development_environment)), adds several helpful features that make coding in R easier.
 
 -   To download R, go to CRAN and download R from the location nearest you: <https://cran.r-project.org/mirrors.html>.
 -   Then, install RStudio Desktop (the free version) at this link: <https://rstudio.com/products/rstudio/download> .
@@ -72,6 +72,20 @@ The book by Grolemund also provides an overview of [RStudio's user interface](ht
 Here's a screenshot of what the script window might look like:
 
 ![](images/script-screenshot.PNG){width="500"}
+
+## Writing code vs writing a comment
+
+On a particular line of code, anything followed by a `#` is considered by R to be a comment and will not be evaluated as code. Comments are a way to annotate your code to your future self or other collaborators. Text considered by R to be comments will change to a different color. In the default R Studio setup, they're green.
+
+```{r}
+#This is a comment.
+
+#The below line is code:
+x=1:2
+x
+```
+
+For exampleAnything in your code followed by a \# is considered by R to
 
 # Functions and packages
 

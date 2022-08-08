@@ -389,7 +389,7 @@ div.tocify {
 <h1><span class="header-section-number">3</span> Install R and RStudio and become familiar with the user interface.</h1>
 <p>Let’s get up and running with R now.</p>
 <ol style="list-style-type: decimal">
-<li><strong>Install R and RStudio.</strong> R can be used as a stand-alone program, but RStudio (an <a href="https://en.wikipedia.org/wiki/Integrated_development_environment">IDE</a>) adds several helpful features that make coding in R easier.</li>
+<li><strong>Install R and RStudio.</strong> R can be used as a stand-alone program, but RStudio, an integrated development environment (<a href="https://en.wikipedia.org/wiki/Integrated_development_environment">IDE</a>), adds several helpful features that make coding in R easier.</li>
 </ol>
 <ul>
 <li>To download R, go to CRAN and download R from the location nearest you: <a href="https://cran.r-project.org/mirrors.html" class="uri">https://cran.r-project.org/mirrors.html</a>.</li>
@@ -407,6 +407,17 @@ div.tocify {
 <p>The book by Grolemund also provides an overview of <a href="https://rstudio-education.github.io/hopr/basics.html#the-r-user-interface">RStudio’s user interface</a>.</p>
 <p>Here’s a screenshot of what the script window might look like:</p>
 <p><img src="images/script-screenshot.PNG" width="500" /></p>
+<div id="writing-code-vs-writing-a-comment" class="section level2" number="3.1">
+<h2><span class="header-section-number">3.1</span> Writing code vs writing a comment</h2>
+<p>On a particular line of code, anything followed by a <code>#</code> is considered by R to be a comment and will not be evaluated as code. Comments are a way to annotate your code to your future self or other collaborators. Text considered by R to be comments will change to a different color. In the default R Studio setup, they’re green.</p>
+<pre class="r"><code>#This is a comment.
+
+#The below line is code:
+x=1:2
+x</code></pre>
+<pre><code>## [1] 1 2</code></pre>
+<p>For exampleAnything in your code followed by a # is considered by R to</p>
+</div>
 </div>
 <div id="functions-and-packages" class="section level1" number="4">
 <h1><span class="header-section-number">4</span> Functions and packages</h1>
@@ -439,8 +450,8 @@ div.tocify {
 </div>
 <div id="load-the-package" class="section level2" number="4.3">
 <h2><span class="header-section-number">4.3</span> Load the package</h2>
-<p>Now that the package is installed, load it (technically, “attach it”) using the <code>library()</code> function (no quotes). Attaching the package tells R to make the functions of the package available for your current work session.</p>
-<p>For additional details on package management, please see this module: XYZ</p>
+<p>Now that the package is installed, load it (technically, <em>attach</em> it) using the <code>library(package_name)</code> function (no quotes around package name). Attaching the package tells R to make the functions from the package available for your current work session.</p>
+<p>For additional details on package management, please see this module: <a href="https://michaeldgarber.github.io/teach-r/0-managing-packages.html" class="uri">https://michaeldgarber.github.io/teach-r/0-managing-packages.html</a></p>
 <pre class="r"><code>library(tidyverse)</code></pre>
 </div>
 </div>
