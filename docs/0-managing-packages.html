@@ -9,11 +9,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Michael D Garber" />
+<meta name="author" content="Michael D. Garber, PhD MPH" />
 
-<meta name="date" content="2022-08-07" />
+<meta name="date" content="2022-08-08" />
 
-<title>Managing packages</title>
+<title>Managing packages: attached</title>
 
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -346,32 +346,71 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Managing packages</h1>
-<h4 class="author">Michael D Garber</h4>
-<h4 class="date">2022-08-07</h4>
+<h1 class="title toc-ignore">Managing packages: attached</h1>
+<h4 class="author">Michael D. Garber, PhD MPH</h4>
+<h4 class="date">2022-08-08</h4>
 
 </div>
 
 
-<p>Introduction</p>
-<p>R’s vast package ecosystem is one reason R is so popular, but packages can also be a source of frustration. Sometimes packages don’t load as expected, and sometimes their dependencies on one another can cause code to break. In this module, we’ll work through aspects of package management, including how to:</p>
+<div id="background" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> Background</h1>
+<p>R’s vast package ecosystem provides abundant functionality, but packages can also be a source of frustration. Sometimes packages don’t load as expected, and sometimes their dependencies on one another can cause code to break. In this module, we explore some technical details on packages, including how to:</p>
 <ul>
-<li><p>check what version of R you’re using</p></li>
 <li><p>check what packages are <strong>attached</strong> during the current R session and those that are <strong>loaded</strong> (technically different)</p></li>
-<li><p>check what packages have been downloaded, even if they’re not attached or loaded in the current session</p></li>
-<li><p>find where packages are in your computer</p></li>
+<li><p>check what packages have been installed (i.e., downloaded), even if they’re not attached or loaded in the current session</p></li>
+<li><p>find where installed packages are in your computer</p></li>
 <li><p>remove (detach) packages from the current session</p></li>
+<li><p>unload a package that was loaded via a namespace</p></li>
 <li><p>remove packages from your computer altogether</p></li>
 <li><p>check what packages a package depends on</p></li>
 </ul>
-<p>Resources</p>
-<p><a href="http://www.sthda.com/english/wiki/installing-and-using-r-packages" class="uri">http://www.sthda.com/english/wiki/installing-and-using-r-packages</a></p>
-<div id="check-r-version-and-packages-currently-loaded" class="section level1" number="1">
-<h1><span class="header-section-number">1</span> Check R version and packages currently loaded</h1>
-<p>sessioninfo::</p>
-<p>The function sessionInfo(), which comes pre-installed with a “base-R” package called utils, tells you what version of R you’re using, the packages that are loaded (“attached”) and those that you can use even though they were nyou a lot about your current session, including current R version, One function that gives you a lot of information is sessionInfo.</p>
-<p>This tells us that some packages are loaded as part of base R (i.e., when you download R), and some Check R version and what packages are loaded during session</p>
-<p>See what packages I have</p>
+<div id="vocabulary-attached-vs-loaded-via-namespace" class="section level2" number="1.1">
+<h2><span class="header-section-number">1.1</span> Vocabulary: attached vs loaded via namespace</h2>
+<p>An “attached” package is one that has been loaded via <code>library()</code> and whose functions are accessible without having to use the <code>::</code> operator as in <code>package_name::package_function()</code>. For example, if dplyr is attached, I can simply write <code>mutate()</code>; I don’t have to write <code>dplyr::mutate()</code>. Packages that are attached are accessible via what R calls the <em>search path</em> or <em>search list</em>. When a function is used without the double-colon syntax [e.g., <code>mutate()]</code>, R looks for a function with that name in the first package on the path, and if it doesn’t find it, it looks in the second package on the path, and so on. The order of the search path can be obtained via <code>searchpaths()</code>. Packages loaded with <code>library()</code> more recently will rank earlier in the search path, which has implications for function conflicts.</p>
+<p>There are other packages that are “loaded via a namespace.” This means that the packages have been loaded because the user called the function using the <a href="https://stat.ethz.ch/R-manual/R-devel/library/base/html/ns-dblcolon.html">double-colon operator</a> (<code>package_name::package_function()</code> but has not <em>attached</em> the package via <code>library()</code>; because <a href="https://github.com/rstudio/rstudio/issues/8072">R Studio sees that the package is used somewhere in the script</a>, even if the user has not run that code yet; or because the package is needed by the IDE to perform a behind-the-scenes operation. For example, knitr is loaded via a namespace in my current session because I am using R Markdown even though that package does not appear in a script in my current session.</p>
+<p>In common usage, I cannot glean any difference between use of a package that has been loaded via namespace versus one that has been installed (e.g., using <code>install.packages("package_name")</code> but has not been loaded at all. To use a function from a package that has already been loaded via a namespace, you still must use the double-colon notation of <code>package_name::package_function()</code>, as you would a function from a package that has not (yet) been loaded via namespace.</p>
+<p>That a package has been loaded via a namespace may, however, have implications for troubleshooting. For example, if you try to install a package that has already been loaded via a namespace, this dialogue box may appear:</p>
+<p><img src="images/updating-loaded-packages.png" /></p>
+<p>To summarize this section, all attached packages are loaded, but not all loaded packages are attached. We will deduce this relationship using functions from the <a href="https://r-lib.github.io/sessioninfo/">sessioninfo</a> package below. If a package is attached, we can write the function name by itself without its corresponding package name (mindful of potential conflicts); if not, we must use the double-colon notation, <code>::</code>, and write the package as well.</p>
+</div>
+<div id="resources-and-references" class="section level2" number="1.2">
+<h2><span class="header-section-number">1.2</span> Resources and references</h2>
+<ul>
+<li><p><a href="https://cran.rstudio.com/web/packages/sessioninfo/readme/README.html">sessioninfo</a>: A package for getting information about your packages and other information about the current session, co-authored by some RStudio team members.</p></li>
+<li><p>Chapter13 “Packages” in <u>An Introduction to R</u>. Technical but precisely written.</p>
+<ul>
+<li><p>Official CRAN link: <a href="https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf" class="uri">https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf</a></p></li>
+<li><p>Direct link to Chapter 13, which discusses packages and namespaces, via an adapted Bookdown interface: <a href="https://colinfay.me/intro-to-r/packages.html" class="uri">https://colinfay.me/intro-to-r/packages.html</a></p></li>
+</ul></li>
+<li><p><a href="https://stackoverflow.com/questions/14988722/in-r-what-does-loaded-via-a-namespace-and-not-attached-mean" class="uri">https://stackoverflow.com/questions/14988722/in-r-what-does-loaded-via-a-namespace-and-not-attached-mean</a></p></li>
+<li><p><a href="https://stat.ethz.ch/R-manual/R-devel/library/base/html/search.html" class="uri">https://stat.ethz.ch/R-manual/R-devel/library/base/html/search.html</a></p></li>
+<li><p><a href="https://github.com/rstudio/rstudio/issues/8072" class="uri">https://github.com/rstudio/rstudio/issues/8072</a></p></li>
+</ul>
+<p>Functions to check</p>
+</div>
+</div>
+<div id="functions-to-view-and-manage-packages" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Functions to view and manage packages</h1>
+<p>The following base-R functions provide information about currently loaded packages.</p>
+<ul>
+<li><p><code>utils::sessionInfo()</code>: view R version, attached packages, and packages loaded via a namespace. Also includes package version.</p></li>
+<li><p><code>base::search()</code>: shows attached packages. Note this also shows other objects on the search path, including the Global Environment.</p></li>
+<li><p><code>base::loadedNamespaces()</code>: display a list of packages loaded via a namespace.</p></li>
+</ul>
+<p>These two base-R functions remove (detach) attached packages and unload packages that have been loaded via a namespace. I use the sf package as an example. Note the single colon in <code>"package:sf"</code> is <a href="https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/detach">intentional</a>.</p>
+<ul>
+<li><p><code>base::detach("package:sf", unload = TRUE)</code>. Note if <code>unload=FALSE</code>, the package may remain in a namespace.</p></li>
+<li><p><code>base::unloadNamespace()</code> unloads a namespace.</p></li>
+</ul>
+<p><a href="https://r-lib.github.io/sessioninfo/">sessioninfo</a> is a package with functionality similar to that of <code>utils::sessionInfo()</code> but has a nicer output and includes more information about packages.</p>
+<ul>
+<li><code>sessioninfo::session_info()</code> prints session information, including a list of packages, their version, and the date the package was built.</li>
+</ul>
+</div>
+<div id="demo" class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Demo</h1>
+<p>The function <code>sessionInfo()</code>, from the utils base-R package, tells you what version of R you’re using, what packages are attached, and what packages have been loaded via a namespace. Here’s my current set-up:</p>
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>## R version 4.2.0 (2022-04-22)
 ## Platform: aarch64-apple-darwin20 (64-bit)
@@ -394,9 +433,126 @@ div.tocify {
 ## [13] bslib_0.4.0     rmarkdown_2.14  tools_4.2.0     stringr_1.4.0  
 ## [17] xfun_0.31       yaml_2.3.5      fastmap_1.1.0   compiler_4.2.0 
 ## [21] htmltools_0.5.3 knitr_1.39      sass_0.4.2</code></pre>
+<p>Let’s see what happens if I use a function from the here package. Note that I have not loaded here via library(here) but merely loaded it</p>
+<pre class="r"><code>here::here()</code></pre>
+<pre><code>## [1] &quot;/Users/michaeldgarber/Dropbox/Work/teach/teach-r&quot;</code></pre>
+<p>The are loaded (“attached”) and those that you can use even though they were nyou a lot about your current session, including current R version, One function that gives you a lot of information is sessionInfo.</p>
+<p>This tells us that some packages are loaded as part of base R (i.e., when you download R), and some Check R version and what packages are loaded during session</p>
+<p>Let’s check which packages have been loaded via a namespace using <code>loadedNamespaces()</code> . Note that the <strong>here</strong> package appears in the list.</p>
+<pre class="r"><code>search()</code></pre>
+<pre><code>## [1] &quot;.GlobalEnv&quot;        &quot;package:stats&quot;     &quot;package:graphics&quot; 
+## [4] &quot;package:grDevices&quot; &quot;package:utils&quot;     &quot;package:datasets&quot; 
+## [7] &quot;package:methods&quot;   &quot;Autoloads&quot;         &quot;package:base&quot;</code></pre>
+<pre class="r"><code>loadedNamespaces()</code></pre>
+<pre><code>##  [1] &quot;bookdown&quot;   &quot;here&quot;       &quot;grDevices&quot;  &quot;rprojroot&quot;  &quot;digest&quot;    
+##  [6] &quot;R6&quot;         &quot;jsonlite&quot;   &quot;magrittr&quot;   &quot;evaluate&quot;   &quot;datasets&quot;  
+## [11] &quot;stringi&quot;    &quot;cachem&quot;     &quot;rlang&quot;      &quot;utils&quot;      &quot;cli&quot;       
+## [16] &quot;rstudioapi&quot; &quot;jquerylib&quot;  &quot;bslib&quot;      &quot;graphics&quot;   &quot;rmarkdown&quot; 
+## [21] &quot;base&quot;       &quot;tools&quot;      &quot;stringr&quot;    &quot;xfun&quot;       &quot;yaml&quot;      
+## [26] &quot;fastmap&quot;    &quot;compiler&quot;   &quot;stats&quot;      &quot;htmltools&quot;  &quot;knitr&quot;     
+## [31] &quot;methods&quot;    &quot;sass&quot;</code></pre>
+<div id="use-sessioninfosession_info" class="section level2" number="3.1">
+<h2><span class="header-section-number">3.1</span> Use <code>sessioninfo::session_info()</code></h2>
+<p>The same information is available from a newer package called sessioninfo.</p>
 <p>There are a few ways to update packages you already have. You can type update.packages()</p>
+<pre class="r"><code>sessioninfo::session_info()</code></pre>
+<pre><code>## ─ Session info ───────────────────────────────────────────────────────────────
+##  setting  value
+##  version  R version 4.2.0 (2022-04-22)
+##  os       macOS Monterey 12.5
+##  system   aarch64, darwin20
+##  ui       X11
+##  language (EN)
+##  collate  en_US.UTF-8
+##  ctype    en_US.UTF-8
+##  tz       America/Denver
+##  date     2022-08-08
+##  pandoc   2.18 @ /Applications/RStudio.app/Contents/MacOS/quarto/bin/tools/ (via rmarkdown)
+## 
+## ─ Packages ───────────────────────────────────────────────────────────────────
+##  package     * version date (UTC) lib source
+##  bookdown      0.27    2022-06-14 [1] CRAN (R 4.2.0)
+##  bslib         0.4.0   2022-07-16 [1] CRAN (R 4.2.0)
+##  cachem        1.0.6   2021-08-19 [1] CRAN (R 4.2.0)
+##  cli           3.3.0   2022-04-25 [1] CRAN (R 4.2.0)
+##  digest        0.6.29  2021-12-01 [1] CRAN (R 4.2.0)
+##  evaluate      0.15    2022-02-18 [1] CRAN (R 4.2.0)
+##  fastmap       1.1.0   2021-01-25 [1] CRAN (R 4.2.0)
+##  here          1.0.1   2020-12-13 [1] CRAN (R 4.2.0)
+##  htmltools     0.5.3   2022-07-18 [1] CRAN (R 4.2.0)
+##  jquerylib     0.1.4   2021-04-26 [1] CRAN (R 4.2.0)
+##  jsonlite      1.8.0   2022-02-22 [1] CRAN (R 4.2.0)
+##  knitr         1.39    2022-04-26 [1] CRAN (R 4.2.0)
+##  magrittr      2.0.3   2022-03-30 [1] CRAN (R 4.2.0)
+##  R6            2.5.1   2021-08-19 [1] CRAN (R 4.2.0)
+##  rlang         1.0.4   2022-07-12 [1] CRAN (R 4.2.0)
+##  rmarkdown     2.14    2022-04-25 [1] CRAN (R 4.2.0)
+##  rprojroot     2.0.3   2022-04-02 [1] CRAN (R 4.2.0)
+##  rstudioapi    0.13    2020-11-12 [1] CRAN (R 4.2.0)
+##  sass          0.4.2   2022-07-16 [1] CRAN (R 4.2.0)
+##  sessioninfo   1.2.2   2021-12-06 [1] CRAN (R 4.2.0)
+##  stringi       1.7.8   2022-07-11 [1] CRAN (R 4.2.0)
+##  stringr       1.4.0   2019-02-10 [1] CRAN (R 4.2.0)
+##  xfun          0.31    2022-05-10 [1] CRAN (R 4.2.0)
+##  yaml          2.3.5   2022-02-21 [1] CRAN (R 4.2.0)
+## 
+##  [1] /Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library
+## 
+## ──────────────────────────────────────────────────────────────────────────────</code></pre>
 <pre class="r"><code>#update.packages(checkBuilt = T, ask = F)</code></pre>
 <p>In RStudio, we can visualize those packages that have been attached (i.e., those that are in the search list) versus all of the packages that we have installed on our computer. Note that the packages that have a check next to them are those that have been installed.</p>
+</div>
+</div>
+<div id="search-path-demo" class="section level1" number="4">
+<h1><span class="header-section-number">4</span> Search path demo</h1>
+<pre class="r"><code>library(raster) #
+library(dplyr) 
+searchpaths()</code></pre>
+<pre><code>##  [1] &quot;.GlobalEnv&quot;                                                                    
+##  [2] &quot;/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/dplyr&quot;    
+##  [3] &quot;/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/raster&quot;   
+##  [4] &quot;/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/sp&quot;       
+##  [5] &quot;/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/stats&quot;    
+##  [6] &quot;/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/graphics&quot; 
+##  [7] &quot;/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/grDevices&quot;
+##  [8] &quot;/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/utils&quot;    
+##  [9] &quot;/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/datasets&quot; 
+## [10] &quot;/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/methods&quot;  
+## [11] &quot;Autoloads&quot;                                                                     
+## [12] &quot;/Library/Frameworks/R.framework/Resources/library/base&quot;</code></pre>
+<pre class="r"><code>select #dplyr version</code></pre>
+<pre><code>## function (.data, ...) 
+## {
+##     UseMethod(&quot;select&quot;)
+## }
+## &lt;bytecode: 0x11f46c7a0&gt;
+## &lt;environment: namespace:dplyr&gt;</code></pre>
+<pre class="r"><code>base::detach(&quot;package:raster&quot;, unload = TRUE)
+base::detach(&quot;package:dplyr&quot;, unload = TRUE)
+library(dplyr) 
+library(raster) #
+searchpaths()</code></pre>
+<pre><code>##  [1] &quot;.GlobalEnv&quot;                                                                    
+##  [2] &quot;/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/raster&quot;   
+##  [3] &quot;/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/dplyr&quot;    
+##  [4] &quot;/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/sp&quot;       
+##  [5] &quot;/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/stats&quot;    
+##  [6] &quot;/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/graphics&quot; 
+##  [7] &quot;/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/grDevices&quot;
+##  [8] &quot;/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/utils&quot;    
+##  [9] &quot;/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/datasets&quot; 
+## [10] &quot;/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/methods&quot;  
+## [11] &quot;Autoloads&quot;                                                                     
+## [12] &quot;/Library/Frameworks/R.framework/Resources/library/base&quot;</code></pre>
+<pre class="r"><code>select #raster version</code></pre>
+<pre><code>## standardGeneric for &quot;select&quot; defined from package &quot;raster&quot;
+## 
+## function (x, ...) 
+## standardGeneric(&quot;select&quot;)
+## &lt;bytecode: 0x11ab83138&gt;
+## &lt;environment: 0x11aa89800&gt;
+## Methods may be defined for arguments: x
+## Use  showMethods(select)  for currently available ones.</code></pre>
 </div>
 
 <br>

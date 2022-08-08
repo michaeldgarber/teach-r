@@ -136,7 +136,7 @@ I mostly use packages that are a part of the tidyverse or which work well with t
 
         -   The two keyboard shortcuts I use the most are:
 
-            | Operation                    | Mac          | Windows & Linux |
-            |------------------------------|--------------|-----------------|
-            | Run current line / selection | cmd+return   | ctrl+enter      |
-            | Insert pipe (`%>%`)          | cmd+shift+m  | ctrl+shift+m    |
+            | Operation                    | Mac         | Windows & Linux |
+            |------------------------------|-------------|-----------------|
+            | Run current line / selection | cmd+return  | ctrl+enter      |
+            | Insert pipe (`%>%`)          | cmd+shift+m | ctrl+shift+m    |

@@ -1,6 +1,6 @@
 ---
-title: "Managing packages"
-author: "Michael D Garber"
+title: "Managing packages: attached"
+author: "Michael D. Garber, PhD MPH"
 date: "`r Sys.Date()`"
 output:
   html_document:
@@ -9,46 +9,134 @@ output:
     number_sections: true
 ---
 
-Introduction
+# Background
 
-R's vast package ecosystem is one reason R is so popular, but packages can also be a source of frustration. Sometimes packages don't load as expected, and sometimes their dependencies on one another can cause code to break. In this module, we'll work through aspects of package management, including how to:
-
--   check what version of R you're using
+R's vast package ecosystem provides abundant functionality, but packages can also be a source of frustration. Sometimes packages don't load as expected, and sometimes their dependencies on one another can cause code to break. In this module, we explore some technical details on packages, including how to:
 
 -   check what packages are **attached** during the current R session and those that are **loaded** (technically different)
 
--   check what packages have been downloaded, even if they're not attached or loaded in the current session
+-   check what packages have been installed (i.e., downloaded), even if they're not attached or loaded in the current session
 
--   find where packages are in your computer
+-   find where installed packages are in your computer
 
 -   remove (detach) packages from the current session
+
+-   unload a package that was loaded via a namespace
 
 -   remove packages from your computer altogether
 
 -   check what packages a package depends on
 
-Resources
+## Vocabulary: attached vs loaded via namespace
 
-<http://www.sthda.com/english/wiki/installing-and-using-r-packages>
+An "attached" package is one that has been loaded via `library()` and whose functions are accessible without having to use the `::` operator as in `package_name::package_function()`. For example, if dplyr is attached, I can simply write `mutate()`; I don't have to write `dplyr::mutate()`. Packages that are attached are accessible via what R calls the *search path* or *search list*. When a function is used without the double-colon syntax [e.g., `mutate()]`, R looks for a function with that name in the first package on the path, and if it doesn't find it, it looks in the second package on the path, and so on. The order of the search path can be obtained via `searchpaths()`. Packages loaded with `library()` more recently will rank earlier in the search path, which has implications for function conflicts.
 
-# Check R version and packages currently loaded
+There are other packages that are "loaded via a namespace." This means that the packages have been loaded because the user called the function using the [double-colon operator](https://stat.ethz.ch/R-manual/R-devel/library/base/html/ns-dblcolon.html) (`package_name::package_function()` but has not *attached* the package via `library()`; because [R Studio sees that the package is used somewhere in the script](https://github.com/rstudio/rstudio/issues/8072), even if the user has not run that code yet; or because the package is needed by the IDE to perform a behind-the-scenes operation. For example, knitr is loaded via a namespace in my current session because I am using R Markdown even though that package does not appear in a script in my current session.
 
-sessioninfo::
+In common usage, I cannot glean any difference between use of a package that has been loaded via namespace versus one that has been installed (e.g., using `install.packages("package_name")` but has not been loaded at all. To use a function from a package that has already been loaded via a namespace, you still must use the double-colon notation of `package_name::package_function()`, as you would a function from a package that has not (yet) been loaded via namespace.
 
-The function sessionInfo(), which comes pre-installed with a "base-R" package called utils, tells you what version of R you're using, the packages that are loaded ("attached") and those that you can use even though they were nyou a lot about your current session, including current R version, One function that gives you a lot of information is sessionInfo.
+That a package has been loaded via a namespace may, however, have implications for troubleshooting. For example, if you try to install a package that has already been loaded via a namespace, this dialogue box may appear:
 
-This tells us that some packages are loaded as part of base R (i.e., when you download R), and some Check R version and what packages are loaded during session
+![](images/updating-loaded-packages.png)
 
-See what packages I have
+To summarize this section, all attached packages are loaded, but not all loaded packages are attached. We will deduce this relationship using functions from the [sessioninfo](https://r-lib.github.io/sessioninfo/) package below. If a package is attached, we can write the function name by itself without its corresponding package name (mindful of potential conflicts); if not, we must use the double-colon notation, `::`, and write the package as well.
+
+## Resources and references
+
+-   [sessioninfo](https://cran.rstudio.com/web/packages/sessioninfo/readme/README.html): A package for getting information about your packages and other information about the current session, co-authored by some RStudio team members.
+
+-   Chapter13 "Packages" in [An Introduction to R]{.underline}. Technical but precisely written.
+
+    -   Official CRAN link: <https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf>
+
+    -   Direct link to Chapter 13, which discusses packages and namespaces, via an adapted Bookdown interface: <https://colinfay.me/intro-to-r/packages.html>
+
+-   <https://stackoverflow.com/questions/14988722/in-r-what-does-loaded-via-a-namespace-and-not-attached-mean>
+
+-   <https://stat.ethz.ch/R-manual/R-devel/library/base/html/search.html>
+
+-   <https://github.com/rstudio/rstudio/issues/8072>
+
+Functions to check
+
+# Functions to view and manage packages
+
+The following base-R functions provide information about currently loaded packages.
+
+-   `utils::sessionInfo()`: view R version, attached packages, and packages loaded via a namespace. Also includes package version.
+
+-   `base::search()`: shows attached packages. Note this also shows other objects on the search path, including the Global Environment.
+
+-   `base::loadedNamespaces()`: display a list of packages loaded via a namespace.
+
+These two base-R functions remove (detach) attached packages and unload packages that have been loaded via a namespace. I use the sf package as an example. Note the single colon in `"package:sf"` is [intentional](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/detach).
+
+-   `base::detach("package:sf", unload = TRUE)`. Note if `unload=FALSE`, the package may remain in a namespace.
+
+-   `base::unloadNamespace()` unloads a namespace.
+
+[sessioninfo](https://r-lib.github.io/sessioninfo/) is a package with functionality similar to that of `utils::sessionInfo()` but has a nicer output and includes more information about packages.
+
+-   `sessioninfo::session_info()` prints session information, including a list of packages, their version, and the date the package was built.
+
+# Demo
+
+The function `sessionInfo()`, from the utils base-R package, tells you what version of R you're using, what packages are attached, and what packages have been loaded via a namespace. Here's my current set-up:
 
 ```{r}
 sessionInfo()
 ```
 
+Let's see what happens if I use a function from the here package. Note that I have not loaded here via library(here) but merely loaded it
+
+```{r}
+here::here()
+```
+
+The are loaded ("attached") and those that you can use even though they were nyou a lot about your current session, including current R version, One function that gives you a lot of information is sessionInfo.
+
+This tells us that some packages are loaded as part of base R (i.e., when you download R), and some Check R version and what packages are loaded during session
+
+Let's check which packages have been loaded via a namespace using `loadedNamespaces()` . Note that the **here** package appears in the list.
+
+```{r}
+search()
+```
+
+```{r}
+loadedNamespaces()
+```
+
+## Use `sessioninfo::session_info()`
+
+The same information is available from a newer package called sessioninfo.
+
 There are a few ways to update packages you already have. You can type update.packages()
+
+```{r}
+sessioninfo::session_info()
+```
 
 ```{r, eval=FALSE}
 #update.packages(checkBuilt = T, ask = F)
 ```
 
 In RStudio, we can visualize those packages that have been attached (i.e., those that are in the search list) versus all of the packages that we have installed on our computer. Note that the packages that have a check next to them are those that have been installed.
+
+# Search path demo
+
+```{r, message=FALSE, warning=FALSE}
+library(raster) #
+library(dplyr) 
+searchpaths()
+select #dplyr version
+```
+
+```{r, message=FALSE, warning=FALSE}
+base::detach("package:raster", unload = TRUE)
+base::detach("package:dplyr", unload = TRUE)
+library(dplyr) 
+library(raster) #
+searchpaths()
+select #raster version
+```

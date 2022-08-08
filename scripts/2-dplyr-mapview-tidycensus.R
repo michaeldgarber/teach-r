@@ -60,6 +60,7 @@ pop_by_state_geo =tidycensus::get_acs(
   geometry = TRUE #to grab geometry
 )
 
+
 library(here)
 setwd(here("data-processed"))
 save(pop_by_state_geo, file = "pop_by_state_geo.RData")

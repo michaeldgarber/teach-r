@@ -1,6 +1,10 @@
 #Title: R for spatial data wrangling: a demo of sf through an 
 #example analysis assessing population living near pharmacies in Atlanta
 #Revised August 4, 2022
+#Revised August 8, 2022
+#I made changes to the markdown not reflected here,
+#specifically in the get_acs() call, getting data on median home value
+#and median hh inc
 
 
 # Demo of sf using  counties and pharmacies
@@ -70,19 +74,20 @@ options(tigris_use_cache = TRUE)
 #Load population data for all of Georgia's census tracts
 tract_ga =tidycensus::get_acs(
   year=2020,
-  #make it wide form (rather than long-form, otherwise default) so variable names are in columns
+  #make it wide form (rather than long-form, default) so variable names are in columns
   # https://cran.r-project.org/web/packages/tidycensus/tidycensus.pdf
-  output = "wide",
+  output = "wide",  
   geography = "tract",
   state ="GA",
   geometry = TRUE, #omit geometry for speed
   variables = c(
-    pop  = "B01001_001")
+    pop_  = "B01001_001",
+    h_val_med_ = "B25077_001",
+    hh_inc_med_ = "B19013_001")
 )
-
 library(here)
 setwd(here("data-processed"))
-#save(tract_ga, file = "tract_ga.RData")
+save(tract_ga, file = "tract_ga.RData")
 load("tract_ga.RData")
 tract_ga 
 
@@ -672,6 +677,8 @@ nrow(pharm_fd_combined)
 mapview(pharm_fd_combined, zcol = "type_original") +  
   mapview(fulton_dekalb_union, col.regions = "gray50") 
 
+setwd(here("data-processed"))
+save(pharm_fd_combined, file = "pharm_fd_combined.RData")
 
 # 5. Estimate population within a .5 mile of a pharmacy------------------------
 ## Create half-mile buffer around each pharmacy------------

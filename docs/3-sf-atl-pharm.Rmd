@@ -1,7 +1,7 @@
 ---
 title: "R for spatial data wrangling: a demo of sf through an example analysis assessing population living near pharmacies in Atlanta"
 author: "Michael D. Garber, PhD MPH"
-date: "Revised August 4, 2022"
+date: "Revised August 8, 2022"
 output:
   html_document:
     toc: true
@@ -124,10 +124,24 @@ Load population data for all of Georgia's census tracts based on American Commun
 
 ```{r, eval=FALSE}
 vars_acs_2020 = tidycensus::load_variables(2020, "acs5", cache = TRUE)
-#View(vars_acs_2019) 
+View(vars_acs_2019) 
 ```
 
 ## Download data using `get_acs()`
+
+Some notes this function call:
+
+-   We're downloading, at the census-tract level:
+
+    -   Total population
+
+    -   Median home value
+
+    -   Median household income
+
+-   Use `output="wide"` so the resulting data is wide-form. It is otherwise long-form [by default](https://cran.r-project.org/web/packages/tidycensus/tidycensus.pdf). This way, variable names will appear as columns and are easier to manage.
+
+-   I add an underscore at the end of the variable names, e.g., `pop_`, `h_val_med_`, because suffixes of E for estimate and M for margin of error are automatically added during the `get_acs()` function call. The addition of the underscore allows these suffixes to be more easily seen.
 
 ```{r, include=FALSE, eval=TRUE, echo=FALSE}
 library(here)
@@ -138,14 +152,14 @@ load("tract_ga.RData")
 ```{r, eval=FALSE}
 tract_ga =tidycensus::get_acs(
   year=2020,
-  #make it wide form (rather than long-form, default) so variable names are in columns
-  # https://cran.r-project.org/web/packages/tidycensus/tidycensus.pdf
   output = "wide",  
   geography = "tract",
   state ="GA",
-  geometry = TRUE, #omit geometry for speed
+  geometry = TRUE,  
   variables = c(
-    pop  = "B01001_001")
+    pop_  = "B01001_001",
+    h_val_med_ = "B25077_001",
+    hh_inc_med_ = "B19013_001")
 )
 ```
 
@@ -182,7 +196,7 @@ tract_ga_wrangle = tract_ga %>%
   dplyr::rename(
     geo_id= GEOID,
     name_tract_county = NAME,
-    pop = popE
+    pop = pop_E
   ) %>% 
   sf::st_transform(4326) %>% #
   dplyr::mutate(
@@ -191,7 +205,6 @@ tract_ga_wrangle = tract_ga %>%
     #correspond to state. Then the next 3 indicate the county.
     # Note Fulton is 13121
     # Dekalb is 13089
-    #stringr is a tidyverse package
     county_fips = stringr::str_sub(geo_id, start=1, 5),
     area_4326 = sf::st_area(geometry), #returns area of type "units". 
     #measured in meters squared because of the coordinate system.
@@ -210,8 +223,7 @@ tract_ga_wrangle = tract_ga %>%
         ) ~1,
       TRUE ~0)  
     ) %>% 
-  #For fun, convert it to a coordinate system that will output in feet.
-  #https://www.spatialreference.org/ref/epsg/2239/
+  #Convert it to a coordinate system that will output in feet as well.
   #NAD83 / Georgia West (ftUS)
   sf::st_transform(2240) %>% 
   dplyr::mutate(
@@ -221,20 +233,48 @@ tract_ga_wrangle = tract_ga %>%
     #calculate population density
     pop_dens_per_mi2 = pop/area_mi2
   ) %>% 
-  #Remove the population margin of error
-  dplyr::select(-popM) 
+  #Remove the margins of error 
+  dplyr::select(-ends_with("_M")) 
 ```
 
 Note that we could have included the above code as part of the one above it (i.e., where `tract_ga` was created) all in one pipe. That would have made the code a bit more concise. When downloading from an external source, though, it can be better to limit the number of times the you call on the external source, both for computing speed (it can take a while) and because some sources (e.g., OpenStreetMap) have limits on the number of times you can download in a short period of time, as it strains their resources. So, in this case, assuming we may have to re-run the wrangling steps a few times before we've made our final decision, we prioritize courtesy over brevity.
 
 Take a look at the data:
 
+variable names:
+
 ```{r}
-tract_ga_wrangle
+names(tract_ga_wrangle)
+```
+
+Note units of the area measurements
+
+```{r}
 class(tract_ga_wrangle$area_4326) #note units
 class(tract_ga_wrangle$area_m2) #numeric
 class(tract_ga_wrangle$area_2240) #units
 class(tract_ga_wrangle$area_ft) #numeric
+```
+
+Do household income and median home value seem reasonable? Use base::summary() to briefly describe each:
+
+**Median household income of census tracts**
+
+```{r}
+summary(tract_ga_wrangle$hh_inc_med_E)
+```
+
+**Median home value of census tracts**
+
+```{r}
+summary(tract_ga_wrangle$h_val_med)
+```
+
+### Save ACS data for use in later code
+
+```{r, warning=FALSE}
+setwd(here("data-processed"))
+save(tract_ga_wrangle, file = "tract_ga_wrangle.RData")
 ```
 
 ## Map census tracts using ggplot
@@ -925,6 +965,13 @@ Map them classified by their original type. Note that they are all points now.
 ```{r}
 mapview(pharm_fd_combined, zcol = "type_original") +  
   mapview(fulton_dekalb_union, col.regions = "gray50") 
+```
+
+## Save this dataset of pharmacies
+
+```{r}
+setwd(here("data-processed"))
+save(pharm_fd_combined, file = "pharm_fd_combined.RData")
 ```
 
 **Next session**: estimate population living within a certain radius of these pharmacies.

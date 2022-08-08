@@ -121,9 +121,9 @@ In my experience, it's best to let R pick where it installs the packages on your
 
 ## Load the package
 
-Now that the package is installed, load it (technically, "attach it") using the `library()` function (no quotes). Attaching the package tells R to make the functions of the package available for your current work session.
+Now that the package is installed, load it (technically, *attach* it) using the `library(package_name)` function (no quotes around package name). Attaching the package tells R to make the functions from the package available for your current work session.
 
-For additional details on package management, please see this module: <https://michaeldgarber.github.io/0-manage-packages.html>
+For additional details on package management, please see this module: <https://michaeldgarber.github.io/teach-r/0-managing-packages.html>
 
 ```{r load tidyverse, eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
 library(tidyverse)
