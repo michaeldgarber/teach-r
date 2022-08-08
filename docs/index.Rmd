@@ -59,7 +59,9 @@ This short course will introduce participants to popular tools in R for manipula
 
     The sf package and its corresponding object class has become standard tools for managing and representing (vector-based) spatial data in R. An appealing aspect of the sf object class is that it behaves like regular rectangular data and is thus amenable to common data manipulation techniques. In this module, we will work through an example analysis of pharmacies downloaded from OpenStreetMap in the Atlanta area. Through the example, we describe several operations in the sf ecosystem, including ways to merge spatial data, manipulate coordinate systems, and create buffers.
 
-    Link: <https://michaeldgarber.github.io/teach-r/3-sf-atl-pharm.html>
+    Link for Part 1: <https://michaeldgarber.github.io/teach-r/3-sf-atl-pharm.html>
+
+    Link for Part 2: [https://michaeldgarber.github.io/teach-r/3-sf-atl-pharm-part-2.html](https://michaeldgarber.github.io/teach-r/3-sf-atl-pharm.html){.uri}
 
 4.  **Making static and interactive maps in R**
 
