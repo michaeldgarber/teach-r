@@ -37,7 +37,7 @@ This short course will introduce participants to popular tools in R for manipula
 
 2.  **Managing packages: attached vs loaded via a namespace and other nuances**
 
-    R\'s vast package ecosystem provides abundant functionality, but packages can also be a source of frustration if they don't load properly. In this module, we explore some technical details on ways packages are loaded that may facilitate troubleshooting and understanding. We specifically cover the difference between a package being *attached to the search path* versus *loaded via a namespace* and how to check this distinction. We also learn how to remove packages, both from the current session and from the computer altogether. This module has a fair amount of technical detail and need not necessarily be reviewed before proceeding with the main modules.
+    R's vast package ecosystem provides abundant functionality, but packages can also be a source of frustration if they don't load as expected. In this module, we explore some technical details on ways packages are loaded that may facilitate troubleshooting and understanding. We specifically cover the difference between a package being *attached to the search path* versus *loaded via a namespace* and how to check this distinction. We also learn how to remove packages, both from the current session and from the computer altogether. This module has a fair amount of technical detail and doesn't necessarily need to be reviewed before proceeding with the main modules.
 
     Link: <https://michaeldgarber.github.io/teach-r/0-manage-packages.html>
 
@@ -122,6 +122,24 @@ Google Drive [folder](https://drive.google.com/drive/folders/125F0jIChEAPEqTKQx5
 -   Module covered: <https://michaeldgarber.github.io/teach-r/3-sf-atl-pharm.html>
 
 -   R script used during session: <https://github.com/michaeldgarber/teach-r/blob/main/scripts/3-sf-atl-pharm.R>
+
+*Session 4 (August 8, 2022)*
+
+-   Session [recording](https://www.dropbox.com/s/w711q4eovnravsk/r-course-session-4-video.mp4?dl=0) on Dropbox
+
+-   Session [recording](https://drive.google.com/file/d/1ZYGZ8hMzN6vFHs_j-dflT18yC-yC9QUA/view?usp=sharing) on Google Drive
+
+-   Modules covered:
+
+    -   <https://michaeldgarber.github.io/teach-r/0-manage-packages.html>
+
+    -   <https://michaeldgarber.github.io/teach-r/3-sf-atl-pharm-part-2.html>
+
+-   R scripts used during session:
+
+    -   <https://github.com/michaeldgarber/teach-r/blob/main/scripts/0-manage-packages.R>
+
+    -   <https://github.com/michaeldgarber/teach-r/blob/main/scripts/3-sf-atl-pharm.R>
 
 <br />
 
