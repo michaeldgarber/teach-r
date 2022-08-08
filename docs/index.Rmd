@@ -27,11 +27,21 @@ This short course will introduce participants to popular tools in R for manipula
 
 # Modules
 
-0.  **Background and set-up**
+[Background modules:]{.underline}
 
-    This module briefly describes key terms, shows how to install R and RStudio, and offers some other setup tips, like using the here package.
+1.  **Background and set-up**
+
+    This module is a short background module intended for those who have never used R. It describes key terms, shows how to install R and RStudio, and offers some tips for managing projects and files
 
     Link: <https://michaeldgarber.github.io/teach-r/0-pre-reqs>
+
+2.  **Managing packages: attached vs loaded via a namespace and other nuances**
+
+    R\'s vast package ecosystem provides abundant functionality, but packages can also be a source of frustration if they don't load properly. In this module, we explore some technical details on packages that may facilitate troubleshooting and understanding. Topics covered include ways to check what packages are loaded and installed and how to remove packages, both from the current session and from the computer altogether. This module has a fair amount of technical detail and need not necessarily be reviewed before proceeding with the main modules.
+
+    <https://michaeldgarber.github.io/teach-r/0-manage-packages.html>
+
+[Main course modules:]{.underline}
 
 1.  **Introduction to R and data wrangling: learning the basics of dplyr with publicly available COVID-19 data.**
 
