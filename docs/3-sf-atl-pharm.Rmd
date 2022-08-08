@@ -1,5 +1,5 @@
 ---
-title: "R for spatial data wrangling: a demo of sf through an example analysis assessing population living near pharmacies in Atlanta"
+title: "R for spatial data wrangling: using sf to wrangle pharmacies in Atlanta and assess population living nearby (Part 1)"
 author: "Michael D. Garber, PhD MPH"
 date: "Revised August 8, 2022"
 output:
@@ -11,15 +11,17 @@ output:
 
 # Objective and background
 
-**Overall goal**: Illustrate use of sf through some example analyses using spatially referenced pharmacy data downloaded from OpenStreetMap and spatially referenced population data in the Atlanta area downloaded from the US Census.
+**Overall goal**: Illustrate use of **sf** through example analyses with spatially referenced pharmacy data downloaded from OpenStreetMap via **osmdata** and spatially referenced census data in the Atlanta area downloaded via **tidycensus**.
 
 Specifically:
 
-1.  Count the number of pharmacies in Fulton and Dekalb counties (Atlanta area), according to OpenStreetMap.
+1.  According to OpenStreetMap, how many pharmacies are there in Fulton and Dekalb counties (Atlanta area)?
 
 2.  How many people live within 1/2 mile of these pharmacies in these counties?
 
 3.  How is residential proximity to a pharmacy distributed socioeconomically?
+
+*In part 1, we answer the first question. In part 2, we answer questions 2 and 3.*
 
 <br />
 
@@ -61,7 +63,7 @@ Specifically:
 
 -   Note that dplyr and sf functions can be used in the same pipe.
 
--   sf is "sticky", meaning the geometry column "sticks around" unless you explicitly remove it, e.g., using `st_set_geometry(NULL).` For example, even if you use `dplyr::select()` and don't include geometry as one of the columns to select, the geometry column will remain.
+-   sf is "sticky", meaning the geometry column "sticks around" unless you explicitly remove it, e.g., using `st_set_geometry(NULL)`. For example, even if you use `dplyr::select()` and don't include geometry as one of the columns to select, the geometry column will remain.
 
 -   Illustrate use of the `st_area()` function to measure area.
 
@@ -256,7 +258,7 @@ class(tract_ga_wrangle$area_2240) #units
 class(tract_ga_wrangle$area_ft) #numeric
 ```
 
-Do household income and median home value seem reasonable? Use base::summary() to briefly describe each:
+Examine household income and median home value seem using `base::summary()`.
 
 **Median household income of census tracts**
 

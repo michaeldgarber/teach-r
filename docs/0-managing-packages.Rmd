@@ -59,7 +59,7 @@ To summarize this section, all attached packages are loaded, but not all loaded 
 
 Functions to check
 
-# Functions to view and manage packages
+# Functions to print information on and manage packages
 
 The following base-R functions provide information about currently loaded packages.
 
