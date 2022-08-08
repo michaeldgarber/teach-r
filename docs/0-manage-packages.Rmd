@@ -221,7 +221,10 @@ packages_tibble_tidycensus = packages %>%
   dplyr::as_tibble() %>% 
   dplyr::filter(Package == "tidycensus")
 
-packages_tibble_tidycensus
+#Just select these two fields.
+packages_tibble_tidycensus %>% 
+  dplyr::select(Package, Imports)
+
 ```
 
 # Use the graphical user interface to manage packages

@@ -650,7 +650,7 @@ installed_packages_here</code></pre>
 <pre class="r"><code>install.packages(&quot;here&quot;)</code></pre>
 <pre><code>## 
 ## The downloaded binary packages are in
-##  /var/folders/sd/fx5w2bb91wxbnndc3hpqvtcr0000gn/T//RtmpFkneh9/downloaded_packages</code></pre>
+##  /var/folders/sd/fx5w2bb91wxbnndc3hpqvtcr0000gn/T//Rtmp0v31rh/downloaded_packages</code></pre>
 </div>
 <div id="examine-package-dependencies" class="section level2" number="4.4">
 <h2><span class="header-section-number">4.4</span> Examine package dependencies</h2>
@@ -663,16 +663,13 @@ packages_tibble_tidycensus = packages %&gt;%
   dplyr::as_tibble() %&gt;% 
   dplyr::filter(Package == &quot;tidycensus&quot;)
 
-packages_tibble_tidycensus</code></pre>
-<pre><code>## # A tibble: 1 × 17
-##   Package    Version Priority Depends    Imports Linki…¹ Sugge…² Enhan…³ License
-##   &lt;chr&gt;      &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;      &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
-## 1 tidycensus 1.2.2   &lt;NA&gt;     R (&gt;= 3.3… &quot;httr,… &lt;NA&gt;    ggplot… &lt;NA&gt;    MIT + …
-## # … with 8 more variables: License_is_FOSS &lt;chr&gt;, License_restricts_use &lt;chr&gt;,
-## #   OS_type &lt;chr&gt;, Archs &lt;chr&gt;, MD5sum &lt;chr&gt;, NeedsCompilation &lt;chr&gt;,
-## #   File &lt;chr&gt;, Repository &lt;chr&gt;, and abbreviated variable names ¹​LinkingTo,
-## #   ²​Suggests, ³​Enhances
-## # ℹ Use `colnames()` to see all variable names</code></pre>
+#Just select these two fields.
+packages_tibble_tidycensus %&gt;% 
+  dplyr::select(Package, Imports)</code></pre>
+<pre><code>## # A tibble: 1 × 2
+##   Package    Imports                                                            
+##   &lt;chr&gt;      &lt;chr&gt;                                                              
+## 1 tidycensus &quot;httr, sf, dplyr (&gt;= 1.0.0), tigris, stringr, jsonlite (&gt;=\n1.5.0)…</code></pre>
 </div>
 </div>
 <div id="use-the-graphical-user-interface-to-manage-packages" class="section level1" number="5">
