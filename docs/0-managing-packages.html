@@ -365,17 +365,17 @@ div.tocify {
 <li><p>remove packages from your computer altogether</p></li>
 <li><p>check what packages a package depends on</p></li>
 </ul>
-<div id="vocabulary-attached-to-search-path-vs-loaded-via-namespace" class="section level2" number="1.1">
-<h2><span class="header-section-number">1.1</span> Vocabulary: attached to search path vs loaded via namespace</h2>
+<div id="vocabulary-attached-to-search-path-vs-loaded-via-a-namespace" class="section level2" number="1.1">
+<h2><span class="header-section-number">1.1</span> Vocabulary: attached to search path vs loaded via a namespace</h2>
 <p>An “attached” package is one that has been loaded via <code>library()</code> and whose functions are accessible without having to use the <code>::</code> operator as in <code>package_name::package_function()</code>. For example, if dplyr is attached, I can simply write <code>mutate()</code>; I don’t have to write <code>dplyr::mutate()</code>. Packages that are attached are accessible via what R calls the <em>search path</em> or <em>search list</em>. When a function is used without the double-colon syntax [e.g., <code>mutate()]</code>, R looks for a function with that name in the first package on the path, and if it doesn’t find it, it looks in the second package on the path, and so on. The order of the search path can be obtained via <code>searchpaths()</code>. Packages loaded with <code>library()</code> more recently will rank earlier in the search path, which can have consequences for function conflicts.</p>
 <p>Packages can also be “loaded via a namespace.” This means that the packages have been loaded because the user called the function using the <a href="https://stat.ethz.ch/R-manual/R-devel/library/base/html/ns-dblcolon.html">double-colon operator</a> (<code>package_name::package_function()</code> but has not <em>attached</em> the package to the search path via <code>library()</code>; because <a href="https://github.com/rstudio/rstudio/issues/8072">R Studio sees that the package is used somewhere in the script</a>, even if the user has not run that code yet; or because the package is needed by the IDE to perform a behind-the-scenes operation. For example, knitr is loaded via a namespace in my current session because I am using R Markdown even though that package does not appear in a script in my current session.</p>
-<p>In common usage, I cannot glean any difference between use of a package that has been loaded via namespace versus one that has been installed (e.g., using <code>install.packages("package_name")</code> but has not been loaded at all. To use a function from a package that has already been loaded via a namespace, you still must use the double-colon notation of <code>package_name::package_function()</code>, as you would a function from a package that has not (yet) been loaded via namespace.</p>
+<p>In common usage, I cannot glean any difference between use of a package that has been loaded via namespace versus one that has been installed (e.g., using <code>install.packages("package_name")</code> but has not been loaded at all. To use a function from a package that has already been loaded via a namespace, you still must use the double-colon notation of <code>package_name::package_function()</code>, as you would a function from a package that has not (yet) been loaded via a namespace.</p>
 <p>That a package has been loaded via a namespace may, however, have implications for troubleshooting. For example, if you try to install a package that has already been loaded via a namespace, this dialogue box may appear:</p>
 <p><img src="images/updating-loaded-packages.png" /></p>
 <p>To summarize this section, all attached packages are loaded, but not all loaded packages are attached. We will deduce this relationship using functions from the <a href="https://r-lib.github.io/sessioninfo/">sessioninfo</a> package below. If a package is attached, we can write the function name by itself without its corresponding package name (mindful of potential conflicts); if not, we must use the double-colon notation, <code>::</code>, and write the package as well.</p>
 </div>
 <div id="vocabulary-package-dependencies" class="section level2" number="1.2">
-<h2><span class="header-section-number">1.2</span> Vocabulary: Package dependencies</h2>
+<h2><span class="header-section-number">1.2</span> Vocabulary: package dependencies</h2>
 <p>Information related to package dependencies appears, for a given package, in the following fields: <code>Depends</code>, <code>Imports</code>, <code>and Suggests.</code> Package dependencies are covered in this work-in-progress <a href="https://r-pkgs.org/dependencies.html">chapter</a> of the book <a href="https://r-pkgs.org">R Packages</a>.</p>
 <p>In brief, sometimes you will notice that the installation of a package causes other packages to be installed. This is because that package <code>Imports</code> that package. For any package, this information can be obtained via the <code>available.packages()</code> function, described further below. <code>Suggests</code> is softer. If a package suggests another package, it won’t install that package automatically, but that some features of the package may benefit from functions in that package.</p>
 </div>
@@ -605,7 +605,9 @@ sessionInfo()</code></pre>
 ##  here    * 1.0.1   2020-12-13 [1] CRAN (R 4.2.0)
 ## 
 ##  [1] /Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library</code></pre>
+<p>Note that the result of <code>sessioninfo::package_info("attached")</code> is a subset of <code>sessioninfo::package_info("loaded")</code>, implying that all attached packages are loaded.</p>
 <p>I’m not going to print all installed packages, because the list is long, but that would be done by</p>
+<pre class="r"><code>sessioninfo::package_info(&quot;installed&quot;)</code></pre>
 <p>If we remove here using <code>detach()</code>, is it removed from the list of attached packages?</p>
 <pre class="r"><code>base::detach(&quot;package:here&quot;, unload = TRUE)
 sessioninfo::package_info(&quot;attached&quot;)</code></pre>
@@ -616,7 +618,7 @@ sessioninfo::package_info(&quot;attached&quot;)</code></pre>
 </div>
 <div id="remove-a-package" class="section level2" number="4.3">
 <h2><span class="header-section-number">4.3</span> Remove a package</h2>
-<p>Above, we detached the here package from the current session, but it’s still available as an installed package. We can check this via <code>sessioninfo::package_info("installed")</code>. Rather than the print the entire list of installed packages in this demo (very long), I’m going to create an object corresponding to the installed packages and then filter only to the here package using dplyr functions.</p>
+<p>Above, we detached the here package from the current session, but it’s still available as an installed package. We can check this via <code>sessioninfo::package_info("installed")</code>. Rather than print the entire list of installed packages in this demo (long), I’m going to create an object corresponding to the installed packages and then filter only to the here package using dplyr functions.</p>
 <pre class="r"><code>library(tidyverse) #so that the pipe will work</code></pre>
 <pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
 ## ✔ tibble  3.1.8     ✔ dplyr   1.0.9
@@ -638,7 +640,7 @@ installed_packages_here</code></pre>
 ## # … with 1 more variable: library &lt;fct&gt;, and abbreviated variable names
 ## #   ¹​loadedversion, ²​loadedpath, ³​attached
 ## # ℹ Use `colnames()` to see all variable names</code></pre>
-<p>Remove the here package. Note we now get an error when we try to run <code>here::here().</code></p>
+<p>Remove the here package. Note we now get an error when we try to run <code>here::here()</code> because the package is nowhere to be found.</p>
 <pre class="r"><code>remove.packages(&quot;here&quot;)</code></pre>
 <pre><code>## Removing package from &#39;/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library&#39;
 ## (as &#39;lib&#39; is unspecified)</code></pre>
@@ -648,7 +650,7 @@ installed_packages_here</code></pre>
 <pre class="r"><code>install.packages(&quot;here&quot;)</code></pre>
 <pre><code>## 
 ## The downloaded binary packages are in
-##  /var/folders/sd/fx5w2bb91wxbnndc3hpqvtcr0000gn/T//RtmpV1R68k/downloaded_packages</code></pre>
+##  /var/folders/sd/fx5w2bb91wxbnndc3hpqvtcr0000gn/T//RtmpDFoNGv/downloaded_packages</code></pre>
 </div>
 <div id="examine-package-dependencies" class="section level2" number="4.4">
 <h2><span class="header-section-number">4.4</span> Examine package dependencies</h2>

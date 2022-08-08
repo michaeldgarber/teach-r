@@ -27,13 +27,13 @@ R's vast package ecosystem provides abundant functionality, but packages can als
 
 -   check what packages a package depends on
 
-## Vocabulary: attached to search path vs loaded via namespace
+## Vocabulary: attached to search path vs loaded via a namespace
 
 An "attached" package is one that has been loaded via `library()` and whose functions are accessible without having to use the `::` operator as in `package_name::package_function()`. For example, if dplyr is attached, I can simply write `mutate()`; I don't have to write `dplyr::mutate()`. Packages that are attached are accessible via what R calls the *search path* or *search list*. When a function is used without the double-colon syntax [e.g., `mutate()]`, R looks for a function with that name in the first package on the path, and if it doesn't find it, it looks in the second package on the path, and so on. The order of the search path can be obtained via `searchpaths()`. Packages loaded with `library()` more recently will rank earlier in the search path, which can have consequences for function conflicts.
 
 Packages can also be "loaded via a namespace." This means that the packages have been loaded because the user called the function using the [double-colon operator](https://stat.ethz.ch/R-manual/R-devel/library/base/html/ns-dblcolon.html) (`package_name::package_function()` but has not *attached* the package to the search path via `library()`; because [R Studio sees that the package is used somewhere in the script](https://github.com/rstudio/rstudio/issues/8072), even if the user has not run that code yet; or because the package is needed by the IDE to perform a behind-the-scenes operation. For example, knitr is loaded via a namespace in my current session because I am using R Markdown even though that package does not appear in a script in my current session.
 
-In common usage, I cannot glean any difference between use of a package that has been loaded via namespace versus one that has been installed (e.g., using `install.packages("package_name")` but has not been loaded at all. To use a function from a package that has already been loaded via a namespace, you still must use the double-colon notation of `package_name::package_function()`, as you would a function from a package that has not (yet) been loaded via namespace.
+In common usage, I cannot glean any difference between use of a package that has been loaded via namespace versus one that has been installed (e.g., using `install.packages("package_name")` but has not been loaded at all. To use a function from a package that has already been loaded via a namespace, you still must use the double-colon notation of `package_name::package_function()`, as you would a function from a package that has not (yet) been loaded via a namespace.
 
 That a package has been loaded via a namespace may, however, have implications for troubleshooting. For example, if you try to install a package that has already been loaded via a namespace, this dialogue box may appear:
 
@@ -41,7 +41,7 @@ That a package has been loaded via a namespace may, however, have implications f
 
 To summarize this section, all attached packages are loaded, but not all loaded packages are attached. We will deduce this relationship using functions from the [sessioninfo](https://r-lib.github.io/sessioninfo/) package below. If a package is attached, we can write the function name by itself without its corresponding package name (mindful of potential conflicts); if not, we must use the double-colon notation, `::`, and write the package as well.
 
-## Vocabulary: Package dependencies
+## Vocabulary: package dependencies
 
 Information related to package dependencies appears, for a given package, in the following fields: `Depends`, `Imports`, `and Suggests.` Package dependencies are covered in this work-in-progress [chapter](https://r-pkgs.org/dependencies.html) of the book [R Packages](https://r-pkgs.org).
 
@@ -157,7 +157,13 @@ Look at only those package(s) that have been attached:
 sessioninfo::package_info("attached")
 ```
 
+Note that the result of `sessioninfo::package_info("attached")` is a subset of `sessioninfo::package_info("loaded")`, implying that all attached packages are loaded.
+
 I'm not going to print all installed packages, because the list is long, but that would be done by
+
+```{r, eval=FALSE}
+sessioninfo::package_info("installed")
+```
 
 If we remove here using `detach()`, is it removed from the list of attached packages?
 
@@ -168,7 +174,7 @@ sessioninfo::package_info("attached")
 
 ## Remove a package
 
-Above, we detached the here package from the current session, but it's still available as an installed package. We can check this via `sessioninfo::package_info("installed")`. Rather than the print the entire list of installed packages in this demo (very long), I'm going to create an object corresponding to the installed packages and then filter only to the here package using dplyr functions.
+Above, we detached the here package from the current session, but it's still available as an installed package. We can check this via `sessioninfo::package_info("installed")`. Rather than print the entire list of installed packages in this demo (long), I'm going to create an object corresponding to the installed packages and then filter only to the here package using dplyr functions.
 
 ```{r}
 library(tidyverse) #so that the pipe will work
@@ -179,7 +185,7 @@ installed_packages_here = sessioninfo::package_info("installed") %>%
 installed_packages_here
 ```
 
-Remove the here package. Note we now get an error when we try to run `here::here().`
+Remove the here package. Note we now get an error when we try to run `here::here()` because the package is nowhere to be found.
 
 ```{r, error = TRUE}
 remove.packages("here")
