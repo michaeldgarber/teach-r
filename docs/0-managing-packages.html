@@ -433,8 +433,12 @@ div.tocify {
 <p>To remove packages from either the search path or a namespace, use:</p>
 <ul>
 <li><p><code>base::detach("package:sf", unload = TRUE)</code>. Note if <code>unload=FALSE</code>, the package may remain in a namespace.</p></li>
-<li><p><code>base::unloadNamespace()</code> unloads a namespace.</p></li>
-<li><p>To <strong>remove all packages</strong> that do not come with R, my suggestion would be to remove the R program altogether via the usual way to remove programs in the operating system (Windows or Mac). You can also follow guidance here: <a href="https://stackoverflow.com/questions/16382647/remove-all-packages-that-do-not-come-with-r" class="uri">https://stackoverflow.com/questions/16382647/remove-all-packages-that-do-not-come-with-r</a></p></li>
+<li><p><code>base::unloadNamespace("package_name")</code> unloads a namespace.</p></li>
+</ul>
+<p>To remove packages that have been instaslled:</p>
+<ul>
+<li><p><code>remove.packages("package_name")</code></p></li>
+<li><p>To <strong>remove all installed packages</strong> that do not come with R, my suggestion would be to remove the R program altogether via the usual way to remove programs in the operating system (Windows or Mac). You can also follow guidance here: <a href="https://stackoverflow.com/questions/16382647/remove-all-packages-that-do-not-come-with-r" class="uri">https://stackoverflow.com/questions/16382647/remove-all-packages-that-do-not-come-with-r</a></p></li>
 </ul>
 </div>
 <div id="demo-of-functions" class="section level1" number="4">
@@ -542,8 +546,8 @@ sessionInfo()</code></pre>
 ## 
 ## ──────────────────────────────────────────────────────────────────────────────</code></pre>
 </div>
-<div id="explore-package-info-specifically" class="section level2" number="4.2">
-<h2><span class="header-section-number">4.2</span> Explore package info, specifically</h2>
+<div id="explore-package-info-and-detach-packages" class="section level2" number="4.2">
+<h2><span class="header-section-number">4.2</span> Explore package info and detach packages</h2>
 <p>Now let’s specify what type of packages we want to see from <code>sessioninfo::package_info()</code></p>
 <p>Look at all packages that have been loaded.</p>
 <pre class="r"><code>sessioninfo::package_info(&quot;loaded&quot;)</code></pre>
@@ -601,7 +605,7 @@ sessionInfo()</code></pre>
 ##  here    * 1.0.1   2020-12-13 [1] CRAN (R 4.2.0)
 ## 
 ##  [1] /Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library</code></pre>
-<p>I’m not going to print all installed packages, because the list is long, but that would be done by <code>sessioninfo::package_info("installed")</code></p>
+<p>I’m not going to print all installed packages, because the list is long, but that would be done by</p>
 <p>If we remove here using <code>detach()</code>, is it removed from the list of attached packages?</p>
 <pre class="r"><code>base::detach(&quot;package:here&quot;, unload = TRUE)
 sessioninfo::package_info(&quot;attached&quot;)</code></pre>
@@ -610,13 +614,10 @@ sessioninfo::package_info(&quot;attached&quot;)</code></pre>
 ## 
 ##  [1] /Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library</code></pre>
 </div>
-<div id="examine-package-dependencies" class="section level2" number="4.3">
-<h2><span class="header-section-number">4.3</span> Examine package dependencies</h2>
-<p>We can save the information about all available R packages to an object called packages and then convert that object (a matrix) into an easier-to-manage tibble, and then use dplyr functions to filter to one specific package.</p>
-<p>We see, for example, that <strong>tidycensus</strong> <code>Imports</code> <strong>sf</strong>, among other packages.</p>
-<pre class="r"><code>packages  = utils::available.packages()
-
-library(tidyverse) #so the pipe works</code></pre>
+<div id="remove-a-package" class="section level2" number="4.3">
+<h2><span class="header-section-number">4.3</span> Remove a package</h2>
+<p>Above, we detached the here package from the current session, but it’s still available as an installed package. We can check this via <code>sessioninfo::package_info("installed")</code>. Rather than the print the entire list of installed packages in this demo (very long), I’m going to create an object corresponding to the installed packages and then filter only to the here package using dplyr functions.</p>
+<pre class="r"><code>library(tidyverse) #so that the pipe will work</code></pre>
 <pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
 ## ✔ tibble  3.1.8     ✔ dplyr   1.0.9
 ## ✔ tidyr   1.2.0     ✔ stringr 1.4.0
@@ -625,7 +626,38 @@ library(tidyverse) #so the pipe works</code></pre>
 ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ## ✖ dplyr::filter() masks stats::filter()
 ## ✖ dplyr::lag()    masks stats::lag()</code></pre>
-<pre class="r"><code>packages_tibble_tidycensus = packages %&gt;% 
+<pre class="r"><code>installed_packages_here = sessioninfo::package_info(&quot;installed&quot;) %&gt;% 
+  dplyr::as_tibble() %&gt;% 
+  dplyr::filter(package == &quot;here&quot;)
+
+installed_packages_here</code></pre>
+<pre><code>## # A tibble: 1 × 11
+##   package ondiskversion loade…¹ path  loade…² attac…³ is_base date  source md5ok
+##   &lt;chr&gt;   &lt;chr&gt;         &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;   &lt;lgl&gt;   &lt;lgl&gt;   &lt;chr&gt; &lt;chr&gt;  &lt;lgl&gt;
+## 1 here    1.0.1         &lt;NA&gt;    /Lib… &lt;NA&gt;    FALSE   FALSE   2020… CRAN … NA   
+## # … with 1 more variable: library &lt;fct&gt;, and abbreviated variable names
+## #   ¹​loadedversion, ²​loadedpath, ³​attached
+## # ℹ Use `colnames()` to see all variable names</code></pre>
+<p>Remove the here package. Note we now get an error when we try to run <code>here::here().</code></p>
+<pre class="r"><code>remove.packages(&quot;here&quot;)</code></pre>
+<pre><code>## Removing package from &#39;/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library&#39;
+## (as &#39;lib&#39; is unspecified)</code></pre>
+<pre class="r"><code>here::here()</code></pre>
+<pre><code>## Error in loadNamespace(x): there is no package called &#39;here&#39;</code></pre>
+<p>Re-install it.</p>
+<pre class="r"><code>install.packages(&quot;here&quot;)</code></pre>
+<pre><code>## 
+## The downloaded binary packages are in
+##  /var/folders/sd/fx5w2bb91wxbnndc3hpqvtcr0000gn/T//RtmpV1R68k/downloaded_packages</code></pre>
+</div>
+<div id="examine-package-dependencies" class="section level2" number="4.4">
+<h2><span class="header-section-number">4.4</span> Examine package dependencies</h2>
+<p>We can save the information about all available R packages to an object called packages and then convert that object (a matrix) into an easier-to-manage tibble, and then use dplyr functions to filter to one specific package.</p>
+<p>We see, for example, that <strong>tidycensus</strong> <code>Imports</code> <strong>sf</strong>, among other packages.</p>
+<pre class="r"><code>packages  = utils::available.packages()
+
+library(tidyverse) #so the pipe works
+packages_tibble_tidycensus = packages %&gt;% 
   dplyr::as_tibble() %&gt;% 
   dplyr::filter(Package == &quot;tidycensus&quot;)
 
@@ -655,26 +687,7 @@ packages_tibble_tidycensus</code></pre>
 <p><img src="images/check-for-package-updates-packages-pane-2.png" width="500" /></p>
 <p>Packages on the search path (attached) can also be seen from this dropdown. The only package of the below that I loaded explicitly was here.</p>
 <p><img src="images/search-path-screenshot.png" width="500" /></p>
-<p>This shows the same information as</p>
-<pre class="r"><code>searchpaths()</code></pre>
-<pre><code>##  [1] &quot;.GlobalEnv&quot;                                                                    
-##  [2] &quot;/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/forcats&quot;  
-##  [3] &quot;/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/stringr&quot;  
-##  [4] &quot;/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/dplyr&quot;    
-##  [5] &quot;/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/purrr&quot;    
-##  [6] &quot;/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/readr&quot;    
-##  [7] &quot;/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/tidyr&quot;    
-##  [8] &quot;/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/tibble&quot;   
-##  [9] &quot;/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/tidyverse&quot;
-## [10] &quot;/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/ggplot2&quot;  
-## [11] &quot;/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/stats&quot;    
-## [12] &quot;/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/graphics&quot; 
-## [13] &quot;/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/grDevices&quot;
-## [14] &quot;/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/utils&quot;    
-## [15] &quot;/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/datasets&quot; 
-## [16] &quot;/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/methods&quot;  
-## [17] &quot;Autoloads&quot;                                                                     
-## [18] &quot;/Library/Frameworks/R.framework/Resources/library/base&quot;</code></pre>
+<p>This shows the same information as <code>searchpaths()</code>.</p>
 </div>
 
 <br>

@@ -113,9 +113,13 @@ To remove packages from either the search path or a namespace, use:
 
 -   `base::detach("package:sf", unload = TRUE)`. Note if `unload=FALSE`, the package may remain in a namespace.
 
--   `base::unloadNamespace()` unloads a namespace.
+-   `base::unloadNamespace("package_name")` unloads a namespace.
 
--   To **remove all packages** that do not come with R, my suggestion would be to remove the R program altogether via the usual way to remove programs in the operating system (Windows or Mac). You can also follow guidance here: <https://stackoverflow.com/questions/16382647/remove-all-packages-that-do-not-come-with-r>
+To remove packages that have been instaslled:
+
+-   `remove.packages("package_name")`
+
+-   To **remove all installed packages** that do not come with R, my suggestion would be to remove the R program altogether via the usual way to remove programs in the operating system (Windows or Mac). You can also follow guidance here: <https://stackoverflow.com/questions/16382647/remove-all-packages-that-do-not-come-with-r>
 
 # Demo of functions
 
@@ -137,7 +141,7 @@ Now let's get the same information using `sessioninfo::session_info()`. Note the
 sessioninfo::session_info()
 ```
 
-## Explore package info, specifically
+## Explore package info and detach packages
 
 Now let's specify what type of packages we want to see from `sessioninfo::package_info()`
 
@@ -153,7 +157,7 @@ Look at only those package(s) that have been attached:
 sessioninfo::package_info("attached")
 ```
 
-I'm not going to print all installed packages, because the list is long, but that would be done by `sessioninfo::package_info("installed")`
+I'm not going to print all installed packages, because the list is long, but that would be done by
 
 If we remove here using `detach()`, is it removed from the list of attached packages?
 
@@ -162,11 +166,27 @@ base::detach("package:here", unload = TRUE)
 sessioninfo::package_info("attached")
 ```
 
-## Examine package dependencies
+## Remove a package
 
-We can save the information about all available R packages to an object called packages and then convert that object (a matrix) into an easier-to-manage tibble, and then use dplyr functions to filter to one specific package.
+Above, we detached the here package from the current session, but it's still available as an installed package. We can check this via `sessioninfo::package_info("installed")`. Rather than the print the entire list of installed packages in this demo (very long), I'm going to create an object corresponding to the installed packages and then filter only to the here package using dplyr functions.
 
-We see, for example, that **tidycensus** `Imports` **sf**, among other packages.
+```{r}
+library(tidyverse) #so that the pipe will work
+installed_packages_here = sessioninfo::package_info("installed") %>% 
+  dplyr::as_tibble() %>% 
+  dplyr::filter(package == "here")
+
+installed_packages_here
+```
+
+Remove the here package. Note we now get an error when we try to run `here::here().`
+
+```{r, error = TRUE}
+remove.packages("here")
+here::here()
+```
+
+Re-install it.
 
 ```{r, include=FALSE, eval=TRUE, echo=FALSE}
 #I got an error saying I was trying to use CRAN without a mirror, so I followed
@@ -176,6 +196,16 @@ r["CRAN"] = "http://cran.us.r-project.org"
 options(repos = r)
 install.packages("utils")
 ```
+
+```{r, message = FALSE, warning=FALSE}
+install.packages("here")
+```
+
+## Examine package dependencies
+
+We can save the information about all available R packages to an object called packages and then convert that object (a matrix) into an easier-to-manage tibble, and then use dplyr functions to filter to one specific package.
+
+We see, for example, that **tidycensus** `Imports` **sf**, among other packages.
 
 ```{r}
 packages  = utils::available.packages()
@@ -214,8 +244,4 @@ Packages on the search path (attached) can also be seen from this dropdown. The 
 
 ![](images/search-path-screenshot.png){width="500"}
 
-This shows the same information as
-
-```{r}
-searchpaths()
-```
+This shows the same information as `searchpaths()`.
