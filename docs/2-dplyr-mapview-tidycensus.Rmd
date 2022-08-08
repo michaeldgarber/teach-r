@@ -1,7 +1,7 @@
 ---
 title: "R for data wrangling 2: more dplyr and some tidycensus, mapview, and ggplot"
-author: "Michael Garber, PhD MPH"
-date: "Revised August 3, 2022"
+author: "Michael D. Garber, PhD MPH"
+date: "Revised August 7, 2022"
 output:
   html_document:
     toc: true
@@ -119,7 +119,7 @@ You will get a confirmation email with your key asking you to activate it, and t
 The first time you use the key on your computer, enter this line of code, entering the key you received by email:
 
 ```{r censuskey, eval=FALSE, echo=TRUE, warning=FALSE, message=TRUE}
-census_api_key("your_census_key_here", install=TRUE)
+tidycensuscensus_api_key("your_census_key_here", install=TRUE)
 ```
 
 Tidycensus lets the user specify
@@ -143,7 +143,7 @@ One great aspect of `sf` objects--as compared with the sp package, the previous 
 
 ## Get state-level population data
 
-Without further adieu, let's run the tidycensus function `get_acs()` to return state-level population data from ACS:
+Without further adieu, let's run the tidycensus function `get_acs()` to return state-level population data (2015-2019 5-year estimates) from the American Community Survey:
 
 ```{r get states, eval=FALSE, echo=TRUE, warning=FALSE, message=TRUE}
 #Run this to save the data locally for speed.
@@ -169,7 +169,7 @@ View(vars_acs_2019)
 
 **Note**: if `tidycensus::get_acs()` returned an error because the Census key did not work, tidycensus did not load, or for any other reason, please feel free to download a version of **pop_by_state_geo** from this [Dropbox folder](https://www.dropbox.com/sh/ff85l058vl82wwy/AABKygH3PhQkausaxOcIgO0Sa?dl=0):
 
-I would then suggest saving the file (pop_by_state_geo.RData) to a folder within your R Studio project's directory. For example, I would save save it to a folder called 'data-input' one level beneath the folder containing the .Rproj file for this project and would then load the data like this. I use the `here::here()` to set the working directory.
+I would then suggest saving the file (pop_by_state_geo.RData) to a folder within your R Studio project's directory. For example, I would save save it to a folder called 'data-input' one level beneath the folder containing the .Rproj file for this project and would then load the data like this, using `here::here()` to set the working directory:
 
 ```{r}
 setwd(here("data-input"))
@@ -226,7 +226,6 @@ pop_by_state_wrangle_geo = pop_by_state_geo %>%
   ) %>% 
   dplyr::select(-moe, -variable) %>% 
   #To simplify some of the maps below, create an indicator variable corresponding to the Continental 48.
-  #Do the same type of operation using two different types of syntax, the  %in% operator and the or operator.
   mutate(
     continental_48 = case_when(
       state %in% c("Alaska", "Hawaii", "Northern Mariana Islands", "Guam", "Virgin Islands", "Puerto Rico") ~ 0,

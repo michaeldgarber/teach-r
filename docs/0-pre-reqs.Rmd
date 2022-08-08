@@ -1,6 +1,6 @@
 ---
 title: "First things first: background and setup before dplyr"
-author: "Michael Garber "
+author: "Michael D. Garber, PhD MPH"
 date: "Revised August 5, 2022"
 output:
   html_document:
@@ -85,7 +85,7 @@ Two often-[quoted](https://adv-r.hadley.nz/functions.html) slogans describing R 
 >
 > \-[John Chambers](https://www.r-bloggers.com/2016/07/extending-r/).
 
-So, at its core, when using R, you are using functions to perform actions on objects. (As we'll see explicitly when going over [purrr](https://purrr.tidyverse.org/), [functions are themselves objects](https://cran.r-project.org/doc/manuals/r-devel/R-lang.html#Function-objects) and can be manipulated by other functions.)
+So, at its core, when using R, you are using functions to perform actions on objects. As we'll see explicitly when going over [purrr](https://purrr.tidyverse.org/), [functions are themselves objects](https://cran.r-project.org/doc/manuals/r-devel/R-lang.html#Function-objects) and can be manipulated by other functions.
 
 R comes pre-loaded with a set of functions that can be used to analyze data. This is called "base R" and is the foundation upon which everything else in R is built.
 
@@ -93,7 +93,15 @@ Many commonly used functions, however, are not a part of base R but are instead 
 
 ## Install a package
 
-Using a package requires first installing it with the `install.packages("package_name")` function and then loading it using the `library(package_name)` function. Note the absence of quotes inside the parentheses of the `library()` function. There is some stackoverflow [discussion](https://stackoverflow.com/questions/36802132/the-use-of-quotation-marks-when-loading-a-package-in-r) on whether to use quotes when loading packages. In my experience, it works better to *not* use quotes when loading packages but to use them when installing packages.
+Using a package requires first installing it with the `install.packages("package_name")` function. Installing a package means downloading it from CRAN (R's central software repository) and storing it on your computer (R will decide where it goes) so that it can be used later. You can also install packages (or package versions) that aren't on CRAN using [devtools](https://github.com/r-lib/devtools).
+
+In RStudio, you can also install CRAN packages using the Tools dropdown,
+
+![](images/install-package-tools-dropdown.png){width="500"}
+
+which will prompt the following screen, where you can search for and install packages. In the background, this tool will run the `install.packages("package_name")` code.
+
+![](images/install-package-tools-dropdown-2-usethis.png){width="500"}
 
 For this exercise, let's install the full **tidyverse**. The [tidyverse](https://www.tidyverse.org/) is a unique package in that it is a collection of packages, one of which is **dplyr**.
 
@@ -107,13 +115,15 @@ To run the code, put your cursor on that line or highlight that line of code, an
 
 ![](images/run-screenshot)
 
-On Windows, the keyboard shortcut for **Run** is **control+enter**. On a Mac, it's **command+enter (return)**.
+On Windows, the keyboard shortcut for **Run** is **control+enter**. On a Mac, it's **command+return.**
 
-In my experience, it's usually fine to let R pick where it installs the packages on your computer. This may depend on whether you're using your own computer or, say, a work computer with limited access to certain drives. If needed, you can [specify](https://www.r-bloggers.com/2020/10/customizing-your-package-library-location/) where you want the package to land by adding the `lib= "file path"` argument in the `install.packages()` function. For example: `install.packages("tidyverse", lib = "file-path")`.
+In my experience, it's best to let R pick where it installs the packages on your computer. This may depend on whether you're using your own computer or, say, a work computer with limited access to some drives. If needed, you can [specify](https://www.r-bloggers.com/2020/10/customizing-your-package-library-location/) where you want the package to land by adding the `lib= "file path"` argument in the `install.packages()` function. For example: `install.packages("tidyverse", lib = "file-path")`.
 
 ## Load the package
 
-Now that the package is installed, load it using the `library()` function (no quotes). Loading the package tells R to make the functions of the package available for your current work session.
+Now that the package is installed, load it (technically, "attach it") using the `library()` function (no quotes). Attaching the package tells R to make the functions of the package available for your current work session.
+
+For additional details on package management, please see this module: <https://michaeldgarber.github.io/0-manage-packages.html>
 
 ```{r load tidyverse, eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
 library(tidyverse)
@@ -123,13 +133,20 @@ library(tidyverse)
 
 ## Here package and projects
 
-The folder in which R reads (loads) and writes (saves) files is called the working directory. For years, I had set the working directory by typing the entire file path. This is not ideal practice for a few of reasons:
+The folder in which R reads and writes files is called the working directory. For years, I had set the working directory by typing the entire file path. This is not ideal practice for a few of reasons:
 
 1.  It takes a long time to type a long file path.
-2.  Typing file paths is prone to error. (How do I type the back-slash, \\ or /? Do I need the :?)
+2.  Typing file paths is prone to error. (How do I type the back-slash, \\ or /? Do I need the : on a Windows path?)
 3.  It's hard-coded: If you were to change computers or share your code with someone, those working directories won't work.
 
 Fortunately, there's a very simple solution to these issues: Use the [here](https://here.r-lib.org/) package. This package creates a working directory [relative]{.underline} to the location of the R project (described below) you are working in. This means that wherever your project is in the folder structure of your computer, the `here()` function to define your working directory and thus any read/write commands that rely on it will just work.
+
+This code returns the current working directory.
+
+```{r}
+library(here)
+here()
+```
 
 (Jenny Bryan's [ode](https://github.com/jennybc/here_here) to the here package is a great read.)
 
@@ -169,16 +186,16 @@ Note when you load the here package, it will by default tell you where your work
 getwd() #base R
 ```
 
-What if we want to change the working directory, to the "data-input" folder? Use the base-R `setwd()` function to set the working directory and the here function to define the path relative to the project. Note the "data-input" folder is one level beneath the .Rproj file (screenshot above).
+What if we want to change the working directory, to the "data-input" folder? Use the base-R `setwd()` function to set the working directory and the `here::here()` function to define the path relative to the project. Note the "data-input" folder is one level beneath the .Rproj file (screenshot above).
 
 ```{r}
 setwd(here("data-input"))
 getwd() #check
 ```
 
-Note if we wanted to set the working directory to another level beneath data-input, we would write: `setwd(here("data-input","another-level-beneath")`. That is, we would write the name of the sub-folder in quotes after a comma.
+Note if we wanted to set the working directory to two folders beneath data-input, we would write: `setwd(here("data-input","sub-folder","sub-sub-folder")`. That is, we would write the name of each sub-folder in quotes after a comma. Note that `here::here()`, like [`base::file.path()`](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/file.path), allows us to quote each folder in the path rather than use slashes. This makes the path easier to write and more likely to work on another operating system than if we had to write, say `"data-input/sub-folder/sub-sub-folder"`.
 
-And if we want to change it back to the original directory containing the project? Simply use `here()` without specifying an argument.
+If we want to change it back to the original directory containing the project? Simply use `here()` without specifying an argument.
 
 ```{r}
 setwd(here())
@@ -193,7 +210,7 @@ Okay, as mentioned, the tidyverse contains lots of packages. One of them is **da
 
 The below code chunk simply creates a copy of the LakeHuron dataset and calls it lake_huron_raw. In the next line of code, we print the object by typing its name: `lake_huron_raw.`
 
-Side-note: the `package_name::object` syntax, as in `datasets::LakeHuron`, is R's way of explicitly stating which package the object is coming from. We could have equally have written `lake_huron_raw = LakeHuron`, but, for clarity, it can help to be explicit. This is especially important if the same word is used by multiple packages.
+**Side-note**: the `package_name::object` syntax, as in `datasets::LakeHuron`, is R's way of explicitly stating which package the object is coming from. We could have equally have written `lake_huron_raw = LakeHuron`, but, for clarity, it can help to be explicit. This is especially important if the same word is used by multiple packages.
 
 ```{r}
 #Define new object called lake_huron_raw.
@@ -215,7 +232,7 @@ lake_huron_transformed = lake_huron_raw %>% #use the object defined above
 lake_huron_transformed #look at the transformed data
 ```
 
-Now we have an easier-to-comprehend dataset called `lake_huron` with two columns. I'd like to save it to the folder called "data-processed," which is one level beneath the project file. The [`save()`](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/save) function takes the object to be saved as its first argument and what it will be named on the computer as its second arguments. [A good](https://bookdown.org/ndphillips/YaRrr/rdata-files.html) (not the only) file format with which to save R objects locally is `.Rdata.`
+Now we have an easier-to-comprehend dataset called `lake_huron` with two columns. I'd like to save it to the folder called "data-processed," which is one level beneath the project file. The [`save()`](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/save) function takes the object to be saved as its first argument and what it will be named on the computer as its second argument. [A good](https://bookdown.org/ndphillips/YaRrr/rdata-files.html) (not the only) file format with which to save R objects locally is `.Rdata.`
 
 ```{r}
 library(here)

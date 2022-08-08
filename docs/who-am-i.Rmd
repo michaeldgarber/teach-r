@@ -1,6 +1,6 @@
 ---
 title: "Who am I?"
-author: "Michael Garber, PhD MPH"
+author: "Michael D. Garber, PhD MPH"
 date: "Revised August 5, 2022"
 output: 
   bookdown::html_document2:

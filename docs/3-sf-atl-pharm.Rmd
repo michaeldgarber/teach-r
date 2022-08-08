@@ -1,6 +1,6 @@
 ---
 title: "R for spatial data wrangling: a demo of sf through an example analysis assessing population living near pharmacies in Atlanta"
-author: "Michael Garber, PhD MPH"
+author: "Michael D. Garber, PhD MPH"
 date: "Revised August 4, 2022"
 output:
   html_document:

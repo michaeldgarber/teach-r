@@ -1,0 +1,54 @@
+---
+title: "Managing packages"
+author: "Michael D Garber"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+---
+
+Introduction
+
+R's vast package ecosystem is one reason R is so popular, but packages can also be a source of frustration. Sometimes packages don't load as expected, and sometimes their dependencies on one another can cause code to break. In this module, we'll work through aspects of package management, including how to:
+
+-   check what version of R you're using
+
+-   check what packages are **attached** during the current R session and those that are **loaded** (technically different)
+
+-   check what packages have been downloaded, even if they're not attached or loaded in the current session
+
+-   find where packages are in your computer
+
+-   remove (detach) packages from the current session
+
+-   remove packages from your computer altogether
+
+-   check what packages a package depends on
+
+Resources
+
+<http://www.sthda.com/english/wiki/installing-and-using-r-packages>
+
+# Check R version and packages currently loaded
+
+sessioninfo::
+
+The function sessionInfo(), which comes pre-installed with a "base-R" package called utils, tells you what version of R you're using, the packages that are loaded ("attached") and those that you can use even though they were nyou a lot about your current session, including current R version, One function that gives you a lot of information is sessionInfo.
+
+This tells us that some packages are loaded as part of base R (i.e., when you download R), and some Check R version and what packages are loaded during session
+
+See what packages I have
+
+```{r}
+sessionInfo()
+```
+
+There are a few ways to update packages you already have. You can type update.packages()
+
+```{r, eval=FALSE}
+#update.packages(checkBuilt = T, ask = F)
+```
+
+In RStudio, we can visualize those packages that have been attached (i.e., those that are in the search list) versus all of the packages that we have installed on our computer. Note that the packages that have a check next to them are those that have been installed.
