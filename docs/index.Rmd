@@ -1,7 +1,7 @@
 ---
 title: "R course"
 author: "Michael Garber, PhD MPH"
-date: "Revised August 8, 2022"
+date: "`r Sys.Date()`"
 output: 
   bookdown::html_document2:
     toc: true
@@ -61,7 +61,7 @@ This short course will introduce participants to popular tools in R for manipula
 
     Link for Part 1: <https://michaeldgarber.github.io/teach-r/3-sf-atl-pharm.html>
 
-    Link for Part 2: [https://michaeldgarber.github.io/teach-r/3-sf-atl-pharm-part-2.html](https://michaeldgarber.github.io/teach-r/3-sf-atl-pharm.html){.uri}
+    Link for Part 2: <https://michaeldgarber.github.io/teach-r/3-sf-atl-pharm-part-2.html>
 
 4.  **Making static and interactive maps in R**
 

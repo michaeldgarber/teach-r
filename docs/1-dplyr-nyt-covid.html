@@ -617,7 +617,9 @@ nyt_state_data_mi_pipe = nyt_state_data %&gt;%
 <div id="select" class="section level2" number="4.4">
 <h2><span class="header-section-number">4.4</span> select()</h2>
 <p>Let’s use <code>select()</code> to grab only the <em>date</em> variable. The syntax is to simply state the columns we want.</p>
-<p>Side-note: <code>select()</code> is used by some other packages. To tell R that we want to use the <code>select()</code> function from <strong>dplyr</strong>, specifically, we write <code>dplyr::select()</code>. We can use this syntax for any dplyr verb, e.g. <code>dplyr::mutate()</code> or <code>dplyr::filter()</code>, but <code>select()</code> is the only one where I’ve run into trouble with ambiguity, so I usually leave it off the other ones for brevity. The non-piped version:</p>
+<p>Side-note: <code>select()</code> is used by some other packages. To tell R that we want to use the <code>select()</code> function from <strong>dplyr</strong>, specifically, we use the <code>::</code> operator and write <code>dplyr::select()</code>. We can use this syntax for any dplyr verb, e.g. <code>dplyr::mutate()</code> or <code>dplyr::filter()</code>, but <code>select()</code> is the only one where I frequently encounter conflicts with another package, so I usually leave it off the other ones for brevity.</p>
+<p>Note that technically, the <code>package_name::package_function()</code> syntax can be used for packages that have not been attached via <code>library()</code> but otherwise are loaded via namespace.</p>
+<p>The non-piped version:</p>
 <pre class="r"><code>date = dplyr::select(nyt_state_data, date)</code></pre>
 <p>And the piped version:</p>
 <pre class="r"><code>date_pipe = nyt_state_data %&gt;% 

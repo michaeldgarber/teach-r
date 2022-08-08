@@ -62,7 +62,9 @@ Map one of the socio-demographic variables (median household income) in the Atla
 ```{r}
 tract_ga_wrangle %>% 
   filter(atlanta_metro == 1) %>% 
-  mapview(zcol = "hh_inc_med_E")
+  mapview(
+    layer.name = "Median household income (USD)",
+    zcol = "hh_inc_med_E")
 ```
 
 And do the same steps for the pharmacies.
@@ -197,4 +199,6 @@ tract_fulton_dekalb_linked_summary = tract_fulton_dekalb_linked %>%
 tract_fulton_dekalb_linked_summary
 ```
 
-We estimate that 13% of people live within a half-mile of a pharmacy.
+We estimate that about 13% of people live within a half-mile of a pharmacy.
+
+**Next step**: assess sociodemographic distribution of living near a pharmacy.
