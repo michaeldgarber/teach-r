@@ -98,21 +98,20 @@ tract_ga_wrangle = tract_ga %>%
   dplyr::rename(
     geo_id= GEOID,
     name_tract_county = NAME,
-    pop = popE #to avoid confusion
+    pop = pop_E #simplify 
   ) %>% 
-  #Some resources on coordinate systems:
-  #  https://www.nceas.ucsb.edu/sites/default/files/2020-04/OverviewCoordinateReferenceSystems.pdf
   sf::st_transform(4326) %>% #
   dplyr::mutate(
-    #extract county 5-digit FIPS code
-    #first 2 correspond to state. then the next 3 indicate the county.
+    #Extract county 5-digit FIPS code
+    #first 2 digits of the FIPS code
+    #correspond to state. Then the next 3 indicate the county.
     # Note Fulton is 13121
     # Dekalb is 13089
-    #stringr is a tidyverse package
     county_fips = stringr::str_sub(geo_id, start=1, 5),
     area_4326 = sf::st_area(geometry), #returns area of type "units". 
     #measured in meters squared because of the coordinate system.
-    area_m2 = as.numeric(area_4326) ,#convert to numeric. strip units
+    area_m2 = as.numeric(area_4326), #convert to numeric. strip units
+    
     #indicator for major Atlanta Metro Counties
     atlanta_metro = case_when(
       #character format even though they're numbers, so quote
@@ -126,19 +125,18 @@ tract_ga_wrangle = tract_ga %>%
       ) ~1,
       TRUE ~0)  
   ) %>% 
-  #remove the population margin of error
-  #For fun, convert it to a coordinate system that will output in feet.
-  #https://www.spatialreference.org/ref/epsg/2239/
+  #Convert it to a coordinate system that will output in feet as well.
   #NAD83 / Georgia West (ftUS)
   sf::st_transform(2240) %>% 
   dplyr::mutate(
-    area_2240 = sf::st_area(geometry),
+    area_2240 = sf::st_area(geometry), #square feet
     area_ft2 = as.numeric(area_2240),
     area_mi2 = area_ft2/27878400, #convert to square miles
     #calculate population density
     pop_dens_per_mi2 = pop/area_mi2
   ) %>% 
-  dplyr::select(-popM) 
+  #Remove the margins of error 
+  dplyr::select(-ends_with("_M")) 
 
 #Things to note:
 # st_area and st_transform are functions in the sf package. They can be used together with dplyr.

@@ -201,4 +201,8 @@ tract_fulton_dekalb_linked_summary
 
 We estimate that about 13% of people live within a half-mile of a pharmacy.
 
-**Next step**: assess sociodemographic distribution of living near a pharmacy.
+**Next steps**:
+
+-   Assess sociodemographic distribution of living near a pharmacy.
+
+-   Make informative maps using tmap (<https://mkram01.github.io/EPI563-SpatialEPI/intro-tmap.html>) and compare with mapview, and ggplot2

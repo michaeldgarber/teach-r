@@ -198,7 +198,7 @@ tract_ga_wrangle = tract_ga %>%
   dplyr::rename(
     geo_id= GEOID,
     name_tract_county = NAME,
-    pop = pop_E
+    pop = pop_E #simplify
   ) %>% 
   sf::st_transform(4326) %>% #
   dplyr::mutate(
