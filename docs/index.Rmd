@@ -31,7 +31,7 @@ This short course will introduce participants to popular tools in R for manipula
 
 1.  **Background and set-up**
 
-    This module is a short background module intended for those who have never used R. It describes key terms, shows how to install R and RStudio, and offers some tips for managing projects and files
+    This module is intended for those who have never used R. It describes key terms, shows how to install R and RStudio, and offers some tips for managing projects and files.
 
     Link: <https://michaeldgarber.github.io/teach-r/0-pre-reqs>
 
@@ -39,7 +39,7 @@ This short course will introduce participants to popular tools in R for manipula
 
     R\'s vast package ecosystem provides abundant functionality, but packages can also be a source of frustration if they don't load properly. In this module, we explore some technical details on ways packages are loaded that may facilitate troubleshooting and understanding. We specifically cover the difference between a package being *attached to the search path* versus *loaded via a namespace* and how to check this distinction. We also learn how to remove packages, both from the current session and from the computer altogether. This module has a fair amount of technical detail and need not necessarily be reviewed before proceeding with the main modules.
 
-    <https://michaeldgarber.github.io/teach-r/0-manage-packages.html>
+    Link: <https://michaeldgarber.github.io/teach-r/0-manage-packages.html>
 
 [Main course modules:]{.underline}
 
