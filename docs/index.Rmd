@@ -37,7 +37,7 @@ This short course will introduce participants to popular tools in R for manipula
 
 2.  **Managing packages: attached vs loaded via a namespace and other nuances**
 
-    R\'s vast package ecosystem provides abundant functionality, but packages can also be a source of frustration if they don't load properly. In this module, we explore some technical details on packages that may facilitate troubleshooting and understanding. Topics covered include ways to check what packages are loaded and installed and how to remove packages, both from the current session and from the computer altogether. This module has a fair amount of technical detail and need not necessarily be reviewed before proceeding with the main modules.
+    R\'s vast package ecosystem provides abundant functionality, but packages can also be a source of frustration if they don't load properly. In this module, we explore some technical details on ways packages are loaded that may facilitate troubleshooting and understanding. We specifically cover the difference between a package being *attached to the search path* versus *loaded via a namespace* and how to check this distinction. We also learn how to remove packages, both from the current session and from the computer altogether. This module has a fair amount of technical detail and need not necessarily be reviewed before proceeding with the main modules.
 
     <https://michaeldgarber.github.io/teach-r/0-manage-packages.html>
 
