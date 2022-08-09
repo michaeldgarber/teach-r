@@ -9,6 +9,8 @@ output:
     number_sections: true
 ---
 
+***Please note this module is a work in progress.***
+
 In this module, we compare commonly used techniques to make static and interactive maps. Specifically, we use **tmap**, **mapview**, and **ggplot2**. In previous modules, we have used mapview and ggplot2.
 
 ```{r}
