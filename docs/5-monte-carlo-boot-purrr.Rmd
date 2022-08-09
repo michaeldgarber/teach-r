@@ -1,5 +1,5 @@
 ---
-title: "Monte Carlo Simulations and Boots with the purrr::map_dfr()"
+title: "Monte Carlo simulations and boots with the purrr::map_dfr()"
 author: "Michael D Garber"
 date: "`r Sys.Date()`"
 output:
@@ -38,7 +38,7 @@ Fortunately, we can estimate uncertainty using the computer which largely obviat
 
 ## Monte Carlo simulations
 
-> "Monte Carlo simulation is a method of analysis based on artificially recreating a chance process (usually with a computer), running it many times, and directly observing the results."
+> "Monte Carlo simulation is a method of analysis based on artificially recreating a chance process (usually with a computer), running it many times, and directly observing the results."[@barreto]
 
 An important aspect of a traditional Monte Carlo simulation is that the distribution (i.e., its mean and variance) of each individual source of uncertainty is specified by the analyst. It is not estimated from the data. Monte Carlo simulations are useful to propagate multiple sources of variation throughout an analysis pipeline to assess the impact of all sources of uncertainty on the final result. And, as noted, they're especially helpful compared with traditional (non-computer-based) statistical methods when those sources of variation are correlated with one another.
 
@@ -46,9 +46,9 @@ An important aspect of a traditional Monte Carlo simulation is that the distribu
 
 Monte Carlo simulation in its typical implementation cannot, however, directly estimate the sampling distribution. But bootstrapping can.
 
-> In statistics..., bootstrapping has come to mean to resampling [with replacement] repeatedly and randomly from an original, initial sample using each bootstrapped sample to compute a statistic. The resulting empirical distribution of the statistic is then examined and interpreted as an approximation to the true sampling distribution.
+> "In statistics..., bootstrapping has come to mean to resampling [with replacement] repeatedly and randomly from an original, initial sample using each bootstrapped sample to compute a statistic. The resulting empirical distribution of the statistic is then examined and interpreted as an approximation to the true sampling distribution."[@barreto2005]
 
-The bootstrap was introduced by Brad Efron in the late 1970s. There are many forms of bootstrapping, including ways to bootstrap residuals from regression models.[@efron2016] The most essential is simply re-sampling entire observations from the sample, summarizing each new sample, and using the distribution of those summary statistics to infer the sampling distribution.
+The bootstrap was introduced by Brad Efron in the late 1970s.[@bootstra2022b] There are many forms of bootstrapping, including ways to bootstrap residuals from regression models.[@efron2016] The most essential is simply re-sampling entire observations from the sample, summarizing each new sample, and using the distribution of those summary statistics to infer the sampling distribution.
 
 It is certainly similar to Monte Carlo techniques and might be viewed as a subset thereof. The key difference is that the bootstrap estimates a distribution using data we have, and the Monte Carlo technique described above
 
@@ -56,7 +56,7 @@ It is certainly similar to Monte Carlo techniques and might be viewed as a subse
 
 ## Monte Carlo simulation
 
-Suppose we have a state with 100 counties. We simulate one single dataset, specifying that the mean county population is 1,000 and the probability of the a demographic variable (dem) is 0.5. The prevalence (`prev`)depends in part on pop and dem, and the number of cases in the county is estimated from pop and prev.
+Suppose we have a state with 100 counties. We simulate one single dataset, specifying that the mean county population is 1,000 and the probability of a binary demographic variable (`dem`; say urban versus rural) is 0.5. The prevalence (`prev`) depends in part on `pop` and `dem`, and the number of cases in the county is estimated from `pop` and `prev`.
 
 ```{r, message=FALSE}
 library(tidyverse)
@@ -67,9 +67,9 @@ monte_carlo_sim_frozen = 1:100 %>%
   rename(county_id = value) %>% 
   mutate(
     state = 1,
-    pop = rpois(n=n(), lambda=10000), #mean = var=1000
-    dem = rbinom(n=n(), size=1, prob =.5),
-    prev = rtruncnorm(
+    pop = rpois(n=n(), lambda=10000), #poisson dist. mean = var=1000
+    dem = rbinom(n=n(), size=1, prob =.5), #binomial dist.
+    prev = rtruncnorm( #truncated normal
       n=n(), 
       a=0, 
       b=1,
@@ -81,21 +81,30 @@ monte_carlo_sim_frozen = 1:100 %>%
 monte_carlo_sim_frozen
 ```
 
-What is the mean and standard deviation number of cases per county?
+What is the mean and standard deviation number of cases per county? Note we have not run any replications yet. This is just *one iteration* of the theoretical dataset of counties in a state.
 
 ```{r}
 monte_carlo_sim_frozen %>% 
   group_by(state) %>% 
   summarise(
     n_cases_mean = mean(n_cases),
-    n_cases_sd = sd(n_cases))
+    n_cases_sd = sd(n_cases)) %>% 
+  ungroup()
+```
+
+What is the distribution of the number of cases between counties in the state for this one replication?
+
+```{r}
+monte_carlo_sim_frozen %>% 
+  ggplot(aes(n_cases))+
+  geom_histogram()
 ```
 
 ### Define a function for replications
 
-Now let's randomly vary some things based on the frozen dataset. That dataset itself was created randomly, but let's pretend that it is frozen and not changing now. In this code, we will create a function that will create new variables that will change.
+Now let's randomly vary values of the variables over several replications. In this code, we will create a function that will create new variables that will change.
 
-Create a function for the creation of this dataset, run it 500 times, and find the mean of the means over those 500 iterations. The argument for this function is `rep_id_val`. I create a new variable called `rep_id`, and in each iteration, that variable takes `rep_id_val`.
+Create a function for the creation of this dataset, run it 500 times, and find the mean of the means over those 500 iterations. The argument our function takes is `rep_id_val`. Its value is in the `mutate()` step to create a variable called `rep_id`.
 
 ```{r}
 monte_carlo_sim_fun = function(rep_id_val){
@@ -118,7 +127,7 @@ monte_carlo_sim_fun = function(rep_id_val){
 }
 ```
 
-Define the number of replications. We are creating an integer vector to be iterated through.
+Define the number of replications. Here, we are creating an integer vector ranging from 1 to 500.
 
 ```{r}
 rep_id_val_list = 1:500
@@ -127,7 +136,9 @@ class(rep_id_val_list)
 
 ### Run the replications
 
-Simulate 500 versions of this state, each time generating new counties randomly varying according to the distribution above. We use `map_dfr()` from the purrr package to run th code and then stack the results on top of one another. Note the unusual structure of this code. The function we created above, `monte_carlo_sim_fun(),` is inside `map_dfr()`, and the list of replication ids, `rep_id_val_list,` begins the pipe sequence.
+Simulate 500 versions of this state. In each replication, the values for the variables `pop`, `dem`, `prev`, and `n_cases` randomly vary according to their specified distribution. We use `map_dfr()` from the [purrr](https://purrr.tidyverse.org/) package to run the simulation and then stack the results on top of one another, akin to `mutate::bind_rows()`.
+
+Take note the unusual structure of this code. The function we created above, `monte_carlo_sim_fun(),` is inside `map_dfr()`, and the list of replication ids, `rep_id_val_list,` begins the pipe sequence.
 
 ```{r}
 library(purrr) #make sure it's attached
@@ -156,7 +167,7 @@ n_distinct(monte_carlo_sim_lots$rep_id)
 
 ### Summarize results
 
-What's the distribution of `n_cases_mean` over Monte Carlo replications?
+What's the distribution of `n_cases_mean` over Monte Carlo replications? This is not the variability of the number of cases within the state between counties but rather the variability of the mean number of county-level cases for the state between replications.
 
 ```{r}
 monte_carlo_sim_lots %>% 
@@ -164,11 +175,11 @@ monte_carlo_sim_lots %>%
   summarise(
     n_cases_mean = mean(n_cases),
     n_cases_sd = sd(n_cases)) %>% 
-  ggplot(aes( n_cases_mean))+
+  ggplot(aes(n_cases_mean))+
   geom_histogram()
 ```
 
-What is the 2.5th, 50th (median), and 97.5th percentile of the mean number of cases for each county? This could be used to report a confidence interval around the estimated median number of cases.
+What is the 2.5th, 50th (median), and 97.5th percentile of the mean number of cases between replications? This could be used to report a confidence interval around that estimated mean.
 
 ```{r}
 monte_carlo_sim_lots %>% 
@@ -187,7 +198,7 @@ monte_carlo_sim_lots %>%
 
 ## Bootstrap
 
-Now let's bootstrap `monte_carlo_sim_frozen`, again supposing that even though it was generated randomly, it is now frozen in sample and can be viewed as a single sample. We will then re-sample it **with replacement** with sampling probability of 1, meaning all rows will be re-sampled. This means that, in a given sample, some counties will repeat, and some will not appear at all.
+Now let's bootstrap `monte_carlo_sim_frozen`, again supposing that even though it was generated randomly, it is now viewed as a single frozen sample - the one we drew and have access to. We can estimate the sampling distribution by re-sampling it **with replacement** with sampling probability of 1, meaning all rows will be re-sampled. This means that, in a given sample, some counties will repeat, and some will not appear at all.
 
 Here's one example:
 
@@ -223,7 +234,7 @@ boot_fun = function(rep_id_val){
 
 ### Run the replications
 
-Simulate 500 versions of this state, each time generating new counties randomly varying according to the distribution above. We use `map_dfr()` from the purrr package to run the function and then stack the results on top of one another. Note the unusual structure of this code. The function we created above, `monte_carlo_sim_fun(),` is inside `map_dfr()`, and the list of replication ids, `rep_id_val_list,` begins the pipe sequence.
+Simulate 500 versions of this re-sampling. We again use `map_dfr()` from the purrr package to run the function and then stack the results on top of one another. Note the unusual structure of this code. The function we created above, `monte_carlo_sim_fun(),` is inside `map_dfr()`, and the list of replication ids, `rep_id_val_list,` begins the pipe sequence.
 
 ```{r}
 boot_lots  = rep_id_val_list %>% 
@@ -248,6 +259,8 @@ boot_lots %>%
   geom_histogram()
 ```
 
+We can use the empirical distribution of resampled results to estimate a confidence interval for the sampling distribution. This is a confidence interval for the estimated mean number of cases in the state
+
 ```{r}
 boot_lots %>% 
   group_by(rep_id,state) %>% #group by both rep id and state
@@ -262,6 +275,8 @@ boot_lots %>%
     ) %>% 
   ungroup()
 ```
+
+# Summary of Monte Carlo simulations and bootstrapping
 
 Advantages of these computation-based simulation methods
 

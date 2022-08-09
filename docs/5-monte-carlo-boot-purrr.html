@@ -404,7 +404,7 @@ div.tocify {
 <div id="monte-carlo-simulations" class="section level2" number="3.1">
 <h2><span class="header-section-number">3.1</span> Monte Carlo simulations</h2>
 <blockquote>
-<p>“Monte Carlo simulation is a method of analysis based on artificially recreating a chance process (usually with a computer), running it many times, and directly observing the results.”</p>
+<p>“Monte Carlo simulation is a method of analysis based on artificially recreating a chance process (usually with a computer), running it many times, and directly observing the results.”<span class="citation"><sup><a href="#ref-barreto" role="doc-biblioref">4</a></sup></span></p>
 </blockquote>
 <p>An important aspect of a traditional Monte Carlo simulation is that the distribution (i.e., its mean and variance) of each individual source of uncertainty is specified by the analyst. It is not estimated from the data. Monte Carlo simulations are useful to propagate multiple sources of variation throughout an analysis pipeline to assess the impact of all sources of uncertainty on the final result. And, as noted, they’re especially helpful compared with traditional (non-computer-based) statistical methods when those sources of variation are correlated with one another.</p>
 </div>
@@ -412,9 +412,9 @@ div.tocify {
 <h2><span class="header-section-number">3.2</span> Bootstrapping</h2>
 <p>Monte Carlo simulation in its typical implementation cannot, however, directly estimate the sampling distribution. But bootstrapping can.</p>
 <blockquote>
-<p>In statistics…, bootstrapping has come to mean to resampling [with replacement] repeatedly and randomly from an original, initial sample using each bootstrapped sample to compute a statistic. The resulting empirical distribution of the statistic is then examined and interpreted as an approximation to the true sampling distribution.</p>
+<p>“In statistics…, bootstrapping has come to mean to resampling [with replacement] repeatedly and randomly from an original, initial sample using each bootstrapped sample to compute a statistic. The resulting empirical distribution of the statistic is then examined and interpreted as an approximation to the true sampling distribution.”<span class="citation"><sup><a href="#ref-barreto2005" role="doc-biblioref">5</a></sup></span></p>
 </blockquote>
-<p>The bootstrap was introduced by Brad Efron in the late 1970s. There are many forms of bootstrapping, including ways to bootstrap residuals from regression models.<span class="citation"><sup><a href="#ref-efron2016" role="doc-biblioref">4</a></sup></span> The most essential is simply re-sampling entire observations from the sample, summarizing each new sample, and using the distribution of those summary statistics to infer the sampling distribution.</p>
+<p>The bootstrap was introduced by Brad Efron in the late 1970s.<span class="citation"><sup><a href="#ref-bootstra2022b" role="doc-biblioref">6</a></sup></span> There are many forms of bootstrapping, including ways to bootstrap residuals from regression models.<span class="citation"><sup><a href="#ref-efron2016" role="doc-biblioref">7</a></sup></span> The most essential is simply re-sampling entire observations from the sample, summarizing each new sample, and using the distribution of those summary statistics to infer the sampling distribution.</p>
 <p>It is certainly similar to Monte Carlo techniques and might be viewed as a subset thereof. The key difference is that the bootstrap estimates a distribution using data we have, and the Monte Carlo technique described above</p>
 </div>
 </div>
@@ -422,7 +422,7 @@ div.tocify {
 <h1><span class="header-section-number">4</span> Example code for each method using <code>purrr::map_dfr()</code></h1>
 <div id="monte-carlo-simulation" class="section level2" number="4.1">
 <h2><span class="header-section-number">4.1</span> Monte Carlo simulation</h2>
-<p>Suppose we have a state with 100 counties. We simulate one single dataset, specifying that the mean county population is 1,000 and the probability of the a demographic variable (dem) is 0.5. The prevalence (<code>prev</code>)depends in part on pop and dem, and the number of cases in the county is estimated from pop and prev.</p>
+<p>Suppose we have a state with 100 counties. We simulate one single dataset, specifying that the mean county population is 1,000 and the probability of a binary demographic variable (<code>dem</code>; say urban versus rural) is 0.5. The prevalence (<code>prev</code>) depends in part on <code>pop</code> and <code>dem</code>, and the number of cases in the county is estimated from <code>pop</code> and <code>prev</code>.</p>
 <pre class="r"><code>library(tidyverse)
 library(truncnorm)
 set.seed(11)#set the seed so this dataset is always the same.
@@ -431,9 +431,9 @@ monte_carlo_sim_frozen = 1:100 %&gt;%
   rename(county_id = value) %&gt;% 
   mutate(
     state = 1,
-    pop = rpois(n=n(), lambda=10000), #mean = var=1000
-    dem = rbinom(n=n(), size=1, prob =.5),
-    prev = rtruncnorm(
+    pop = rpois(n=n(), lambda=10000), #poisson dist. mean = var=1000
+    dem = rbinom(n=n(), size=1, prob =.5), #binomial dist.
+    prev = rtruncnorm( #truncated normal
       n=n(), 
       a=0, 
       b=1,
@@ -458,20 +458,27 @@ monte_carlo_sim_frozen</code></pre>
 ## 10        10     1  9995     0 0.281    2804
 ## # … with 90 more rows
 ## # ℹ Use `print(n = ...)` to see more rows</code></pre>
-<p>What is the mean and standard deviation number of cases per county?</p>
+<p>What is the mean and standard deviation number of cases per county? Note we have not run any replications yet. This is just <em>one iteration</em> of the theoretical dataset of counties in a state.</p>
 <pre class="r"><code>monte_carlo_sim_frozen %&gt;% 
   group_by(state) %&gt;% 
   summarise(
     n_cases_mean = mean(n_cases),
-    n_cases_sd = sd(n_cases))</code></pre>
+    n_cases_sd = sd(n_cases)) %&gt;% 
+  ungroup()</code></pre>
 <pre><code>## # A tibble: 1 × 3
 ##   state n_cases_mean n_cases_sd
 ##   &lt;dbl&gt;        &lt;dbl&gt;      &lt;dbl&gt;
 ## 1     1        3512.       736.</code></pre>
+<p>What is the distribution of the number of cases between counties in the state for this one replication?</p>
+<pre class="r"><code>monte_carlo_sim_frozen %&gt;% 
+  ggplot(aes(n_cases))+
+  geom_histogram()</code></pre>
+<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="5-monte-carlo-boot-purrr_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
 <div id="define-a-function-for-replications" class="section level3" number="4.1.1">
 <h3><span class="header-section-number">4.1.1</span> Define a function for replications</h3>
-<p>Now let’s randomly vary some things based on the frozen dataset. That dataset itself was created randomly, but let’s pretend that it is frozen and not changing now. In this code, we will create a function that will create new variables that will change.</p>
-<p>Create a function for the creation of this dataset, run it 500 times, and find the mean of the means over those 500 iterations. The argument for this function is <code>rep_id_val</code>. I create a new variable called <code>rep_id</code>, and in each iteration, that variable takes <code>rep_id_val</code>.</p>
+<p>Now let’s randomly vary values of the variables over several replications. In this code, we will create a function that will create new variables that will change.</p>
+<p>Create a function for the creation of this dataset, run it 500 times, and find the mean of the means over those 500 iterations. The argument our function takes is <code>rep_id_val</code>. Its value is in the <code>mutate()</code> step to create a variable called <code>rep_id</code>.</p>
 <pre class="r"><code>monte_carlo_sim_fun = function(rep_id_val){
   monte_carlo_sim_df = 1:100 %&gt;% 
     as_tibble() %&gt;% 
@@ -490,14 +497,15 @@ monte_carlo_sim_frozen</code></pre>
     rep_id = rep_id_val  #add replication ID
   )
 }</code></pre>
-<p>Define the number of replications. We are creating an integer vector to be iterated through.</p>
+<p>Define the number of replications. Here, we are creating an integer vector ranging from 1 to 500.</p>
 <pre class="r"><code>rep_id_val_list = 1:500
 class(rep_id_val_list)</code></pre>
 <pre><code>## [1] &quot;integer&quot;</code></pre>
 </div>
 <div id="run-the-replications" class="section level3" number="4.1.2">
 <h3><span class="header-section-number">4.1.2</span> Run the replications</h3>
-<p>Simulate 500 versions of this state, each time generating new counties randomly varying according to the distribution above. We use <code>map_dfr()</code> from the purrr package to run th code and then stack the results on top of one another. Note the unusual structure of this code. The function we created above, <code>monte_carlo_sim_fun(),</code> is inside <code>map_dfr()</code>, and the list of replication ids, <code>rep_id_val_list,</code> begins the pipe sequence.</p>
+<p>Simulate 500 versions of this state. In each replication, the values for the variables <code>pop</code>, <code>dem</code>, <code>prev</code>, and <code>n_cases</code> randomly vary according to their specified distribution. We use <code>map_dfr()</code> from the <a href="https://purrr.tidyverse.org/">purrr</a> package to run the simulation and then stack the results on top of one another, akin to <code>mutate::bind_rows()</code>.</p>
+<p>Take note the unusual structure of this code. The function we created above, <code>monte_carlo_sim_fun(),</code> is inside <code>map_dfr()</code>, and the list of replication ids, <code>rep_id_val_list,</code> begins the pipe sequence.</p>
 <pre class="r"><code>library(purrr) #make sure it&#39;s attached
 set.seed(NULL) #allow it to vary differently each time.
 monte_carlo_sim_lots  = rep_id_val_list %&gt;% 
@@ -507,16 +515,16 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 <pre><code>## # A tibble: 50,000 × 7
 ##    county_id state   pop   dem  prev n_cases rep_id
 ##        &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt;   &lt;int&gt;  &lt;int&gt;
-##  1         1     1  9685     0 0.278    2688      1
-##  2         2     1 10215     1 0.461    4712      1
-##  3         3     1  9916     1 0.392    3889      1
-##  4         4     1  9944     1 0.356    3538      1
-##  5         5     1  9976     1 0.466    4647      1
-##  6         6     1 10030     1 0.398    3995      1
-##  7         7     1  9859     0 0.260    2566      1
-##  8         8     1  9894     1 0.459    4545      1
-##  9         9     1 10055     1 0.440    4424      1
-## 10        10     1  9974     0 0.115    1145      1
+##  1         1     1 10012     0 0.148    1486      1
+##  2         2     1 10064     0 0.287    2890      1
+##  3         3     1 10023     0 0.352    3528      1
+##  4         4     1  9816     0 0.279    2741      1
+##  5         5     1  9897     0 0.369    3647      1
+##  6         6     1  9959     1 0.391    3892      1
+##  7         7     1  9961     0 0.347    3454      1
+##  8         8     1 10079     0 0.323    3260      1
+##  9         9     1  9843     1 0.292    2870      1
+## 10        10     1  9930     0 0.280    2783      1
 ## # … with 49,990 more rows
 ## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 <p>How many rows?</p>
@@ -528,19 +536,19 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 </div>
 <div id="summarize-results" class="section level3" number="4.1.3">
 <h3><span class="header-section-number">4.1.3</span> Summarize results</h3>
-<p>What’s the distribution of <code>n_cases_mean</code> over Monte Carlo replications?</p>
+<p>What’s the distribution of <code>n_cases_mean</code> over Monte Carlo replications? This is not the variability of the number of cases within the state between counties but rather the variability of the mean number of county-level cases for the state between replications.</p>
 <pre class="r"><code>monte_carlo_sim_lots %&gt;% 
   group_by(rep_id,state) %&gt;% 
   summarise(
     n_cases_mean = mean(n_cases),
     n_cases_sd = sd(n_cases)) %&gt;% 
-  ggplot(aes( n_cases_mean))+
+  ggplot(aes(n_cases_mean))+
   geom_histogram()</code></pre>
 <pre><code>## `summarise()` has grouped output by &#39;rep_id&#39;. You can override using the
 ## `.groups` argument.
 ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
-<p><img src="5-monte-carlo-boot-purrr_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
-<p>What is the 2.5th, 50th (median), and 97.5th percentile of the mean number of cases for each county? This could be used to report a confidence interval around the estimated median number of cases.</p>
+<p><img src="5-monte-carlo-boot-purrr_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p>What is the 2.5th, 50th (median), and 97.5th percentile of the mean number of cases between replications? This could be used to report a confidence interval around that estimated mean.</p>
 <pre class="r"><code>monte_carlo_sim_lots %&gt;% 
   group_by(rep_id,state) %&gt;% #group by both rep id and state
   summarise(
@@ -558,12 +566,12 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 <pre><code>## # A tibble: 1 × 4
 ##   state n_cases_mean_ll n_cases_mean_med n_cases_mean_ul
 ##   &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;           &lt;dbl&gt;
-## 1     1           3286.            3493.           3698.</code></pre>
+## 1     1           3305.            3495.           3704.</code></pre>
 </div>
 </div>
 <div id="bootstrap" class="section level2" number="4.2">
 <h2><span class="header-section-number">4.2</span> Bootstrap</h2>
-<p>Now let’s bootstrap <code>monte_carlo_sim_frozen</code>, again supposing that even though it was generated randomly, it is now frozen in sample and can be viewed as a single sample. We will then re-sample it <strong>with replacement</strong> with sampling probability of 1, meaning all rows will be re-sampled. This means that, in a given sample, some counties will repeat, and some will not appear at all.</p>
+<p>Now let’s bootstrap <code>monte_carlo_sim_frozen</code>, again supposing that even though it was generated randomly, it is now viewed as a single frozen sample - the one we drew and have access to. We can estimate the sampling distribution by re-sampling it <strong>with replacement</strong> with sampling probability of 1, meaning all rows will be re-sampled. This means that, in a given sample, some counties will repeat, and some will not appear at all.</p>
 <p>Here’s one example:</p>
 <pre class="r"><code>monte_carlo_sim_one_boot = monte_carlo_sim_frozen %&gt;% 
   slice_sample(prop=1,replace=TRUE)</code></pre>
@@ -572,23 +580,23 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 <pre><code>## # A tibble: 100 × 6
 ##    county_id state   pop   dem  prev n_cases
 ##        &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt;   &lt;int&gt;
-##  1        19     1 10000     0 0.439    4385
-##  2        37     1 10021     1 0.375    3760
-##  3        96     1  9936     0 0.432    4291
-##  4        58     1 10015     0 0.206    2063
-##  5        31     1 10002     0 0.274    2735
-##  6        61     1  9910     1 0.468    4636
-##  7        54     1 10045     0 0.349    3504
-##  8        44     1  9948     0 0.306    3047
-##  9        95     1  9891     0 0.283    2795
-## 10         5     1 10132     0 0.297    3005
+##  1        65     1  9910     0 0.331    3280
+##  2        64     1  9909     0 0.347    3437
+##  3        46     1  9915     0 0.317    3147
+##  4        26     1  9913     1 0.336    3334
+##  5        68     1 10085     0 0.373    3760
+##  6        72     1 10051     0 0.216    2172
+##  7        61     1  9910     1 0.468    4636
+##  8        67     1 10035     1 0.459    4605
+##  9        57     1  9956     1 0.414    4120
+## 10        47     1  9904     0 0.278    2753
 ## # … with 90 more rows
 ## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 <p>As expected, we have the same number of rows, but fewer unique values for <code>county_id.</code> Some are repeating.</p>
 <pre class="r"><code>nrow(monte_carlo_sim_one_boot)</code></pre>
 <pre><code>## [1] 100</code></pre>
 <pre class="r"><code>n_distinct(monte_carlo_sim_one_boot$county_id)</code></pre>
-<pre><code>## [1] 61</code></pre>
+<pre><code>## [1] 65</code></pre>
 <p>Repeat this bootstrap procedure 500 times by first writing a function and then iterating replications through that function using <code>purrr::map_dfr()</code></p>
 <div id="define-a-function-for-replications-1" class="section level3" number="4.2.1">
 <h3><span class="header-section-number">4.2.1</span> Define a function for replications</h3>
@@ -600,7 +608,7 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 </div>
 <div id="run-the-replications-1" class="section level3" number="4.2.2">
 <h3><span class="header-section-number">4.2.2</span> Run the replications</h3>
-<p>Simulate 500 versions of this state, each time generating new counties randomly varying according to the distribution above. We use <code>map_dfr()</code> from the purrr package to run the function and then stack the results on top of one another. Note the unusual structure of this code. The function we created above, <code>monte_carlo_sim_fun(),</code> is inside <code>map_dfr()</code>, and the list of replication ids, <code>rep_id_val_list,</code> begins the pipe sequence.</p>
+<p>Simulate 500 versions of this re-sampling. We again use <code>map_dfr()</code> from the purrr package to run the function and then stack the results on top of one another. Note the unusual structure of this code. The function we created above, <code>monte_carlo_sim_fun(),</code> is inside <code>map_dfr()</code>, and the list of replication ids, <code>rep_id_val_list,</code> begins the pipe sequence.</p>
 <pre class="r"><code>boot_lots  = rep_id_val_list %&gt;% 
   map_dfr(boot_fun) </code></pre>
 </div>
@@ -610,16 +618,16 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 <pre><code>## # A tibble: 50,000 × 7
 ##    county_id state   pop   dem  prev n_cases rep_id
 ##        &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt;   &lt;int&gt;  &lt;int&gt;
-##  1        19     1 10000     0 0.439    4385      1
-##  2        76     1 10019     0 0.345    3458      1
-##  3        15     1  9842     0 0.274    2692      1
-##  4        70     1  9897     1 0.398    3936      1
-##  5        67     1 10035     1 0.459    4605      1
-##  6        84     1 10247     0 0.320    3282      1
-##  7        22     1  9901     1 0.408    4036      1
-##  8        72     1 10051     0 0.216    2172      1
-##  9        70     1  9897     1 0.398    3936      1
-## 10        54     1 10045     0 0.349    3504      1
+##  1        26     1  9913     1 0.336    3334      1
+##  2        28     1 10154     1 0.439    4454      1
+##  3         8     1  9995     1 0.514    5134      1
+##  4        47     1  9904     0 0.278    2753      1
+##  5        88     1 10059     1 0.341    3428      1
+##  6        11     1  9885     1 0.391    3868      1
+##  7        40     1  9936     0 0.261    2591      1
+##  8        52     1  9995     0 0.218    2178      1
+##  9        21     1  9985     0 0.238    2377      1
+## 10        35     1  9781     0 0.332    3244      1
 ## # … with 49,990 more rows
 ## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 <p>What’s the distribution of <code>n_cases_mean</code> over bootstrap replications?</p>
@@ -633,7 +641,8 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 <pre><code>## `summarise()` has grouped output by &#39;rep_id&#39;. You can override using the
 ## `.groups` argument.
 ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
-<p><img src="5-monte-carlo-boot-purrr_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<p><img src="5-monte-carlo-boot-purrr_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+<p>We can use the empirical distribution of resampled results to estimate a confidence interval for the sampling distribution. This is a confidence interval for the estimated mean number of cases in the state</p>
 <pre class="r"><code>boot_lots %&gt;% 
   group_by(rep_id,state) %&gt;% #group by both rep id and state
   summarise(
@@ -651,7 +660,12 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 <pre><code>## # A tibble: 1 × 4
 ##   state n_cases_mean_ll n_cases_mean_med n_cases_mean_ul
 ##   &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;           &lt;dbl&gt;
-## 1     1           3367.            3512.           3638.</code></pre>
+## 1     1           3362.            3515.           3650.</code></pre>
+</div>
+</div>
+</div>
+<div id="summary-of-monte-carlo-simulations-and-bootstrapping" class="section level1" number="5">
+<h1><span class="header-section-number">5</span> Summary of Monte Carlo simulations and bootstrapping</h1>
 <p>Advantages of these computation-based simulation methods</p>
 <ul>
 <li><p>Makes explicit where the variation is coming from and aids in intuition.</p></li>
@@ -669,8 +683,6 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 <li>Summarize the distribution of the results. Conventionally, take the median, 2.5th, and 97.5th percentile.</li>
 </ol>
 </div>
-</div>
-</div>
 <div id="references" class="section level1 unnumbered">
 <h1><strong>References</strong></h1>
 <div id="refs" class="references csl-bib-body">
@@ -683,8 +695,17 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 <div id="ref-garber2022" class="csl-entry">
 <div class="csl-left-margin">3. </div><div class="csl-right-inline">Garber MD, Flanders WD, Watkins KE, Lobelo RLF, Kramer MR, McCullough LE. Have paved trails and protected bike lanes led to more bicycling in atlanta? A generalized synthetic-control analysis. <em>Epidemiology</em>. 2022;33(4):493-504. doi:<a href="https://doi.org/10.1097/EDE.0000000000001483">10.1097/EDE.0000000000001483</a></div>
 </div>
+<div id="ref-barreto" class="csl-entry">
+<div class="csl-left-margin">4. </div><div class="csl-right-inline">Barreto H, Howland FM. Chapter 9: Monte Carlo Simulation. <a href="https://www.cambridge.org/us/academic/subjects/economics/econometrics-statistics-and-mathematical-economics/introductory-econometrics-using-monte-carlo-simulation-microsoft-excel, https://www.cambridge.org/us/academic/subjects/economics/econometrics-statistics-and-mathematical-economics">https://www.cambridge.org/us/academic/subjects/economics/econometrics-statistics-and-mathematical-economics/introductory-econometrics-using-monte-carlo-simulation-microsoft-excel, https://www.cambridge.org/us/academic/subjects/economics/econometrics-statistics-and-mathematical-economics</a></div>
+</div>
+<div id="ref-barreto2005" class="csl-entry">
+<div class="csl-left-margin">5. </div><div class="csl-right-inline">Barreto H, Howland FM. Chapter 23: Bootstrap. In:; 2005. <a href="http://www3.wabash.edu/econometrics/EconometricsBook/chap23.htm">http://www3.wabash.edu/econometrics/EconometricsBook/chap23.htm</a></div>
+</div>
+<div id="ref-bootstra2022b" class="csl-entry">
+<div class="csl-left-margin">6. </div><div class="csl-right-inline">Bootstrapping (statistics). Published online July 24, 2022. <a href="https://en.wikipedia.org/w/index.php?title=Bootstrapping_(statistics)&amp;oldid=1100235056">https://en.wikipedia.org/w/index.php?title=Bootstrapping_(statistics)&amp;oldid=1100235056</a></div>
+</div>
 <div id="ref-efron2016" class="csl-entry">
-<div class="csl-left-margin">4. </div><div class="csl-right-inline">Efron B, Hastie T. <em>Computer Age Statistical Inference: Algorithms, Evidence, and Data Science</em>. Cambridge University Press; 2016.</div>
+<div class="csl-left-margin">7. </div><div class="csl-right-inline">Efron B, Hastie T. <em>Computer Age Statistical Inference: Algorithms, Evidence, and Data Science</em>. Cambridge University Press; 2016.</div>
 </div>
 </div>
 </div>

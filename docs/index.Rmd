@@ -71,9 +71,9 @@ This short course will introduce participants to popular tools in R for manipula
 
 5.  **Monte Carlo simulations and boots with the purrr::map_dfr()**
 
-    Creating your own functions can help reduce tedious and error-prone repetition in code. Functions can also be used to iteratively modify steps in the data analysis to estimate uncertainty of results through Monte Carlo techniques and bootstrap resampling. This module will motivate, describe, and provide demo examples of Monte Carlo simulations and bootstrapping using map_dfr() from purrr.
+    Creating your own functions can help reduce tedious and error-prone repetition in code. Functions can also be used to iteratively modify steps in the data analysis to estimate uncertainty of results through Monte Carlo simulation techniques and bootstrap resampling. This module will motivate, describe, and provide demo examples of Monte Carlo simulations and bootstrapping using `map_dfr()` from purrr.
 
-    Link TBD
+    Link: <https://michaeldgarber.github.io/teach-r/5-monte-carlo-boot-purrr.html>
 
 <br />
 
