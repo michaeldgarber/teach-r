@@ -99,7 +99,7 @@ tmap_mode("view") #run again just in case it was changed above.
 qtm(tract_fulton_dekalb)
 ```
 
-### Customize qtm
+### Customize `qtm()`
 
 All of the options for customization can be found here: <https://rdrr.io/cran/tmap/man/qtm.html>
 
@@ -135,7 +135,7 @@ qtm(tract_fulton_dekalb, "h_val_med_E")
 
 ## More customization using `tmap()` 
 
-## Adding multiple objects
+### Adding multiple objects using `tmap()`
 
 Static plot
 
