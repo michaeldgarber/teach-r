@@ -16,9 +16,9 @@ link-citations: true
 
 # Learning objectives
 
--   Provide a working definition of Monte Carlo simulations and bootstrapping
+-   Provide a working definition of Monte Carlo simulations and bootstrapping.
 
--   Perform a simple version of each using R
+-   Perform each using R.
 
 # Motivation
 
@@ -69,16 +69,23 @@ monte_carlo_sim_frozen = 1:100 %>%
     state = 1,
     pop = rpois(n=n(), lambda=10000), #poisson dist. mean = var=1000
     dem = rbinom(n=n(), size=1, prob =.5), #binomial dist.
-    prev = rtruncnorm( #truncated normal
+    prev = rtruncnorm( #truncated normal so prevalence is bounded by 0,1
       n=n(), 
       a=0, 
       b=1,
-      mean=.2+(pop/100000)+(dem/10),
-      sd=0.05),
+      mean=0.05+(pop/50000)+(dem/10),
+      sd=0.05 +(pop/200000)+(dem/40)),
     n_cases = as.integer(pop*prev),
   )
 
 monte_carlo_sim_frozen
+```
+
+Note that population `pop` and `prev` are correlated. That is, they're not independent from one another, so when estimating variability of their product, `n_cases`, that correlation should be considered.
+
+```{r}
+cor(monte_carlo_sim_frozen$pop,
+     monte_carlo_sim_frozen$prev)
 ```
 
 What is the mean and standard deviation number of cases per county? Note we have not run any replications yet. This is just *one iteration* of the theoretical dataset of counties in a state.
@@ -102,7 +109,7 @@ monte_carlo_sim_frozen %>%
 
 ### Define a function for replications
 
-Now let's randomly vary values of the variables over several replications. In this code, we will create a function that will create new variables that will change.
+Now let's randomly vary values of the variables over several replications. In this code, we will create a function that will create new variables that will change. Functions are described in the [functions chapter](https://r4ds.had.co.nz/functions.html#functions) of R 4 Data Science. At the end of this module, I have another example of how to use a function in a dplyr pipe.
 
 Create a function for the creation of this dataset, run it 500 times, and find the mean of the means over those 500 iterations. The argument our function takes is `rep_id_val`. Its value is in the `mutate()` step to create a variable called `rep_id`.
 
@@ -119,15 +126,22 @@ monte_carlo_sim_fun = function(rep_id_val){
         n=n(), 
         a=0, 
         b=1,
-        mean=.2+(pop/100000)+(dem/10),
-        sd=0.05+(pop/400000)+(dem/40)),
+        mean=0.05+(pop/50000)+(dem/10),
+        sd=0.05 +(pop/200000)+(dem/40)),
     n_cases = as.integer(pop*prev),
     rep_id = rep_id_val  #add replication ID
   )
 }
 ```
 
-Define the number of replications. Here, we are creating an integer vector ranging from 1 to 500.
+To see how the function works, run one iteration of it:
+
+```{r}
+monte_carlo_sim_once = monte_carlo_sim_fun(rep_id_val = 5)
+monte_carlo_sim_once
+```
+
+Now let's run the function lots of times. Define the number of replications. Here, we are creating an integer vector ranging from 1 to 500.
 
 ```{r}
 rep_id_val_list = 1:500
@@ -182,7 +196,7 @@ monte_carlo_sim_lots %>%
 What is the 2.5th, 50th (median), and 97.5th percentile of the mean number of cases between replications? This could be used to report a confidence interval around that estimated mean.
 
 ```{r}
-monte_carlo_sim_lots %>% 
+monte_carlo_sim_lots_summary = monte_carlo_sim_lots %>% 
   group_by(rep_id,state) %>% #group by both rep id and state
   summarise(
     n_cases_mean = mean(n_cases),
@@ -193,7 +207,10 @@ monte_carlo_sim_lots %>%
     n_cases_mean_med = quantile(n_cases_mean, probs = 0.5, na.rm=TRUE),
     n_cases_mean_ul = quantile(n_cases_mean, probs = 0.975, na.rm=TRUE)
     ) %>% 
-  ungroup()
+  ungroup() %>% 
+  mutate(simulation_type = "monte-carlo")
+
+monte_carlo_sim_lots_summary
 ```
 
 ## Bootstrap
@@ -259,10 +276,10 @@ boot_lots %>%
   geom_histogram()
 ```
 
-We can use the empirical distribution of resampled results to estimate a confidence interval for the sampling distribution. This is a confidence interval for the estimated mean number of cases in the state
+We can use the empirical distribution of resampled results to estimate a confidence interval for the sampling distribution. This is a confidence interval for the estimated mean number of cases in the state:
 
 ```{r}
-boot_lots %>% 
+boot_lots_summary = boot_lots %>% 
   group_by(rep_id,state) %>% #group by both rep id and state
   summarise(
     n_cases_mean = mean(n_cases),
@@ -273,7 +290,17 @@ boot_lots %>%
     n_cases_mean_med = quantile(n_cases_mean, probs = 0.5, na.rm=TRUE),
     n_cases_mean_ul = quantile(n_cases_mean, probs = 0.975, na.rm=TRUE)
     ) %>% 
-  ungroup()
+  ungroup() %>% 
+  mutate(simulation_type = "bootstrap")
+
+boot_lots_summary
+```
+
+How does this estimate of the sampling distribution of `n_cases_mean` align with the truth? We happen to know the truth here. It's the distribution of `n_cases_mean` between the Monte Carlo simulations, defined above.
+
+```{r}
+monte_carlo_sim_lots_summary %>% 
+  bind_rows(boot_lots_summary)
 ```
 
 # Summary of Monte Carlo simulations and bootstrapping
@@ -294,6 +321,34 @@ Broad steps for each:
 
 1.  Define a function that contains steps of the analysis with variability.
 2.  Run that function lots of times using `purrr::map_dfr()`
-3.  Summarize the distribution of the results. Conventionally, take the median, 2.5th, and 97.5th percentile.
+3.  Summarize the distribution of the results. Conventionally, to report percentile-based confidence intervals,[@efron2016a] take the median, 2.5th, and 97.5th percentiles.
+
+# More on functions
+
+In addition to their use for simulations as above, functions can also be used simply to reduce repetition in code. Sometimes you end up writing the same or similar code many times and apply that code to several datasets. Here is a set of dplyr steps combined into one function.
+
+```{r}
+do_some_dplyr_stuff = function(df){ 
+  df %>%
+  mutate(
+    example_var_x=rnorm(n=n(), mean=0, sd=1),
+    example_var_y=4,
+    example_var_z = rbinom(n=n(), size=1, prob=.2)
+  ) %>% 
+  dplyr::select(state, county_id, starts_with("example"))
+}  
+```
+
+The argument of the function here is a dataframe or tibble arbitrary called `df` . When we run this function in a piped chain, that df will be taken as the implied object, and the function can be run as if it were any other dplyr function.
+
+Let's apply that function to one county from our `monte_carlo_sim_frozen` dataset.
+
+```{r}
+function_result_one_county = monte_carlo_sim_frozen %>% 
+  filter(county_id==2) %>% 
+  do_some_dplyr_stuff()
+
+function_result_one_county
+```
 
 # **References**
