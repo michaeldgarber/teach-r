@@ -1,0 +1,284 @@
+---
+title: "Monte Carlo Simulations and Boots with the purrr::map_dfr()"
+author: "Michael D Garber"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+bibliography: references.bib
+csl: american-medical-association.csl
+link-citations: true
+---
+
+![source: https://commons.wikimedia.org/wiki/File:Wiki79.jpg](images/chevy-monte-carlo-pic.jpg){width="500"}
+
+# Learning objectives
+
+-   Provide a working definition of Monte Carlo simulations and bootstrapping
+
+-   Perform a simple version of each using R
+
+# Motivation
+
+## Sources of uncertainty from multiple sources
+
+Almost any epidemiological or statistical analysis has uncertainty. Uncertainty may arise within the dataset available for analysis (the sample) or, if we aim to infer characteristics of a larger population from the sample, from sampling. For example, suppose we want to estimate the prevalence of Covid-19 in a county. To do so, we randomly sample 1,000 people from that county and test them using at-home antigen tests. Home tests have good specificity but fairly poor sensitivity,[@chu2022] meaning some of the negative results probably were truly positive (false negative). And because the poor sensitivity is a property of the test, not the sampling, this error is expected to occur regardless of the sample size. In addition to this systematic error in measurement, uncertainty arises from the sampling because we don't know if the Covid prevalence among the 1,000 people we tested represent that of the county. By chance, we could have tested a particularly healthy or sick sample.
+
+In our final estimate of prevalence, how would we go about summarizing its uncertainty, considering both the expected error in measurement and random error from sampling? Statistics of course has fundamental methods for estimating uncertainty from multiple sources, but many traditional methods involve complex math.[@distribu2022a] To simplify the math, analysts often make assumptions that may not hold, for example that random variables considered in the analysis are independent from one another. In this particular example, the two sources of uncertainty (test accuracy and sampling) are actually probably independent from one another, but that independence often does not hold.
+
+## When independence between sources of uncertainty does not hold
+
+For example, in my dissertation, I aimed to estimate the total amount of bicycling on every road in Atlanta. I had two sources of information, both of which had uncertainty. The first was a sample of bicycling on every roadway obtained from a smartphone app, inducing sampling variability and probably other sources of bias.[@garber2022] The second was a set of about 15 bicycle counters located throughout the city, assumed to accurately measure all bicycling. I used these counters to estimate the proportion of bicyclists captured by the app. In this analysis, bike traffic in the smartphone-generated sample was correlated with the proportion captured in the app over the counter locations, meaning estimating the variance of their product would require me to consider this correlation. Accurately estimating the variance arising from both of these inter-related sources by appropriately considering their covariance using traditional pen-and-paper statistical methods, and propagating that combined uncertainty through other steps in the analysis which may themselves have uncertainty, would be difficult.
+
+# Estimating variability via repeated  (re)sampling of random variations
+
+Fortunately, we can estimate uncertainty using the computer which largely obviates the need to do complex math. Two broad (and, depending on the definition, overlapping) ways to estimate uncertainty using computer-based simulation techniques are **Monte Carlo simulations** and **bootstrapping**. In addition to easing the math, these simulation methods can help the analyst visualize how and when something varies in the analysis, which facilitates clarity and understanding.
+
+## Monte Carlo simulations
+
+> "Monte Carlo simulation is a method of analysis based on artificially recreating a chance process (usually with a computer), running it many times, and directly observing the results."
+
+An important aspect of a traditional Monte Carlo simulation is that the distribution (i.e., its mean and variance) of each individual source of uncertainty is specified by the analyst. It is not estimated from the data. Monte Carlo simulations are useful to propagate multiple sources of variation throughout an analysis pipeline to assess the impact of all sources of uncertainty on the final result. And, as noted, they're especially helpful compared with traditional (non-computer-based) statistical methods when those sources of variation are correlated with one another.
+
+## Bootstrapping
+
+Monte Carlo simulation in its typical implementation cannot, however, directly estimate the sampling distribution. But bootstrapping can.
+
+> In statistics..., bootstrapping has come to mean to resampling [with replacement] repeatedly and randomly from an original, initial sample using each bootstrapped sample to compute a statistic. The resulting empirical distribution of the statistic is then examined and interpreted as an approximation to the true sampling distribution.
+
+The bootstrap was introduced by Brad Efron in the late 1970s. There are many forms of bootstrapping, including ways to bootstrap residuals from regression models.[@efron2016] The most essential is simply re-sampling entire observations from the sample, summarizing each new sample, and using the distribution of those summary statistics to infer the sampling distribution.
+
+It is certainly similar to Monte Carlo techniques and might be viewed as a subset thereof. The key difference is that the bootstrap estimates a distribution using data we have, and the Monte Carlo technique described above
+
+# Example code for each method using `purrr::map_dfr()`
+
+## Monte Carlo simulation
+
+Suppose we have a state with 100 counties. We simulate one single dataset, specifying that the mean county population is 1,000 and the probability of the a demographic variable (dem) is 0.5. The prevalence (`prev`)depends in part on pop and dem, and the number of cases in the county is estimated from pop and prev.
+
+```{r, message=FALSE}
+library(tidyverse)
+library(truncnorm)
+set.seed(11)#set the seed so this dataset is always the same.
+monte_carlo_sim_frozen = 1:100 %>% 
+  as_tibble() %>% 
+  rename(county_id = value) %>% 
+  mutate(
+    state = 1,
+    pop = rpois(n=n(), lambda=10000), #mean = var=1000
+    dem = rbinom(n=n(), size=1, prob =.5),
+    prev = rtruncnorm(
+      n=n(), 
+      a=0, 
+      b=1,
+      mean=.2+(pop/100000)+(dem/10),
+      sd=0.05),
+    n_cases = as.integer(pop*prev),
+  )
+
+monte_carlo_sim_frozen
+```
+
+What is the mean and standard deviation number of cases per county?
+
+```{r}
+monte_carlo_sim_frozen %>% 
+  group_by(state) %>% 
+  summarise(
+    n_cases_mean = mean(n_cases),
+    n_cases_sd = sd(n_cases))
+```
+
+### Define a function for replications
+
+Now let's randomly vary some things based on the frozen dataset. That dataset itself was created randomly, but let's pretend that it is frozen and not changing now. In this code, we will create a function that will create new variables that will change.
+
+Create a function for the creation of this dataset, run it 500 times, and find the mean of the means over those 500 iterations. The argument for this function is `rep_id_val`. I create a new variable called `rep_id`, and in each iteration, that variable takes `rep_id_val`.
+
+```{r}
+monte_carlo_sim_fun = function(rep_id_val){
+  monte_carlo_sim_df = 1:100 %>% 
+    as_tibble() %>% 
+    rename(county_id = value) %>% 
+    mutate(
+      state = 1,
+      pop = rpois(n=n(), lambda=10000), #mean = var=1000
+      dem = rbinom(n=n(), size=1, prob =.5),
+      prev = rtruncnorm(
+        n=n(), 
+        a=0, 
+        b=1,
+        mean=.2+(pop/100000)+(dem/10),
+        sd=0.05+(pop/400000)+(dem/40)),
+    n_cases = as.integer(pop*prev),
+    rep_id = rep_id_val  #add replication ID
+  )
+}
+```
+
+Define the number of replications. We are creating an integer vector to be iterated through.
+
+```{r}
+rep_id_val_list = 1:500
+class(rep_id_val_list)
+```
+
+### Run the replications
+
+Simulate 500 versions of this state, each time generating new counties randomly varying according to the distribution above. We use `map_dfr()` from the purrr package to run th code and then stack the results on top of one another. Note the unusual structure of this code. The function we created above, `monte_carlo_sim_fun(),` is inside `map_dfr()`, and the list of replication ids, `rep_id_val_list,` begins the pipe sequence.
+
+```{r}
+library(purrr) #make sure it's attached
+set.seed(NULL) #allow it to vary differently each time.
+monte_carlo_sim_lots  = rep_id_val_list %>% 
+  map_dfr(monte_carlo_sim_fun) 
+```
+
+Take a look at output.
+
+```{r}
+monte_carlo_sim_lots
+```
+
+How many rows?
+
+```{r}
+nrow(monte_carlo_sim_lots)
+```
+
+How many distinct values of `rep_id`?
+
+```{r}
+n_distinct(monte_carlo_sim_lots$rep_id)
+```
+
+### Summarize results
+
+What's the distribution of `n_cases_mean` over Monte Carlo replications?
+
+```{r}
+monte_carlo_sim_lots %>% 
+  group_by(rep_id,state) %>% 
+  summarise(
+    n_cases_mean = mean(n_cases),
+    n_cases_sd = sd(n_cases)) %>% 
+  ggplot(aes( n_cases_mean))+
+  geom_histogram()
+```
+
+What is the 2.5th, 50th (median), and 97.5th percentile of the mean number of cases for each county? This could be used to report a confidence interval around the estimated median number of cases.
+
+```{r}
+monte_carlo_sim_lots %>% 
+  group_by(rep_id,state) %>% #group by both rep id and state
+  summarise(
+    n_cases_mean = mean(n_cases),
+    n_cases_sd = sd(n_cases)) %>% 
+  group_by(state) %>% #now collapse over rep id
+  summarise(
+    n_cases_mean_ll = quantile(n_cases_mean, probs = 0.025, na.rm=TRUE),
+    n_cases_mean_med = quantile(n_cases_mean, probs = 0.5, na.rm=TRUE),
+    n_cases_mean_ul = quantile(n_cases_mean, probs = 0.975, na.rm=TRUE)
+    ) %>% 
+  ungroup()
+```
+
+## Bootstrap
+
+Now let's bootstrap `monte_carlo_sim_frozen`, again supposing that even though it was generated randomly, it is now frozen in sample and can be viewed as a single sample. We will then re-sample it **with replacement** with sampling probability of 1, meaning all rows will be re-sampled. This means that, in a given sample, some counties will repeat, and some will not appear at all.
+
+Here's one example:
+
+```{r}
+monte_carlo_sim_one_boot = monte_carlo_sim_frozen %>% 
+  slice_sample(prop=1,replace=TRUE)
+```
+
+Take a look:
+
+```{r}
+monte_carlo_sim_one_boot
+```
+
+As expected, we have the same number of rows, but fewer unique values for `county_id.` Some are repeating.
+
+```{r}
+nrow(monte_carlo_sim_one_boot)
+n_distinct(monte_carlo_sim_one_boot$county_id)
+```
+
+Repeat this bootstrap procedure 500 times by first writing a function and then iterating replications through that function using `purrr::map_dfr()`
+
+### Define a function for replications
+
+```{r}
+boot_fun = function(rep_id_val){
+  monte_carlo_sim_boot = monte_carlo_sim_frozen %>% 
+    slice_sample(prop=1,replace=TRUE) %>% 
+    mutate(rep_id = rep_id_val) #to keep track of reps
+}
+```
+
+### Run the replications
+
+Simulate 500 versions of this state, each time generating new counties randomly varying according to the distribution above. We use `map_dfr()` from the purrr package to run the function and then stack the results on top of one another. Note the unusual structure of this code. The function we created above, `monte_carlo_sim_fun(),` is inside `map_dfr()`, and the list of replication ids, `rep_id_val_list,` begins the pipe sequence.
+
+```{r}
+boot_lots  = rep_id_val_list %>% 
+  map_dfr(boot_fun) 
+```
+
+### Summarize results
+
+```{r}
+boot_lots
+```
+
+What's the distribution of `n_cases_mean` over bootstrap replications?
+
+```{r}
+boot_lots %>% 
+  group_by(rep_id,state) %>% 
+  summarise(
+    n_cases_mean = mean(n_cases),
+    n_cases_sd = sd(n_cases)) %>% 
+  ggplot(aes( n_cases_mean))+
+  geom_histogram()
+```
+
+```{r}
+boot_lots %>% 
+  group_by(rep_id,state) %>% #group by both rep id and state
+  summarise(
+    n_cases_mean = mean(n_cases),
+    n_cases_sd = sd(n_cases)) %>% 
+  group_by(state) %>% #now collapse over rep id
+  summarise(
+    n_cases_mean_ll = quantile(n_cases_mean, probs = 0.025, na.rm=TRUE),
+    n_cases_mean_med = quantile(n_cases_mean, probs = 0.5, na.rm=TRUE),
+    n_cases_mean_ul = quantile(n_cases_mean, probs = 0.975, na.rm=TRUE)
+    ) %>% 
+  ungroup()
+```
+
+Advantages of these computation-based simulation methods
+
+-   Makes explicit where the variation is coming from and aids in intuition.
+
+-   Easily accommodates correlation between variables and avoids difficult math.
+
+Comparison between the two:
+
+-   Difference: Is variability specified by the user or is it estimated from the sample?
+
+-   In common: Both use repeated sampling to estimate uncertainty. Monte Carlo simulations may sample from a specified distribution to generate values for a variable, and bootstrapping samples the rows of the data at hand.
+
+Broad steps for each:
+
+1.  Define a function that contains steps of the analysis with variability.
+2.  Run that function lots of times using `purrr::map_dfr()`
+3.  Summarize the distribution of the results. Conventionally, take the median, 2.5th, and 97.5th percentile.
+
+# **References**
