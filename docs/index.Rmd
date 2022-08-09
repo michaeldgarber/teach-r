@@ -67,7 +67,7 @@ This short course will introduce participants to popular tools in R for manipula
 
     This module will elaborate upon the capabilities of some of R's mapping tools covered in previous sessions. Specifically, it will illustrate tools for both static maps (as in an image) and interactive maps (as in zooming in and out like Google Maps). Mapview and ggplot2 will again be covered, and tmap will be introduced. This module will also cover color palettes available in R for visualizing continuous and categorical data.
 
-    Link TBD
+    Link: <https://michaeldgarber.github.io/teach-r/4-map-making.html> (work in progress)
 
 5.  **Monte Carlo simulations and boots with the purrr::map_dfr()**
 
