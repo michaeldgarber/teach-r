@@ -217,7 +217,7 @@ monte_carlo_sim_lots_summary
 
 Now let's bootstrap `monte_carlo_sim_frozen`, again supposing that even though it was generated randomly, it is now viewed as a single frozen sample - the one we drew and have access to. We can estimate the sampling distribution by re-sampling it **with replacement** with sampling probability of 1, meaning all rows will be re-sampled. This means that, in a given sample, some counties will repeat, and some will not appear at all.
 
-Here's one example:
+Here's one sample:
 
 ```{r}
 monte_carlo_sim_one_boot = monte_carlo_sim_frozen %>% 
@@ -325,7 +325,7 @@ Broad steps for each:
 
 # More on functions
 
-In addition to their use for simulations as above, functions can also be used simply to reduce repetition in code. Sometimes you end up writing the same or similar code many times and apply that code to several datasets. Here is a set of dplyr steps combined into one function.
+In addition to their use for simulations as above, functions can also be used simply to reduce repetition in code. Sometimes you end up writing the same or similar code many times and apply that code to several datasets. For example, above we wrote basically the same sequence of dplyr functions to define `monte_carlo_sim_frozen` as we did to define the function, `monte_carlo_sim_fun()`. Here is a set of dplyr steps combined into one function.
 
 ```{r}
 do_some_dplyr_stuff = function(df){ 
