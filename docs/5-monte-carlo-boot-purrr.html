@@ -415,7 +415,7 @@ div.tocify {
 <p>“In statistics…, bootstrapping has come to mean to resampling [with replacement] repeatedly and randomly from an original, initial sample using each bootstrapped sample to compute a statistic. The resulting empirical distribution of the statistic is then examined and interpreted as an approximation to the true sampling distribution.”<span class="citation"><sup><a href="#ref-barreto2005" role="doc-biblioref">5</a></sup></span></p>
 </blockquote>
 <p>The bootstrap was introduced by Brad Efron in the late 1970s.<span class="citation"><sup><a href="#ref-bootstra2022b" role="doc-biblioref">6</a></sup></span> There are many forms of bootstrapping, including ways to bootstrap residuals from regression models.<span class="citation"><sup><a href="#ref-efron2016" role="doc-biblioref">7</a></sup></span> The most essential is simply re-sampling entire observations from the sample, summarizing each new sample, and using the distribution of those summary statistics to infer the sampling distribution.</p>
-<p>It is certainly similar to Monte Carlo techniques and might be viewed as a subset thereof. The key difference is that the bootstrap estimates a distribution using data we have, and the Monte Carlo technique described above</p>
+<p>The bootstrap is similar conceptually with Monte Carlo techniques because it involves randomly changing the data over repeated iterations and summarizing results of those iterations. The key difference is that the bootstrap estimates a distribution using data we have, and, under the Monte Carlo technique described, the distribution of each variable is specified by the analyst.</p>
 </div>
 </div>
 <div id="example-code-for-each-method-using-purrrmap_dfr" class="section level1" number="4">
@@ -537,16 +537,16 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 <pre><code>## # A tibble: 50,000 × 7
 ##    county_id state   pop   dem  prev n_cases rep_id
 ##        &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt;   &lt;int&gt;  &lt;int&gt;
-##  1         1     1 10115     0 0.198    2004      1
-##  2         2     1 10101     1 0.508    5127      1
-##  3         3     1  9916     0 0.283    2803      1
-##  4         4     1 10140     1 0.294    2984      1
-##  5         5     1  9936     1 0.513    5093      1
-##  6         6     1  9844     0 0.105    1037      1
-##  7         7     1 10022     0 0.368    3690      1
-##  8         8     1  9882     1 0.175    1733      1
-##  9         9     1 10018     0 0.109    1095      1
-## 10        10     1 10035     0 0.308    3095      1
+##  1         1     1 10027     1 0.168    1680      1
+##  2         2     1  9943     0 0.296    2941      1
+##  3         3     1  9907     0 0.110    1092      1
+##  4         4     1  9968     0 0.328    3273      1
+##  5         5     1 10037     1 0.256    2567      1
+##  6         6     1 10150     0 0.329    3340      1
+##  7         7     1 10119     1 0.318    3214      1
+##  8         8     1 10058     1 0.369    3713      1
+##  9         9     1 10049     0 0.320    3219      1
+## 10        10     1  9860     1 0.205    2023      1
 ## # … with 49,990 more rows
 ## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 <p>How many rows?</p>
@@ -590,7 +590,7 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 <pre><code>## # A tibble: 1 × 5
 ##   state n_cases_mean_ll n_cases_mean_med n_cases_mean_ul simulation_type
 ##   &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;           &lt;dbl&gt; &lt;chr&gt;          
-## 1     1           2755.            3011.           3239. monte-carlo</code></pre>
+## 1     1           2793.            3020.           3278. monte-carlo</code></pre>
 </div>
 </div>
 <div id="bootstrap" class="section level2" number="4.2">
@@ -602,25 +602,25 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 <p>Take a look:</p>
 <pre class="r"><code>monte_carlo_sim_one_boot</code></pre>
 <pre><code>## # A tibble: 100 × 6
-##    county_id state   pop   dem  prev n_cases
-##        &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt;   &lt;int&gt;
-##  1        60     1 10036     0 0.237    2382
-##  2        59     1  9931     1 0.330    3275
-##  3        12     1  9955     0 0.198    1969
-##  4        11     1  9885     1 0.329    3251
-##  5        82     1 10146     1 0.308    3120
-##  6         1     1  9940     1 0.492    4891
-##  7        97     1 10028     1 0.456    4568
-##  8        35     1  9781     0 0.313    3057
-##  9        99     1  9864     0 0.232    2285
-## 10        80     1  9987     1 0.452    4513
+##    county_id state   pop   dem   prev n_cases
+##        &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt;  &lt;dbl&gt;   &lt;int&gt;
+##  1        22     1  9901     1 0.370     3660
+##  2         3     1  9863     1 0.492     4849
+##  3         6     1 10062     1 0.435     4378
+##  4        51     1 10006     1 0.420     4205
+##  5         2     1  9780     1 0.455     4448
+##  6        56     1 10007     0 0.0461     460
+##  7        23     1 10068     0 0.350     3523
+##  8        98     1 10105     1 0.251     2539
+##  9        99     1  9864     0 0.232     2285
+## 10         8     1  9995     1 0.634     6340
 ## # … with 90 more rows
 ## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 <p>As expected, we have the same number of rows, but fewer unique values for <code>county_id.</code> Some are repeating.</p>
 <pre class="r"><code>nrow(monte_carlo_sim_one_boot)</code></pre>
 <pre><code>## [1] 100</code></pre>
 <pre class="r"><code>n_distinct(monte_carlo_sim_one_boot$county_id)</code></pre>
-<pre><code>## [1] 67</code></pre>
+<pre><code>## [1] 66</code></pre>
 <p>Repeat this bootstrap procedure 500 times by first writing a function and then iterating replications through that function using <code>purrr::map_dfr()</code></p>
 <div id="define-a-function-for-replications-1" class="section level3" number="4.2.1">
 <h3><span class="header-section-number">4.2.1</span> Define a function for replications</h3>
@@ -642,16 +642,16 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 <pre><code>## # A tibble: 50,000 × 7
 ##    county_id state   pop   dem   prev n_cases rep_id
 ##        &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt;  &lt;dbl&gt;   &lt;int&gt;  &lt;int&gt;
-##  1        83     1 10022     1 0.330     3312      1
-##  2        40     1  9936     0 0.172     1707      1
-##  3        44     1  9948     0 0.263     2612      1
-##  4         1     1  9940     1 0.492     4891      1
-##  5        96     1  9936     0 0.513     5096      1
+##  1        13     1 10088     0 0.286     2887      1
+##  2        77     1 10070     0 0.395     3975      1
+##  3        87     1 10139     1 0.199     2016      1
+##  4        60     1 10036     0 0.237     2382      1
+##  5        82     1 10146     1 0.308     3120      1
 ##  6        30     1  9922     1 0.303     3010      1
-##  7        58     1 10015     0 0.0619     619      1
-##  8         1     1  9940     1 0.492     4891      1
-##  9        29     1  9938     1 0.350     3476      1
-## 10        50     1 10047     1 0.354     3557      1
+##  7        73     1  9964     1 0.246     2448      1
+##  8        42     1 10054     1 0.224     2251      1
+##  9        56     1 10007     0 0.0461     460      1
+## 10        47     1  9904     0 0.206     2042      1
 ## # … with 49,990 more rows
 ## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 <p>What’s the distribution of <code>n_cases_mean</code> over bootstrap replications?</p>
@@ -686,15 +686,15 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 <pre><code>## # A tibble: 1 × 5
 ##   state n_cases_mean_ll n_cases_mean_med n_cases_mean_ul simulation_type
 ##   &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;           &lt;dbl&gt; &lt;chr&gt;          
-## 1     1           2823.            3068.           3294. bootstrap</code></pre>
+## 1     1           2808.            3053.           3282. bootstrap</code></pre>
 <p>How does this estimate of the sampling distribution of <code>n_cases_mean</code> align with the truth? We happen to know the truth here. It’s the distribution of <code>n_cases_mean</code> between the Monte Carlo simulations, defined above.</p>
 <pre class="r"><code>monte_carlo_sim_lots_summary %&gt;% 
   bind_rows(boot_lots_summary)</code></pre>
 <pre><code>## # A tibble: 2 × 5
 ##   state n_cases_mean_ll n_cases_mean_med n_cases_mean_ul simulation_type
 ##   &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;           &lt;dbl&gt; &lt;chr&gt;          
-## 1     1           2755.            3011.           3239. monte-carlo    
-## 2     1           2823.            3068.           3294. bootstrap</code></pre>
+## 1     1           2793.            3020.           3278. monte-carlo    
+## 2     1           2808.            3053.           3282. bootstrap</code></pre>
 </div>
 </div>
 </div>
@@ -739,7 +739,7 @@ function_result_one_county</code></pre>
 <pre><code>## # A tibble: 1 × 5
 ##   state county_id example_var_x example_var_y example_var_z
 ##   &lt;dbl&gt;     &lt;int&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;int&gt;
-## 1     1         2        -0.635             4             0</code></pre>
+## 1     1         2         0.712             4             0</code></pre>
 </div>
 <div id="references" class="section level1 unnumbered">
 <h1><strong>References</strong></h1>

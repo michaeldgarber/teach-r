@@ -50,7 +50,7 @@ Monte Carlo simulation in its typical implementation cannot, however, directly e
 
 The bootstrap was introduced by Brad Efron in the late 1970s.[@bootstra2022b] There are many forms of bootstrapping, including ways to bootstrap residuals from regression models.[@efron2016] The most essential is simply re-sampling entire observations from the sample, summarizing each new sample, and using the distribution of those summary statistics to infer the sampling distribution.
 
-It is certainly similar to Monte Carlo techniques and might be viewed as a subset thereof. The key difference is that the bootstrap estimates a distribution using data we have, and the Monte Carlo technique described above
+The bootstrap is similar conceptually with Monte Carlo techniques because it involves randomly changing the data over repeated iterations and summarizing results of those iterations. The key difference is that the bootstrap estimates a distribution using data we have, and, under the Monte Carlo technique described, the distribution of each variable is specified by the analyst.
 
 # Example code for each method using `purrr::map_dfr()`
 

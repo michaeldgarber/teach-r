@@ -1,0 +1,162 @@
+---
+title: "Comparison of R mapping methods: tmap vs mapview vs ggplot2"
+author: "Michael D. Garber, PhD MPH"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+---
+
+In this module, we compare commonly used techniques to make static and interactive maps. Specifically, we use **tmap**, **mapview**, and **ggplot2**. In previous modules, we have used mapview and ggplot2.
+
+```{r}
+library(here)
+library(tmap)
+library(sf)
+library(mapview)
+library(tidyverse) #loads ggplot2
+```
+
+# tmap overview
+
+tmap resources:
+
+-   "get started" page by tmap's creator: <https://r-tmap.github.io/tmap/articles/tmap-getstarted.html>
+
+-   This page by Dr. Michael Kramer, a professor and mentor of mine while I was at Emory, is a great overview of tmap: <https://mkram01.github.io/EPI563-SpatialEPI/intro-tmap.html>
+
+Let's load data from our analysis of pharmacies. You might already have this data saved from previous modules. If not, download the corresponding .RData file from this Dropbox [folder](https://www.dropbox.com/sh/ff85l058vl82wwy/AABKygH3PhQkausaxOcIgO0Sa?dl=0) and place in a folder in your project directory so it can be loaded.
+
+Load the census-tract-level data with demographic information.
+
+```{r}
+setwd(here("data-processed"))
+load(file = "tract_ga_wrangle.RData")
+```
+
+```{r}
+tract_fulton_dekalb = tract_ga_wrangle %>% 
+  dplyr::filter(county_fips == "13121" | county_fips == "13089") 
+```
+
+Load the cleaned-up dataset of pharmacies, all of which are represented by points.
+
+```{r}
+setwd(here("data-processed"))
+load("pharm_fd_combined.RData")
+```
+
+## Tmap mode
+
+Unlike mapview, which always produces interactive maps, and ggplot2, which always creates static maps, tmap can switch between the two.
+
+The plot mode makes static maps, and the view mode creates interactive maps akin to mapview.
+
+The mode can be
+
+```{r}
+tmap_mode("plot")
+tmap_mode("view")
+```
+
+## Quick maps using `qtm()`
+
+Tmap has a function for making a quick map called qtm, which stands for quick thematic maps.
+
+The fundamental argument of qtm() is the object, and then other arguments can be specified.
+
+Make a static map of pharmacies
+
+```{r}
+tmap_mode("plot")
+qtm(pharm_fd_combined, "type_original")
+```
+
+Make an interactive map of pharmacies
+
+```{r}
+tmap_mode("view")
+qtm(pharm_fd_combined, "type_original")
+```
+
+Make a static map of the census tracts. First, remind ourselves the names of the variables.
+
+```{r}
+names(tract_fulton_dekalb)
+```
+
+```{r}
+tmap_mode("plot") #run again just in case it was changed above.
+qtm(tract_fulton_dekalb)
+```
+
+Make an interactive map of the census tracts.
+
+```{r}
+tmap_mode("view") #run again just in case it was changed above.
+qtm(tract_fulton_dekalb)
+```
+
+### Customize qtm
+
+All of the options for customization can be found here: <https://rdrr.io/cran/tmap/man/qtm.html>
+
+Customize qtm for points. Change the shape of the point based on whether the point was originally imported as a polygon or a point by OpenStreetMap.
+
+```{r}
+names(tract_fulton_dekalb)
+```
+
+```{r}
+tmap_mode("plot")
+qtm(pharm_fd_combined, symbols.shape = "type_original")
+```
+
+```{r}
+tmap_mode("view")
+qtm(pharm_fd_combined, symbols.shape = "type_original")
+```
+
+Customize qtm for polygons (static)
+
+```{r}
+tmap_mode("plot") #run again just in case it was changed above.
+qtm(tract_fulton_dekalb, "h_val_med_E")
+```
+
+Customize qtm for polygons (interactive)
+
+```{r}
+tmap_mode("view") #run again just in case it was changed above.
+qtm(tract_fulton_dekalb, "h_val_med_E")
+```
+
+## More customization using `tmap()` 
+
+## Adding multiple objects
+
+Static plot
+
+```{r}
+tmap_mode("plot")
+tm_shape(tract_fulton_dekalb)+
+  tm_fill("h_val_med_E")+
+  tm_borders()+
+  
+tm_shape(pharm_fd_combined)+
+  tm_symbols(shape = "type_original")
+```
+
+Interactive plot
+
+```{r}
+tmap_mode("view")
+tm_shape(tract_fulton_dekalb) +
+  tm_fill("h_val_med_E") +
+  tm_borders()+
+  
+tm_shape(pharm_fd_combined)+
+  tm_symbols(shape = "type_original")
+```
