@@ -141,6 +141,22 @@ Google Drive [folder](https://drive.google.com/drive/folders/125F0jIChEAPEqTKQx5
 
     -   <https://github.com/michaeldgarber/teach-r/blob/main/scripts/3-sf-atl-pharm.R>
 
+*Session 5 (August 9, 2022)*
+
+-   Session [recording](https://www.dropbox.com/s/wcskt58blknsbdr/r-course-session-5-video.mp4?dl=0) on Dropbox
+
+-   Session [recording](https://drive.google.com/file/d/1QNBcQ-cR9Og6JBpGTIt1KG-NvNqrp2Xl/view?usp=sharing) on Google Drive
+
+-   Modules covered:
+
+    -   <https://michaeldgarber.github.io/teach-r/5-monte-carlo-boot-purrr.html>
+
+    -   <https://michaeldgarber.github.io/teach-r/4-map-making.html>
+
+-   R scripts used during session:
+
+    -   <https://github.com/michaeldgarber/teach-r/blob/main/scripts/5-monte-carlo-boot-purrr.R>
+
 <br />
 
 # Recommended resources

@@ -62,10 +62,12 @@ monte_carlo_sim_fun = function(rep_id_val){
 #run one iteration
 monte_carlo_sim_once = monte_carlo_sim_fun(rep_id_val = 5)
 monte_carlo_sim_once
+nrow(monte_carlo_sim_once)
 
 #run function lots of times
 
 rep_id_val_list = 1:500
+rep_id_val_list
 class(rep_id_val_list)
 
 library(purrr) #make sure it's attached
