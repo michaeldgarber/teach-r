@@ -11,7 +11,9 @@ output:
       after_body: footer.html
 ---
 
-This is the main landing page for the course, ***Introduction to managing and visualizing data in R: a short course on spatial and non-spatial data***.
+This is the main landing page for the course,
+
+***Introduction to managing and visualizing data in R: a short course on spatial and non-spatial data***.
 
 Page url: <https://michaeldgarber.github.io/teach-r/>
 
@@ -91,7 +93,7 @@ Google Drive [folder](https://drive.google.com/drive/folders/125F0jIChEAPEqTKQx5
 
 -   Session [recording](https://drive.google.com/file/d/13miuMQ-qFwC0d-alyABu5-RbaZ8xmQGH/view?usp=sharing) on Google Drive
 
--   Modules covered (described below):
+-   Modules covered:
 
     -   <https://michaeldgarber.github.io/teach-r/0-pre-reqs>
 
