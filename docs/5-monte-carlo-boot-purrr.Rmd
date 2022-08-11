@@ -12,7 +12,7 @@ csl: american-medical-association.csl
 link-citations: true
 ---
 
-![source: https://commons.wikimedia.org/wiki/File:Wiki79.jpg](images/chevy-monte-carlo-pic.jpg){width="500"}
+![source: <https://commons.wikimedia.org/wiki/File:Wiki79.jpg>](images/chevy-monte-carlo-pic.jpg){width="500"}
 
 # Learning objectives
 
@@ -26,15 +26,15 @@ link-citations: true
 
 Almost any epidemiological or statistical analysis has uncertainty. Uncertainty may arise within the dataset available for analysis (the sample) or, if we aim to infer characteristics of a larger population from the sample, from sampling. For example, suppose we want to estimate the prevalence of Covid-19 in a county. To do so, we randomly sample 1,000 people from that county and test them using at-home antigen tests. Home tests have good specificity but fairly poor sensitivity,[@chu2022] meaning some of the negative results probably were truly positive (false negative). And because the poor sensitivity is a property of the test, not the sampling, this error is expected to occur regardless of the sample size. In addition to this systematic error in measurement, uncertainty arises from the sampling because we don't know if the Covid prevalence among the 1,000 people we tested represent that of the county. By chance, we could have tested a particularly healthy or sick sample.
 
-In our final estimate of prevalence, how would we go about summarizing its uncertainty, considering both the expected error in measurement and random error from sampling? Statistics of course has fundamental methods for estimating uncertainty from multiple sources, but many traditional methods involve complex math.[@distribu2022a] To simplify the math, analysts often make assumptions that may not hold, for example that random variables considered in the analysis are independent from one another. In this particular example, the two sources of uncertainty (test accuracy and sampling) are actually probably independent from one another, but that independence often does not hold.
+In our final estimate of prevalence, how would we go about summarizing its uncertainty, considering both the expected error in measurement and random error from sampling? Statistics of course has fundamental methods for estimating uncertainty from multiple sources, but many traditional methods involve complex math.[@distribu2022a] To simplify the math, analysts often make assumptions that may not hold, for example that random variables considered in the analysis are independent from one another. In this particular example, the two sources of uncertainty (test accuracy and sampling) may be independent from one another, but that independence often does not hold.
 
 ## When independence between sources of uncertainty does not hold
 
-For example, in my dissertation, I aimed to estimate the total amount of bicycling on every road in Atlanta. I had two sources of information, both of which had uncertainty. The first was a sample of bicycling on every roadway obtained from a smartphone app, inducing sampling variability and probably other sources of bias.[@garber2022] The second was a set of about 15 bicycle counters located throughout the city, assumed to accurately measure all bicycling. I used these counters to estimate the proportion of bicyclists captured by the app. In this analysis, bike traffic in the smartphone-generated sample was correlated with the proportion captured in the app over the counter locations, meaning estimating the variance of their product would require me to consider this correlation. Accurately estimating the variance arising from both of these inter-related sources by appropriately considering their covariance using traditional pen-and-paper statistical methods, and propagating that combined uncertainty through other steps in the analysis which may themselves have uncertainty, would be difficult.
+For example, in my dissertation, I aimed to estimate the total amount of bicycling on every road in Atlanta. I had two sources of information, both of which had uncertainty. The first was a sample of bicycling on every roadway obtained from a smartphone app, inducing sampling variability and probably selection bias.[@garber2022] The second was a set of about 15 bicycle counters located throughout the city, assumed to accurately measure all bicycling in that location. I used these counters to estimate the proportion of bicyclists captured by the app. In this analysis, bike traffic in the smartphone-generated sample was correlated with the proportion captured in the app over the counter locations, meaning estimating the variance of their product should consider this lack of independence. Accurately estimating the variance arising from both of these inter-related sources by appropriately considering their covariance using traditional pen-and-paper statistical methods, and propagating that combined uncertainty through other steps in the analysis which may themselves have uncertainty, would be difficult.
 
-# Estimating variability via repeated  (re)sampling of random variations
+# Estimating variability via repeated (re)sampling of random variations
 
-Fortunately, we can estimate uncertainty using the computer which largely obviates the need to do complex math. Two broad (and, depending on the definition, overlapping) ways to estimate uncertainty using computer-based simulation techniques are **Monte Carlo simulations** and **bootstrapping**. In addition to easing the math, these simulation methods can help the analyst visualize how and when something varies in the analysis, which facilitates clarity and understanding.
+Fortunately, we can estimate uncertainty using the computer which largely obviates the need to do complex math. Two broad ways to estimate uncertainty using computer-based simulation techniques are **Monte Carlo simulations** and **bootstrapping**. In addition to easing the math, these simulation methods can help the analyst see how and when something varies in the analysis, which facilitates clarity and understanding.
 
 ## Monte Carlo simulations
 
@@ -150,9 +150,9 @@ class(rep_id_val_list)
 
 ### Run the replications
 
-Simulate 500 versions of this state. In each replication, the values for the variables `pop`, `dem`, `prev`, and `n_cases` randomly vary according to their specified distribution. We use `map_dfr()` from the [purrr](https://purrr.tidyverse.org/) package to run the simulation and then stack the results on top of one another, akin to `mutate::bind_rows()`.
+Simulate 500 versions of this state. In each replication, the values for the variables `pop`, `dem`, `prev`, and `n_cases` randomly vary according to their specified distribution. We use [`map_dfr()`](https://purrr.tidyverse.org/reference/map.html) from the [purrr](https://purrr.tidyverse.org/) package to run the simulation and then stack the results on top of one another, akin to `dplyr::bind_rows()`.
 
-Take note the unusual structure of this code. The function we created above, `monte_carlo_sim_fun(),` is inside `map_dfr()`, and the list of replication ids, `rep_id_val_list,` begins the pipe sequence.
+Take note the unusual structure of this code. The function we created above, `monte_carlo_sim_fun` is inside `map_dfr()`, and the list of replication ids, `rep_id_val_list,` is the object that begins the pipe sequence.
 
 ```{r}
 library(purrr) #make sure it's attached
@@ -181,7 +181,7 @@ n_distinct(monte_carlo_sim_lots$rep_id)
 
 ### Summarize results
 
-What's the distribution of `n_cases_mean` over Monte Carlo replications? This is not the variability of the number of cases within the state between counties but rather the variability of the mean number of county-level cases for the state between replications.
+What's the distribution of `n_cases_mean` over Monte Carlo replications? This is not the variability of the number of cases within the state between counties but rather the variability of the mean number of cases over counties between replications.
 
 ```{r}
 monte_carlo_sim_lots %>% 
@@ -325,7 +325,9 @@ Broad steps for each:
 
 # More on functions
 
-In addition to their use for simulations as above, functions can also be used simply to reduce repetition in code. Sometimes you end up writing the same or similar code many times and apply that code to several datasets. For example, above we wrote basically the same sequence of dplyr functions to define `monte_carlo_sim_frozen` as we did to define the function, `monte_carlo_sim_fun()`. Here is a set of dplyr steps combined into one function.
+In addition to their use for simulations as above, functions can also be used simply to reduce repetition in code. Sometimes you end up writing the same or similar code many times and apply that code to several datasets. For example, above we wrote an almost identical equence of dplyr functions to define both `monte_carlo_sim_frozen` and the function, `monte_carlo_sim_fun()`.
+
+Here is an example sequence of dplyr steps combined into one function.
 
 ```{r}
 do_some_dplyr_stuff = function(df){ 

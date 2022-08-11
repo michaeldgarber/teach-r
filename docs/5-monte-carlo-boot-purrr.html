@@ -11,7 +11,7 @@
 
 <meta name="author" content="Michael D Garber" />
 
-<meta name="date" content="2022-08-09" />
+<meta name="date" content="2022-08-11" />
 
 <title>Monte Carlo simulations and boots with the purrr::map_dfr()</title>
 
@@ -370,7 +370,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Monte Carlo simulations and boots with the purrr::map_dfr()</h1>
 <h4 class="author">Michael D Garber</h4>
-<h4 class="date">2022-08-09</h4>
+<h4 class="date">2022-08-11</h4>
 
 </div>
 
@@ -391,16 +391,16 @@ div.tocify {
 <div id="sources-of-uncertainty-from-multiple-sources" class="section level2" number="2.1">
 <h2><span class="header-section-number">2.1</span> Sources of uncertainty from multiple sources</h2>
 <p>Almost any epidemiological or statistical analysis has uncertainty. Uncertainty may arise within the dataset available for analysis (the sample) or, if we aim to infer characteristics of a larger population from the sample, from sampling. For example, suppose we want to estimate the prevalence of Covid-19 in a county. To do so, we randomly sample 1,000 people from that county and test them using at-home antigen tests. Home tests have good specificity but fairly poor sensitivity,<span class="citation"><sup><a href="#ref-chu2022" role="doc-biblioref">1</a></sup></span> meaning some of the negative results probably were truly positive (false negative). And because the poor sensitivity is a property of the test, not the sampling, this error is expected to occur regardless of the sample size. In addition to this systematic error in measurement, uncertainty arises from the sampling because we don’t know if the Covid prevalence among the 1,000 people we tested represent that of the county. By chance, we could have tested a particularly healthy or sick sample.</p>
-<p>In our final estimate of prevalence, how would we go about summarizing its uncertainty, considering both the expected error in measurement and random error from sampling? Statistics of course has fundamental methods for estimating uncertainty from multiple sources, but many traditional methods involve complex math.<span class="citation"><sup><a href="#ref-distribu2022a" role="doc-biblioref">2</a></sup></span> To simplify the math, analysts often make assumptions that may not hold, for example that random variables considered in the analysis are independent from one another. In this particular example, the two sources of uncertainty (test accuracy and sampling) are actually probably independent from one another, but that independence often does not hold.</p>
+<p>In our final estimate of prevalence, how would we go about summarizing its uncertainty, considering both the expected error in measurement and random error from sampling? Statistics of course has fundamental methods for estimating uncertainty from multiple sources, but many traditional methods involve complex math.<span class="citation"><sup><a href="#ref-distribu2022a" role="doc-biblioref">2</a></sup></span> To simplify the math, analysts often make assumptions that may not hold, for example that random variables considered in the analysis are independent from one another. In this particular example, the two sources of uncertainty (test accuracy and sampling) may be independent from one another, but that independence often does not hold.</p>
 </div>
 <div id="when-independence-between-sources-of-uncertainty-does-not-hold" class="section level2" number="2.2">
 <h2><span class="header-section-number">2.2</span> When independence between sources of uncertainty does not hold</h2>
-<p>For example, in my dissertation, I aimed to estimate the total amount of bicycling on every road in Atlanta. I had two sources of information, both of which had uncertainty. The first was a sample of bicycling on every roadway obtained from a smartphone app, inducing sampling variability and probably other sources of bias.<span class="citation"><sup><a href="#ref-garber2022" role="doc-biblioref">3</a></sup></span> The second was a set of about 15 bicycle counters located throughout the city, assumed to accurately measure all bicycling. I used these counters to estimate the proportion of bicyclists captured by the app. In this analysis, bike traffic in the smartphone-generated sample was correlated with the proportion captured in the app over the counter locations, meaning estimating the variance of their product would require me to consider this correlation. Accurately estimating the variance arising from both of these inter-related sources by appropriately considering their covariance using traditional pen-and-paper statistical methods, and propagating that combined uncertainty through other steps in the analysis which may themselves have uncertainty, would be difficult.</p>
+<p>For example, in my dissertation, I aimed to estimate the total amount of bicycling on every road in Atlanta. I had two sources of information, both of which had uncertainty. The first was a sample of bicycling on every roadway obtained from a smartphone app, inducing sampling variability and probably selection bias.<span class="citation"><sup><a href="#ref-garber2022" role="doc-biblioref">3</a></sup></span> The second was a set of about 15 bicycle counters located throughout the city, assumed to accurately measure all bicycling in that location. I used these counters to estimate the proportion of bicyclists captured by the app. In this analysis, bike traffic in the smartphone-generated sample was correlated with the proportion captured in the app over the counter locations, meaning estimating the variance of their product should consider this lack of independence. Accurately estimating the variance arising from both of these inter-related sources by appropriately considering their covariance using traditional pen-and-paper statistical methods, and propagating that combined uncertainty through other steps in the analysis which may themselves have uncertainty, would be difficult.</p>
 </div>
 </div>
 <div id="estimating-variability-via-repeated-resampling-of-random-variations" class="section level1" number="3">
 <h1><span class="header-section-number">3</span> Estimating variability via repeated (re)sampling of random variations</h1>
-<p>Fortunately, we can estimate uncertainty using the computer which largely obviates the need to do complex math. Two broad (and, depending on the definition, overlapping) ways to estimate uncertainty using computer-based simulation techniques are <strong>Monte Carlo simulations</strong> and <strong>bootstrapping</strong>. In addition to easing the math, these simulation methods can help the analyst visualize how and when something varies in the analysis, which facilitates clarity and understanding.</p>
+<p>Fortunately, we can estimate uncertainty using the computer which largely obviates the need to do complex math. Two broad ways to estimate uncertainty using computer-based simulation techniques are <strong>Monte Carlo simulations</strong> and <strong>bootstrapping</strong>. In addition to easing the math, these simulation methods can help the analyst see how and when something varies in the analysis, which facilitates clarity and understanding.</p>
 <div id="monte-carlo-simulations" class="section level2" number="3.1">
 <h2><span class="header-section-number">3.1</span> Monte Carlo simulations</h2>
 <blockquote>
@@ -526,8 +526,8 @@ class(rep_id_val_list)</code></pre>
 </div>
 <div id="run-the-replications" class="section level3" number="4.1.2">
 <h3><span class="header-section-number">4.1.2</span> Run the replications</h3>
-<p>Simulate 500 versions of this state. In each replication, the values for the variables <code>pop</code>, <code>dem</code>, <code>prev</code>, and <code>n_cases</code> randomly vary according to their specified distribution. We use <code>map_dfr()</code> from the <a href="https://purrr.tidyverse.org/">purrr</a> package to run the simulation and then stack the results on top of one another, akin to <code>mutate::bind_rows()</code>.</p>
-<p>Take note the unusual structure of this code. The function we created above, <code>monte_carlo_sim_fun(),</code> is inside <code>map_dfr()</code>, and the list of replication ids, <code>rep_id_val_list,</code> begins the pipe sequence.</p>
+<p>Simulate 500 versions of this state. In each replication, the values for the variables <code>pop</code>, <code>dem</code>, <code>prev</code>, and <code>n_cases</code> randomly vary according to their specified distribution. We use <a href="https://purrr.tidyverse.org/reference/map.html"><code>map_dfr()</code></a> from the <a href="https://purrr.tidyverse.org/">purrr</a> package to run the simulation and then stack the results on top of one another, akin to <code>dplyr::bind_rows()</code>.</p>
+<p>Take note the unusual structure of this code. The function we created above, <code>monte_carlo_sim_fun</code> is inside <code>map_dfr()</code>, and the list of replication ids, <code>rep_id_val_list,</code> is the object that begins the pipe sequence.</p>
 <pre class="r"><code>library(purrr) #make sure it&#39;s attached
 set.seed(NULL) #allow it to vary differently each time.
 monte_carlo_sim_lots  = rep_id_val_list %&gt;% 
@@ -535,18 +535,18 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 <p>Take a look at output.</p>
 <pre class="r"><code>monte_carlo_sim_lots</code></pre>
 <pre><code>## # A tibble: 50,000 × 7
-##    county_id state   pop   dem  prev n_cases rep_id
-##        &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt;   &lt;int&gt;  &lt;int&gt;
-##  1         1     1 10027     1 0.168    1680      1
-##  2         2     1  9943     0 0.296    2941      1
-##  3         3     1  9907     0 0.110    1092      1
-##  4         4     1  9968     0 0.328    3273      1
-##  5         5     1 10037     1 0.256    2567      1
-##  6         6     1 10150     0 0.329    3340      1
-##  7         7     1 10119     1 0.318    3214      1
-##  8         8     1 10058     1 0.369    3713      1
-##  9         9     1 10049     0 0.320    3219      1
-## 10        10     1  9860     1 0.205    2023      1
+##    county_id state   pop   dem   prev n_cases rep_id
+##        &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt;  &lt;dbl&gt;   &lt;int&gt;  &lt;int&gt;
+##  1         1     1 10006     0 0.178     1779      1
+##  2         2     1 10011     1 0.129     1291      1
+##  3         3     1  9923     1 0.460     4565      1
+##  4         4     1 10068     0 0.226     2271      1
+##  5         5     1  9827     0 0.0526     516      1
+##  6         6     1  9833     1 0.209     2051      1
+##  7         7     1  9927     0 0.171     1701      1
+##  8         8     1 10028     0 0.180     1801      1
+##  9         9     1 10139     1 0.292     2963      1
+## 10        10     1  9961     1 0.341     3398      1
 ## # … with 49,990 more rows
 ## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 <p>How many rows?</p>
@@ -558,7 +558,7 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 </div>
 <div id="summarize-results" class="section level3" number="4.1.3">
 <h3><span class="header-section-number">4.1.3</span> Summarize results</h3>
-<p>What’s the distribution of <code>n_cases_mean</code> over Monte Carlo replications? This is not the variability of the number of cases within the state between counties but rather the variability of the mean number of county-level cases for the state between replications.</p>
+<p>What’s the distribution of <code>n_cases_mean</code> over Monte Carlo replications? This is not the variability of the number of cases within the state between counties but rather the variability of the mean number of cases over counties between replications.</p>
 <pre class="r"><code>monte_carlo_sim_lots %&gt;% 
   group_by(rep_id,state) %&gt;% 
   summarise(
@@ -590,7 +590,7 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 <pre><code>## # A tibble: 1 × 5
 ##   state n_cases_mean_ll n_cases_mean_med n_cases_mean_ul simulation_type
 ##   &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;           &lt;dbl&gt; &lt;chr&gt;          
-## 1     1           2793.            3020.           3278. monte-carlo</code></pre>
+## 1     1           2777.            3013.           3245. monte-carlo</code></pre>
 </div>
 </div>
 <div id="bootstrap" class="section level2" number="4.2">
@@ -604,23 +604,23 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 <pre><code>## # A tibble: 100 × 6
 ##    county_id state   pop   dem   prev n_cases
 ##        &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt;  &lt;dbl&gt;   &lt;int&gt;
-##  1        22     1  9901     1 0.370     3660
-##  2         3     1  9863     1 0.492     4849
-##  3         6     1 10062     1 0.435     4378
-##  4        51     1 10006     1 0.420     4205
-##  5         2     1  9780     1 0.455     4448
-##  6        56     1 10007     0 0.0461     460
-##  7        23     1 10068     0 0.350     3523
-##  8        98     1 10105     1 0.251     2539
-##  9        99     1  9864     0 0.232     2285
-## 10         8     1  9995     1 0.634     6340
+##  1        30     1  9922     1 0.303     3010
+##  2        61     1  9910     1 0.520     5148
+##  3        85     1 10002     0 0.0276     276
+##  4        66     1  9870     1 0.570     5628
+##  5        86     1 10100     1 0.338     3408
+##  6        77     1 10070     0 0.395     3975
+##  7         2     1  9780     1 0.455     4448
+##  8        49     1 10033     1 0.347     3486
+##  9        69     1  9963     0 0.119     1184
+## 10        60     1 10036     0 0.237     2382
 ## # … with 90 more rows
 ## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 <p>As expected, we have the same number of rows, but fewer unique values for <code>county_id.</code> Some are repeating.</p>
 <pre class="r"><code>nrow(monte_carlo_sim_one_boot)</code></pre>
 <pre><code>## [1] 100</code></pre>
 <pre class="r"><code>n_distinct(monte_carlo_sim_one_boot$county_id)</code></pre>
-<pre><code>## [1] 66</code></pre>
+<pre><code>## [1] 69</code></pre>
 <p>Repeat this bootstrap procedure 500 times by first writing a function and then iterating replications through that function using <code>purrr::map_dfr()</code></p>
 <div id="define-a-function-for-replications-1" class="section level3" number="4.2.1">
 <h3><span class="header-section-number">4.2.1</span> Define a function for replications</h3>
@@ -642,16 +642,16 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 <pre><code>## # A tibble: 50,000 × 7
 ##    county_id state   pop   dem   prev n_cases rep_id
 ##        &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt;  &lt;dbl&gt;   &lt;int&gt;  &lt;int&gt;
-##  1        13     1 10088     0 0.286     2887      1
-##  2        77     1 10070     0 0.395     3975      1
-##  3        87     1 10139     1 0.199     2016      1
-##  4        60     1 10036     0 0.237     2382      1
-##  5        82     1 10146     1 0.308     3120      1
-##  6        30     1  9922     1 0.303     3010      1
-##  7        73     1  9964     1 0.246     2448      1
-##  8        42     1 10054     1 0.224     2251      1
-##  9        56     1 10007     0 0.0461     460      1
-## 10        47     1  9904     0 0.206     2042      1
+##  1        19     1 10000     0 0.527     5271      1
+##  2        97     1 10028     1 0.456     4568      1
+##  3        48     1  9804     0 0.157     1539      1
+##  4        40     1  9936     0 0.172     1707      1
+##  5        58     1 10015     0 0.0619     619      1
+##  6        45     1 10006     1 0.396     3961      1
+##  7        66     1  9870     1 0.570     5628      1
+##  8        50     1 10047     1 0.354     3557      1
+##  9        40     1  9936     0 0.172     1707      1
+## 10        63     1  9934     0 0.329     3271      1
 ## # … with 49,990 more rows
 ## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 <p>What’s the distribution of <code>n_cases_mean</code> over bootstrap replications?</p>
@@ -686,15 +686,15 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 <pre><code>## # A tibble: 1 × 5
 ##   state n_cases_mean_ll n_cases_mean_med n_cases_mean_ul simulation_type
 ##   &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;           &lt;dbl&gt; &lt;chr&gt;          
-## 1     1           2808.            3053.           3282. bootstrap</code></pre>
+## 1     1           2826.            3054.           3295. bootstrap</code></pre>
 <p>How does this estimate of the sampling distribution of <code>n_cases_mean</code> align with the truth? We happen to know the truth here. It’s the distribution of <code>n_cases_mean</code> between the Monte Carlo simulations, defined above.</p>
 <pre class="r"><code>monte_carlo_sim_lots_summary %&gt;% 
   bind_rows(boot_lots_summary)</code></pre>
 <pre><code>## # A tibble: 2 × 5
 ##   state n_cases_mean_ll n_cases_mean_med n_cases_mean_ul simulation_type
 ##   &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;           &lt;dbl&gt; &lt;chr&gt;          
-## 1     1           2793.            3020.           3278. monte-carlo    
-## 2     1           2808.            3053.           3282. bootstrap</code></pre>
+## 1     1           2777.            3013.           3245. monte-carlo    
+## 2     1           2826.            3054.           3295. bootstrap</code></pre>
 </div>
 </div>
 </div>
@@ -719,7 +719,8 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 </div>
 <div id="more-on-functions" class="section level1" number="6">
 <h1><span class="header-section-number">6</span> More on functions</h1>
-<p>In addition to their use for simulations as above, functions can also be used simply to reduce repetition in code. Sometimes you end up writing the same or similar code many times and apply that code to several datasets. For example, above we wrote basically the same sequence of dplyr functions to define <code>monte_carlo_sim_frozen</code> as we did to define the function, <code>monte_carlo_sim_fun()</code>. Here is a set of dplyr steps combined into one function.</p>
+<p>In addition to their use for simulations as above, functions can also be used simply to reduce repetition in code. Sometimes you end up writing the same or similar code many times and apply that code to several datasets. For example, above we wrote an almost identical equence of dplyr functions to define both <code>monte_carlo_sim_frozen</code> and the function, <code>monte_carlo_sim_fun()</code>.</p>
+<p>Here is an example sequence of dplyr steps combined into one function.</p>
 <pre class="r"><code>do_some_dplyr_stuff = function(df){ 
   df %&gt;%
   mutate(
@@ -739,7 +740,7 @@ function_result_one_county</code></pre>
 <pre><code>## # A tibble: 1 × 5
 ##   state county_id example_var_x example_var_y example_var_z
 ##   &lt;dbl&gt;     &lt;int&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;int&gt;
-## 1     1         2         0.712             4             0</code></pre>
+## 1     1         2        -0.908             4             1</code></pre>
 </div>
 <div id="references" class="section level1 unnumbered">
 <h1><strong>References</strong></h1>
