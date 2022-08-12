@@ -1,6 +1,6 @@
 ---
 title: "Monte Carlo simulations and boots with the purrr::map_dfr()"
-author: "Michael D Garber"
+author: "Michael D. Garber, PhD MPH"
 date: "`r Sys.Date()`"
 output:
   html_document:
@@ -24,9 +24,9 @@ link-citations: true
 
 ## Sources of uncertainty from multiple sources
 
-Almost any epidemiological or statistical analysis has uncertainty. Uncertainty may arise within the dataset available for analysis (the sample) or, if we aim to infer characteristics of a larger population from the sample, from sampling. For example, suppose we want to estimate the prevalence of Covid-19 in a county. To do so, we randomly sample 1,000 people from that county and test them using at-home antigen tests. Home tests have good specificity but fairly poor sensitivity,[@chu2022] meaning some of the negative results probably were truly positive (false negative). And because the poor sensitivity is a property of the test, not the sampling, this error is expected to occur regardless of the sample size. In addition to this systematic error in measurement, uncertainty arises from the sampling because we don't know if the Covid prevalence among the 1,000 people we tested represent that of the county. By chance, we could have tested a particularly healthy or sick sample.
+Almost any epidemiological or statistical analysis has uncertainty. Uncertainty may arise within the dataset available for analysis (the sample) or, if we aim to infer characteristics of a larger population from the sample, from sampling. For example, suppose we want to estimate the prevalence of Covid-19 in a county. To do so, we randomly sample 1,000 people from that county and test them using at-home antigen tests. Home tests have good specificity but fairly poor sensitivity,[@chu2022] meaning some of the negative results were probably truly positive (false negative). And because the poor sensitivity is a property of the test, not the sampling, this error is expected to occur regardless of the sample size. In addition to this systematic error in measurement, uncertainty arises from the sampling because we don't know if the Covid prevalence among the 1,000 people we tested represents that of the county. By chance, we could have tested a particularly healthy or sick sample.
 
-In our final estimate of prevalence, how would we go about summarizing its uncertainty, considering both the expected error in measurement and random error from sampling? Statistics of course has fundamental methods for estimating uncertainty from multiple sources, but many traditional methods involve complex math.[@distribu2022a] To simplify the math, analysts often make assumptions that may not hold, for example that random variables considered in the analysis are independent from one another. In this particular example, the two sources of uncertainty (test accuracy and sampling) may be independent from one another, but that independence often does not hold.
+In our final estimate of prevalence, how would we go about summarizing its uncertainty, considering both the expected error in measurement and random error from sampling? Statistics of course has fundamental methods for estimating uncertainty from multiple sources, but many traditional methods for estimating variance involve complex math.[@distribu2022a] To simplify the math, analysts often make assumptions that may not hold, for example that random variables considered in the analysis are independent from one another. In this particular example, the two sources of uncertainty (test accuracy and sampling) may be independent from one another, but that independence often does not hold.
 
 ## When independence between sources of uncertainty does not hold
 
@@ -34,7 +34,7 @@ For example, in my dissertation, I aimed to estimate the total amount of bicycli
 
 # Estimating variability via repeated (re)sampling of random variations
 
-Fortunately, we can estimate uncertainty using the computer which largely obviates the need to do complex math. Two broad ways to estimate uncertainty using computer-based simulation techniques are **Monte Carlo simulations** and **bootstrapping**. In addition to easing the math, these simulation methods can help the analyst see how and when something varies in the analysis, which facilitates clarity and understanding.
+Fortunately, we can estimate uncertainty using computer simulations which largely obviates the need to do complex math. Two broad ways to estimate uncertainty using computer-based simulation techniques are **Monte Carlo simulations** and **bootstrapping**. In addition to easing the math, these simulation methods can help the analyst see how and when something varies in the analysis, which facilitates clarity and understanding.
 
 ## Monte Carlo simulations
 
@@ -48,9 +48,9 @@ Monte Carlo simulation in its typical implementation cannot, however, directly e
 
 > "In statistics..., bootstrapping has come to mean to resampling [with replacement] repeatedly and randomly from an original, initial sample using each bootstrapped sample to compute a statistic. The resulting empirical distribution of the statistic is then examined and interpreted as an approximation to the true sampling distribution."[@barreto2005]
 
-The bootstrap was introduced by Brad Efron in the late 1970s.[@bootstra2022c; @efron1979] There are many forms of bootstrapping, including ways to bootstrap residuals from regression models.[@efron2016] In its most basic form, to bootstrap means to re-sample observations from the sample, compute summary statistics from each re-sampled sample, and use the distribution of those summary statistics to infer the sampling distribution.
+The bootstrap was introduced by Bradley Efron in the late 1970s.[@bootstra2022c; @efron1979] There are many forms of bootstrapping, including ways to bootstrap residuals from regression models.[@efron2016] In its most basic form, to bootstrap means to re-sample observations from the sample, compute summary statistics from each re-sampled sample, and use the distribution of those summary statistics to infer the sampling distribution.
 
-The bootstrap is similar conceptually with Monte Carlo techniques because it involves randomly changing the data over repeated iterations and summarizing results of those iterations. The key difference is that the bootstrap estimates a distribution using data we have, and, under the Monte Carlo technique described, the distribution of each variable is specified by the analyst.
+The bootstrap is similar conceptually to Monte Carlo techniques because it involves randomly changing the data over repeated iterations and summarizing results of those iterations. The key difference is that the bootstrap estimates a distribution using data we have, and, under the Monte Carlo technique described, the distribution of each variable is specified by the analyst.
 
 # Example code for each method using `purrr::map_dfr()`
 
@@ -120,7 +120,7 @@ monte_carlo_sim_fun = function(rep_id_val){
     rename(county_id = value) %>% 
     mutate(
       state = 1,
-      pop = rpois(n=n(), lambda=10000), #mean = var=1000
+      pop = rpois(n=n(), lambda=10000),  
       dem = rbinom(n=n(), size=1, prob =.5),
       prev = rtruncnorm(
         n=n(), 

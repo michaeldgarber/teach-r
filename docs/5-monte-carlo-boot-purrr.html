@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Michael D Garber" />
+<meta name="author" content="Michael D. Garber, PhD MPH" />
 
 <meta name="date" content="2022-08-12" />
 
@@ -369,7 +369,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Monte Carlo simulations and boots with the purrr::map_dfr()</h1>
-<h4 class="author">Michael D Garber</h4>
+<h4 class="author">Michael D. Garber, PhD MPH</h4>
 <h4 class="date">2022-08-12</h4>
 
 </div>
@@ -390,8 +390,8 @@ div.tocify {
 <h1><span class="header-section-number">2</span> Motivation</h1>
 <div id="sources-of-uncertainty-from-multiple-sources" class="section level2" number="2.1">
 <h2><span class="header-section-number">2.1</span> Sources of uncertainty from multiple sources</h2>
-<p>Almost any epidemiological or statistical analysis has uncertainty. Uncertainty may arise within the dataset available for analysis (the sample) or, if we aim to infer characteristics of a larger population from the sample, from sampling. For example, suppose we want to estimate the prevalence of Covid-19 in a county. To do so, we randomly sample 1,000 people from that county and test them using at-home antigen tests. Home tests have good specificity but fairly poor sensitivity,<span class="citation"><sup><a href="#ref-chu2022" role="doc-biblioref">1</a></sup></span> meaning some of the negative results probably were truly positive (false negative). And because the poor sensitivity is a property of the test, not the sampling, this error is expected to occur regardless of the sample size. In addition to this systematic error in measurement, uncertainty arises from the sampling because we don’t know if the Covid prevalence among the 1,000 people we tested represent that of the county. By chance, we could have tested a particularly healthy or sick sample.</p>
-<p>In our final estimate of prevalence, how would we go about summarizing its uncertainty, considering both the expected error in measurement and random error from sampling? Statistics of course has fundamental methods for estimating uncertainty from multiple sources, but many traditional methods involve complex math.<span class="citation"><sup><a href="#ref-distribu2022a" role="doc-biblioref">2</a></sup></span> To simplify the math, analysts often make assumptions that may not hold, for example that random variables considered in the analysis are independent from one another. In this particular example, the two sources of uncertainty (test accuracy and sampling) may be independent from one another, but that independence often does not hold.</p>
+<p>Almost any epidemiological or statistical analysis has uncertainty. Uncertainty may arise within the dataset available for analysis (the sample) or, if we aim to infer characteristics of a larger population from the sample, from sampling. For example, suppose we want to estimate the prevalence of Covid-19 in a county. To do so, we randomly sample 1,000 people from that county and test them using at-home antigen tests. Home tests have good specificity but fairly poor sensitivity,<span class="citation"><sup><a href="#ref-chu2022" role="doc-biblioref">1</a></sup></span> meaning some of the negative results were probably truly positive (false negative). And because the poor sensitivity is a property of the test, not the sampling, this error is expected to occur regardless of the sample size. In addition to this systematic error in measurement, uncertainty arises from the sampling because we don’t know if the Covid prevalence among the 1,000 people we tested represents that of the county. By chance, we could have tested a particularly healthy or sick sample.</p>
+<p>In our final estimate of prevalence, how would we go about summarizing its uncertainty, considering both the expected error in measurement and random error from sampling? Statistics of course has fundamental methods for estimating uncertainty from multiple sources, but many traditional methods for estimating variance involve complex math.<span class="citation"><sup><a href="#ref-distribu2022a" role="doc-biblioref">2</a></sup></span> To simplify the math, analysts often make assumptions that may not hold, for example that random variables considered in the analysis are independent from one another. In this particular example, the two sources of uncertainty (test accuracy and sampling) may be independent from one another, but that independence often does not hold.</p>
 </div>
 <div id="when-independence-between-sources-of-uncertainty-does-not-hold" class="section level2" number="2.2">
 <h2><span class="header-section-number">2.2</span> When independence between sources of uncertainty does not hold</h2>
@@ -400,7 +400,7 @@ div.tocify {
 </div>
 <div id="estimating-variability-via-repeated-resampling-of-random-variations" class="section level1" number="3">
 <h1><span class="header-section-number">3</span> Estimating variability via repeated (re)sampling of random variations</h1>
-<p>Fortunately, we can estimate uncertainty using the computer which largely obviates the need to do complex math. Two broad ways to estimate uncertainty using computer-based simulation techniques are <strong>Monte Carlo simulations</strong> and <strong>bootstrapping</strong>. In addition to easing the math, these simulation methods can help the analyst see how and when something varies in the analysis, which facilitates clarity and understanding.</p>
+<p>Fortunately, we can estimate uncertainty using computer simulations which largely obviates the need to do complex math. Two broad ways to estimate uncertainty using computer-based simulation techniques are <strong>Monte Carlo simulations</strong> and <strong>bootstrapping</strong>. In addition to easing the math, these simulation methods can help the analyst see how and when something varies in the analysis, which facilitates clarity and understanding.</p>
 <div id="monte-carlo-simulations" class="section level2" number="3.1">
 <h2><span class="header-section-number">3.1</span> Monte Carlo simulations</h2>
 <blockquote>
@@ -414,8 +414,8 @@ div.tocify {
 <blockquote>
 <p>“In statistics…, bootstrapping has come to mean to resampling [with replacement] repeatedly and randomly from an original, initial sample using each bootstrapped sample to compute a statistic. The resulting empirical distribution of the statistic is then examined and interpreted as an approximation to the true sampling distribution.”<span class="citation"><sup><a href="#ref-barreto2005" role="doc-biblioref">5</a></sup></span></p>
 </blockquote>
-<p>The bootstrap was introduced by Brad Efron in the late 1970s.<span class="citation"><sup><a href="#ref-bootstra2022c" role="doc-biblioref">6</a>,<a href="#ref-efron1979" role="doc-biblioref">7</a></sup></span> There are many forms of bootstrapping, including ways to bootstrap residuals from regression models.<span class="citation"><sup><a href="#ref-efron2016" role="doc-biblioref">8</a></sup></span> In its most basic form, to bootstrap means to re-sample observations from the sample, compute summary statistics from each re-sampled sample, and use the distribution of those summary statistics to infer the sampling distribution.</p>
-<p>The bootstrap is similar conceptually with Monte Carlo techniques because it involves randomly changing the data over repeated iterations and summarizing results of those iterations. The key difference is that the bootstrap estimates a distribution using data we have, and, under the Monte Carlo technique described, the distribution of each variable is specified by the analyst.</p>
+<p>The bootstrap was introduced by Bradley Efron in the late 1970s.<span class="citation"><sup><a href="#ref-bootstra2022c" role="doc-biblioref">6</a>,<a href="#ref-efron1979" role="doc-biblioref">7</a></sup></span> There are many forms of bootstrapping, including ways to bootstrap residuals from regression models.<span class="citation"><sup><a href="#ref-efron2016" role="doc-biblioref">8</a></sup></span> In its most basic form, to bootstrap means to re-sample observations from the sample, compute summary statistics from each re-sampled sample, and use the distribution of those summary statistics to infer the sampling distribution.</p>
+<p>The bootstrap is similar conceptually to Monte Carlo techniques because it involves randomly changing the data over repeated iterations and summarizing results of those iterations. The key difference is that the bootstrap estimates a distribution using data we have, and, under the Monte Carlo technique described, the distribution of each variable is specified by the analyst.</p>
 </div>
 </div>
 <div id="example-code-for-each-method-using-purrrmap_dfr" class="section level1" number="4">
@@ -489,7 +489,7 @@ monte_carlo_sim_frozen</code></pre>
     rename(county_id = value) %&gt;% 
     mutate(
       state = 1,
-      pop = rpois(n=n(), lambda=10000), #mean = var=1000
+      pop = rpois(n=n(), lambda=10000),  
       dem = rbinom(n=n(), size=1, prob =.5),
       prev = rtruncnorm(
         n=n(), 
@@ -537,16 +537,16 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 <pre><code>## # A tibble: 50,000 × 7
 ##    county_id state   pop   dem  prev n_cases rep_id
 ##        &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt;   &lt;int&gt;  &lt;int&gt;
-##  1         1     1  9995     1 0.641    6408      1
-##  2         2     1  9920     1 0.331    3285      1
-##  3         3     1  9912     1 0.323    3197      1
-##  4         4     1  9955     1 0.387    3853      1
-##  5         5     1 10173     0 0.203    2060      1
-##  6         6     1 10033     0 0.118    1179      1
-##  7         7     1  9961     1 0.373    3715      1
-##  8         8     1  9998     0 0.491    4905      1
-##  9         9     1 10014     0 0.139    1389      1
-## 10        10     1 10057     0 0.248    2497      1
+##  1         1     1  9895     1 0.650    6433      1
+##  2         2     1  9836     1 0.457    4490      1
+##  3         3     1  9983     1 0.317    3165      1
+##  4         4     1  9872     0 0.243    2400      1
+##  5         5     1  9911     0 0.265    2627      1
+##  6         6     1  9791     0 0.128    1256      1
+##  7         7     1 10010     0 0.252    2520      1
+##  8         8     1 10187     0 0.228    2324      1
+##  9         9     1 10047     0 0.231    2321      1
+## 10        10     1 10212     1 0.432    4411      1
 ## # … with 49,990 more rows
 ## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 <p>How many rows?</p>
@@ -586,7 +586,7 @@ monte_carlo_sim_lots_summary</code></pre>
 <pre><code>## # A tibble: 1 × 5
 ##   state n_cases_mean_ll n_cases_mean_med n_cases_mean_ul simulation_type
 ##   &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;           &lt;dbl&gt; &lt;chr&gt;          
-## 1     1           2805.            3018.           3274. monte-carlo</code></pre>
+## 1     1           2792.            3012.           3244. monte-carlo</code></pre>
 </div>
 </div>
 <div id="bootstrap" class="section level2" number="4.2">
@@ -600,23 +600,23 @@ monte_carlo_sim_lots_summary</code></pre>
 <pre><code>## # A tibble: 100 × 6
 ##    county_id state   pop   dem  prev n_cases
 ##        &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt;   &lt;int&gt;
-##  1        19     1 10000     0 0.527    5271
-##  2        93     1 10016     1 0.503    5042
-##  3        78     1  9947     0 0.255    2535
-##  4        97     1 10028     1 0.456    4568
-##  5        71     1  9944     1 0.410    4077
-##  6         2     1  9780     1 0.455    4448
-##  7        49     1 10033     1 0.347    3486
-##  8        77     1 10070     0 0.395    3975
-##  9        80     1  9987     1 0.452    4513
-## 10         5     1 10132     0 0.243    2464
+##  1        76     1 10019     0 0.340    3411
+##  2        64     1  9909     0 0.343    3403
+##  3        38     1 10078     0 0.394    3974
+##  4        74     1 10250     1 0.325    3329
+##  5        23     1 10068     0 0.350    3523
+##  6         5     1 10132     0 0.243    2464
+##  7        31     1 10002     0 0.197    1971
+##  8        37     1 10021     1 0.288    2886
+##  9        55     1  9987     0 0.254    2536
+## 10         7     1  9995     0 0.177    1773
 ## # … with 90 more rows
 ## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 <p>As expected, we have the same number of rows, but fewer unique values for <code>county_id.</code> Some are repeating.</p>
 <pre class="r"><code>nrow(monte_carlo_sim_one_boot)</code></pre>
 <pre><code>## [1] 100</code></pre>
 <pre class="r"><code>n_distinct(monte_carlo_sim_one_boot$county_id)</code></pre>
-<pre><code>## [1] 58</code></pre>
+<pre><code>## [1] 65</code></pre>
 <p>Repeat this bootstrap procedure 500 times by first writing a function and then iterating replications through that function using <code>purrr::map_dfr()</code></p>
 <div id="define-a-function-for-replications-1" class="section level3" number="4.2.1">
 <h3><span class="header-section-number">4.2.1</span> Define a function for replications</h3>
@@ -638,16 +638,16 @@ monte_carlo_sim_lots_summary</code></pre>
 <pre><code>## # A tibble: 50,000 × 7
 ##    county_id state   pop   dem  prev n_cases rep_id
 ##        &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt;   &lt;int&gt;  &lt;int&gt;
-##  1        28     1 10154     1 0.446    4533      1
-##  2        49     1 10033     1 0.347    3486      1
-##  3        70     1  9897     1 0.345    3413      1
-##  4        45     1 10006     1 0.396    3961      1
-##  5        49     1 10033     1 0.347    3486      1
-##  6        99     1  9864     0 0.232    2285      1
-##  7        76     1 10019     0 0.340    3411      1
-##  8        60     1 10036     0 0.237    2382      1
-##  9        33     1  9912     0 0.121    1203      1
-## 10        38     1 10078     0 0.394    3974      1
+##  1         4     1  9884     0 0.238    2352      1
+##  2        81     1 10048     0 0.206    2072      1
+##  3        77     1 10070     0 0.395    3975      1
+##  4         9     1  9965     0 0.223    2219      1
+##  5        14     1  9940     0 0.246    2443      1
+##  6        22     1  9901     1 0.370    3660      1
+##  7        90     1  9986     1 0.138    1375      1
+##  8        41     1 10015     1 0.468    4684      1
+##  9        99     1  9864     0 0.232    2285      1
+## 10        98     1 10105     1 0.251    2539      1
 ## # … with 49,990 more rows
 ## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 <p>What’s the distribution of <code>n_cases_mean</code> over bootstrap replications?</p>
@@ -678,15 +678,15 @@ boot_lots_summary</code></pre>
 <pre><code>## # A tibble: 1 × 5
 ##   state n_cases_mean_ll n_cases_mean_med n_cases_mean_ul simulation_type
 ##   &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;           &lt;dbl&gt; &lt;chr&gt;          
-## 1     1           2821.            3054.           3295. bootstrap</code></pre>
+## 1     1           2808.            3056.           3312. bootstrap</code></pre>
 <p>How does this estimate of the sampling distribution of <code>n_cases_mean</code> align with the truth? We happen to know the truth here. It’s the distribution of <code>n_cases_mean</code> between the Monte Carlo simulations, defined above.</p>
 <pre class="r"><code>monte_carlo_sim_lots_summary %&gt;% 
   bind_rows(boot_lots_summary)</code></pre>
 <pre><code>## # A tibble: 2 × 5
 ##   state n_cases_mean_ll n_cases_mean_med n_cases_mean_ul simulation_type
 ##   &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;           &lt;dbl&gt; &lt;chr&gt;          
-## 1     1           2805.            3018.           3274. monte-carlo    
-## 2     1           2821.            3054.           3295. bootstrap</code></pre>
+## 1     1           2792.            3012.           3244. monte-carlo    
+## 2     1           2808.            3056.           3312. bootstrap</code></pre>
 </div>
 </div>
 </div>
@@ -732,7 +732,7 @@ function_result_one_county</code></pre>
 <pre><code>## # A tibble: 1 × 5
 ##   state county_id example_var_x example_var_y example_var_z
 ##   &lt;dbl&gt;     &lt;int&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;int&gt;
-## 1     1         2        -0.968             4             0</code></pre>
+## 1     1         2        -0.266             4             1</code></pre>
 </div>
 <div id="references" class="section level1 unnumbered">
 <h1><strong>References</strong></h1>
