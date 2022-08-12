@@ -1,7 +1,7 @@
 ---
 title: "R for spatial data wrangling: using sf to wrangle pharmacies in Atlanta and assess population living nearby (Part 1)"
 author: "Michael D. Garber, PhD MPH"
-date: "Revised August 8, 2022"
+date: "`r Sys.Date()`"
 output:
   html_document:
     toc: true
@@ -19,9 +19,7 @@ Specifically:
 
 2.  How many people live within 1/2 mile of these pharmacies in these counties?
 
-3.  How is residential proximity to a pharmacy distributed socioeconomically?
-
-*In part 1, we answer the first question. In part 2, we answer questions 2 and 3.*
+*In part 1, we answer the first question. In part 2, we answer the second.*
 
 <br />
 
@@ -89,7 +87,7 @@ install.packages("osmdata")
 install.packages("tidycensus")
 
 #Other packages used
-install.packages("tidyverse") #always
+install.packages("tidyverse") #always :)
 install.packages("sf") #focus of session; spatial data wrangling
 install.packages("mapview") #interactive mapping
 install.packages("viridis") #for color scales.
@@ -107,8 +105,6 @@ library(here)
 ```
 
 # Download, prepare, and visualize census tract data for Georgia
-
-Note: throughout this code, I'm writing out packagename::function to be more clear of the package source, but that syntax is not necessary. That is, you could write `get_acs()` rather than `tidycensus::get_acs()` because no other loaded package uses that function.
 
 Packages used in this section (besides dplyr and sf):
 
@@ -167,7 +163,7 @@ tract_ga =tidycensus::get_acs(
 
 ## Wrangle data using dplyr and sf functions, including `st_area()`, `st_transform()`
 
-Here are our first sf functions. We measure the area of each census tract using `sf::st_area()`, and we go back and forth between coordinate reference systems (CRS) using `sf::st_transform()`. I typically use WGS84, a [commonly used](https://en.wikipedia.org/wiki/World_Geodetic_System#WGS84) CRS, which has the [EPSG](https://en.wikipedia.org/wiki/EPSG_Geodetic_Parameter_Dataset) code of 4326. The main practical consideration in deciding which CRS to use is its system of measurement (meters or feet).
+Here are our first sf functions. We measure the area of each census tract using `sf::st_area()`, and we go back and forth between coordinate reference systems (CRS) using `sf::st_transform()`. I typically use WGS84, a [commonly used](https://en.wikipedia.org/wiki/World_Geodetic_System#WGS84) CRS, which has the [EPSG](https://en.wikipedia.org/wiki/EPSG_Geodetic_Parameter_Dataset) code of 4326. The main practical consideration in deciding which CRS to use is its unit of measurement (i.e., meters or feet).
 
 Overview resources on coordinate reference systems:
 
@@ -312,7 +308,7 @@ tract_ga_wrangle %>%
   viridis::scale_color_viridis()
 ```
 
-Try filtering to Atlanta Metro Counties and removing very high-population-dense census tracts, which are skewing the scale. The scale rises linearly, but the vast majority of census tracts have low density, and a select few have high density, as the histogram shows:
+Try filtering to Atlanta Metro Counties and removing very high-population-dense census tracts, which are skewing the scale. The scale rises linearly, but the vast majority of census tracts have low density, and a few have high density, as the histogram shows:
 
 ```{r, warning=FALSE, message=FALSE}
 tract_ga_wrangle %>% 
@@ -354,9 +350,7 @@ tract_ga_wrangle %>%
 
 ## Summarize by county to create an sf object of counties
 
-Like a "dissolve" in ArcGIS
-
-Summarize over county and keep geometry of counties. The "features" of the sf object will become counties rather than census tracts.
+Here, we summarize over county and keep geometry of counties. The "features" of the sf object will become counties rather than census tracts. This procedure is like a "dissolve" in ArcGIS.
 
 ```{r}
 county_ga  = tract_ga_wrangle %>% 

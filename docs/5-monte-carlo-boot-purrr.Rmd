@@ -305,11 +305,11 @@ monte_carlo_sim_lots_summary %>%
 
 # Summary of Monte Carlo simulations and bootstrapping
 
-Advantages of these computation-based simulation methods
+Advantages of these computation-based simulation methods:
 
--   Makes explicit where the variation is coming from and aids in intuition.
+-   They make explicit where the variation is coming from, aiding in intuition.
 
--   Easily accommodates correlation between variables and avoids difficult math.
+-   They easily accommodate correlation between variables, avoiding difficult math.
 
 Comparison between the two:
 
@@ -320,8 +320,8 @@ Comparison between the two:
 Broad steps for each:
 
 1.  Define a function that contains steps of the analysis with variability.
-2.  Run that function lots of times using `purrr::map_dfr()`
-3.  Summarize the distribution of the results. Conventionally, to report percentile-based confidence intervals,[@efron2016a] take the median, 2.5th, and 97.5th percentiles.
+2.  Run that function lots of times using `purrr::map_dfr()`.
+3.  Summarize the distribution of the results. Conventionally, to report percentile-based confidence intervals,[@efron2016a] take the 2.5th, and 97.5th percentiles.
 
 # More on functions
 

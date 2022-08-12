@@ -222,7 +222,7 @@ As mentioned, the tidyverse contains lots of packages. One of them is **datasets
 
 The below code chunk simply creates a copy of the LakeHuron dataset and calls it lake_huron_raw. In the next line of code, we print the object by typing its name: `lake_huron_raw.`
 
-**Side-note**: the `package_name::object` syntax, as in `datasets::LakeHuron`, is R's way of explicitly stating which package the object is coming from. We could have equally have written `lake_huron_raw = LakeHuron`, but, for clarity, it can help to be explicit. This is especially important if the same word is used by multiple packages.
+**Side-note**: the `package_name::object` syntax, as in `datasets::LakeHuron`, is R's way of explicitly stating which package the object is coming from. Technically, it loads the package via namespace, elaborated upon here: <https://michaeldgarber.github.io/teach-r/0-manage-packages.html>. If the package has been attached via `library(package_name)`, then we could write, `lake_huron_raw = LakeHuron`.
 
 ```{r}
 #Define new object called lake_huron_raw.

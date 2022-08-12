@@ -537,16 +537,16 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 <pre><code>## # A tibble: 50,000 × 7
 ##    county_id state   pop   dem  prev n_cases rep_id
 ##        &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt;   &lt;int&gt;  &lt;int&gt;
-##  1         1     1  9895     1 0.650    6433      1
-##  2         2     1  9836     1 0.457    4490      1
-##  3         3     1  9983     1 0.317    3165      1
-##  4         4     1  9872     0 0.243    2400      1
-##  5         5     1  9911     0 0.265    2627      1
-##  6         6     1  9791     0 0.128    1256      1
-##  7         7     1 10010     0 0.252    2520      1
-##  8         8     1 10187     0 0.228    2324      1
-##  9         9     1 10047     0 0.231    2321      1
-## 10        10     1 10212     1 0.432    4411      1
+##  1         1     1  9953     0 0.380    3781      1
+##  2         2     1 10138     0 0.126    1273      1
+##  3         3     1  9997     1 0.608    6079      1
+##  4         4     1  9985     0 0.228    2274      1
+##  5         5     1 10054     1 0.638    6416      1
+##  6         6     1  9788     1 0.240    2349      1
+##  7         7     1  9915     0 0.267    2647      1
+##  8         8     1 10022     1 0.397    3978      1
+##  9         9     1 10141     1 0.292    2960      1
+## 10        10     1 10005     1 0.285    2847      1
 ## # … with 49,990 more rows
 ## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 <p>How many rows?</p>
@@ -586,7 +586,7 @@ monte_carlo_sim_lots_summary</code></pre>
 <pre><code>## # A tibble: 1 × 5
 ##   state n_cases_mean_ll n_cases_mean_med n_cases_mean_ul simulation_type
 ##   &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;           &lt;dbl&gt; &lt;chr&gt;          
-## 1     1           2792.            3012.           3244. monte-carlo</code></pre>
+## 1     1           2798.            3002.           3247. monte-carlo</code></pre>
 </div>
 </div>
 <div id="bootstrap" class="section level2" number="4.2">
@@ -598,25 +598,25 @@ monte_carlo_sim_lots_summary</code></pre>
 <p>Take a look:</p>
 <pre class="r"><code>monte_carlo_sim_one_boot</code></pre>
 <pre><code>## # A tibble: 100 × 6
-##    county_id state   pop   dem  prev n_cases
-##        &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt;   &lt;int&gt;
-##  1        76     1 10019     0 0.340    3411
-##  2        64     1  9909     0 0.343    3403
-##  3        38     1 10078     0 0.394    3974
-##  4        74     1 10250     1 0.325    3329
-##  5        23     1 10068     0 0.350    3523
-##  6         5     1 10132     0 0.243    2464
-##  7        31     1 10002     0 0.197    1971
-##  8        37     1 10021     1 0.288    2886
-##  9        55     1  9987     0 0.254    2536
-## 10         7     1  9995     0 0.177    1773
+##    county_id state   pop   dem   prev n_cases
+##        &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt;  &lt;dbl&gt;   &lt;int&gt;
+##  1        65     1  9910     0 0.312     3089
+##  2        89     1 10073     1 0.431     4337
+##  3        72     1 10051     0 0.0820     823
+##  4         9     1  9965     0 0.223     2219
+##  5        32     1 10089     1 0.221     2229
+##  6        68     1 10085     0 0.396     3996
+##  7        50     1 10047     1 0.354     3557
+##  8        45     1 10006     1 0.396     3961
+##  9        95     1  9891     0 0.215     2130
+## 10        20     1  9981     1 0.564     5626
 ## # … with 90 more rows
 ## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 <p>As expected, we have the same number of rows, but fewer unique values for <code>county_id.</code> Some are repeating.</p>
 <pre class="r"><code>nrow(monte_carlo_sim_one_boot)</code></pre>
 <pre><code>## [1] 100</code></pre>
 <pre class="r"><code>n_distinct(monte_carlo_sim_one_boot$county_id)</code></pre>
-<pre><code>## [1] 65</code></pre>
+<pre><code>## [1] 68</code></pre>
 <p>Repeat this bootstrap procedure 500 times by first writing a function and then iterating replications through that function using <code>purrr::map_dfr()</code></p>
 <div id="define-a-function-for-replications-1" class="section level3" number="4.2.1">
 <h3><span class="header-section-number">4.2.1</span> Define a function for replications</h3>
@@ -636,18 +636,18 @@ monte_carlo_sim_lots_summary</code></pre>
 <h3><span class="header-section-number">4.2.3</span> Summarize results</h3>
 <pre class="r"><code>boot_lots</code></pre>
 <pre><code>## # A tibble: 50,000 × 7
-##    county_id state   pop   dem  prev n_cases rep_id
-##        &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt;   &lt;int&gt;  &lt;int&gt;
-##  1         4     1  9884     0 0.238    2352      1
-##  2        81     1 10048     0 0.206    2072      1
-##  3        77     1 10070     0 0.395    3975      1
-##  4         9     1  9965     0 0.223    2219      1
-##  5        14     1  9940     0 0.246    2443      1
-##  6        22     1  9901     1 0.370    3660      1
-##  7        90     1  9986     1 0.138    1375      1
-##  8        41     1 10015     1 0.468    4684      1
-##  9        99     1  9864     0 0.232    2285      1
-## 10        98     1 10105     1 0.251    2539      1
+##    county_id state   pop   dem   prev n_cases rep_id
+##        &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt;  &lt;dbl&gt;   &lt;int&gt;  &lt;int&gt;
+##  1       100     1 10128     1 0.222     2252      1
+##  2        56     1 10007     0 0.0461     460      1
+##  3        15     1  9842     0 0.197     1943      1
+##  4        21     1  9985     0 0.126     1261      1
+##  5        17     1  9955     0 0.257     2553      1
+##  6        67     1 10035     1 0.497     4991      1
+##  7        75     1 10060     0 0.249     2501      1
+##  8        32     1 10089     1 0.221     2229      1
+##  9        52     1  9995     0 0.0861     860      1
+## 10        27     1  9981     0 0.338     3369      1
 ## # … with 49,990 more rows
 ## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 <p>What’s the distribution of <code>n_cases_mean</code> over bootstrap replications?</p>
@@ -678,24 +678,24 @@ boot_lots_summary</code></pre>
 <pre><code>## # A tibble: 1 × 5
 ##   state n_cases_mean_ll n_cases_mean_med n_cases_mean_ul simulation_type
 ##   &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;           &lt;dbl&gt; &lt;chr&gt;          
-## 1     1           2808.            3056.           3312. bootstrap</code></pre>
+## 1     1           2814.            3060.           3292. bootstrap</code></pre>
 <p>How does this estimate of the sampling distribution of <code>n_cases_mean</code> align with the truth? We happen to know the truth here. It’s the distribution of <code>n_cases_mean</code> between the Monte Carlo simulations, defined above.</p>
 <pre class="r"><code>monte_carlo_sim_lots_summary %&gt;% 
   bind_rows(boot_lots_summary)</code></pre>
 <pre><code>## # A tibble: 2 × 5
 ##   state n_cases_mean_ll n_cases_mean_med n_cases_mean_ul simulation_type
 ##   &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;           &lt;dbl&gt; &lt;chr&gt;          
-## 1     1           2792.            3012.           3244. monte-carlo    
-## 2     1           2808.            3056.           3312. bootstrap</code></pre>
+## 1     1           2798.            3002.           3247. monte-carlo    
+## 2     1           2814.            3060.           3292. bootstrap</code></pre>
 </div>
 </div>
 </div>
 <div id="summary-of-monte-carlo-simulations-and-bootstrapping" class="section level1" number="5">
 <h1><span class="header-section-number">5</span> Summary of Monte Carlo simulations and bootstrapping</h1>
-<p>Advantages of these computation-based simulation methods</p>
+<p>Advantages of these computation-based simulation methods:</p>
 <ul>
-<li><p>Makes explicit where the variation is coming from and aids in intuition.</p></li>
-<li><p>Easily accommodates correlation between variables and avoids difficult math.</p></li>
+<li><p>They make explicit where the variation is coming from, aiding in intuition.</p></li>
+<li><p>They easily accommodate correlation between variables, avoiding difficult math.</p></li>
 </ul>
 <p>Comparison between the two:</p>
 <ul>
@@ -705,8 +705,8 @@ boot_lots_summary</code></pre>
 <p>Broad steps for each:</p>
 <ol style="list-style-type: decimal">
 <li>Define a function that contains steps of the analysis with variability.</li>
-<li>Run that function lots of times using <code>purrr::map_dfr()</code></li>
-<li>Summarize the distribution of the results. Conventionally, to report percentile-based confidence intervals,<span class="citation"><sup><a href="#ref-efron2016a" role="doc-biblioref">9</a></sup></span> take the median, 2.5th, and 97.5th percentiles.</li>
+<li>Run that function lots of times using <code>purrr::map_dfr()</code>.</li>
+<li>Summarize the distribution of the results. Conventionally, to report percentile-based confidence intervals,<span class="citation"><sup><a href="#ref-efron2016a" role="doc-biblioref">9</a></sup></span> take the 2.5th, and 97.5th percentiles.</li>
 </ol>
 </div>
 <div id="more-on-functions" class="section level1" number="6">
@@ -732,7 +732,7 @@ function_result_one_county</code></pre>
 <pre><code>## # A tibble: 1 × 5
 ##   state county_id example_var_x example_var_y example_var_z
 ##   &lt;dbl&gt;     &lt;int&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;int&gt;
-## 1     1         2        -0.266             4             1</code></pre>
+## 1     1         2         -1.13             4             0</code></pre>
 </div>
 <div id="references" class="section level1 unnumbered">
 <h1><strong>References</strong></h1>

@@ -1,7 +1,7 @@
 ---
 title: "R for spatial data wrangling: using sf to wrangle pharmacies in Atlanta and assess population living nearby (Part 2)"
 author: "Michael D. Garber, PhD MPH"
-date: "Revised August 8, 2022"
+date: "`r Sys.Date()`"
 output:
   html_document:
     toc: true
@@ -19,9 +19,7 @@ Specifically:
 
 2.  How many people live within 1/2 mile of these pharmacies in these counties?
 
-3.  How is residential proximity to a pharmacy distributed socioeconomically?
-
-*In part 1, we answer the first question. In part 2, we answer questions 2 and 3.*
+*In part 1, we answer the first question. In part 2, we answer the second.*
 
 <br />
 
@@ -84,8 +82,6 @@ pharm_fd_combined %>%
 pharm_fd_combined_buff_halfmile = pharm_fd_combined %>% 
   sf::st_transform(2240) %>% 
   sf::st_buffer(5280/2)
-
-
 ```
 
 Use `mapview()` to look at the pharmacies as points compared with their buffer areas.
@@ -201,8 +197,8 @@ tract_fulton_dekalb_linked_summary
 
 We estimate that about 13% of people live within a half-mile of a pharmacy.
 
-**Next steps**:
+**Next steps to consider**:
 
 -   Assess sociodemographic distribution of living near a pharmacy.
 
--   Make informative maps using tmap (<https://mkram01.github.io/EPI563-SpatialEPI/intro-tmap.html>) and compare with mapview, and ggplot2
+-   Visualize the pharmacies and the sociodemographic characteristics on the same map using tmap (<https://mkram01.github.io/EPI563-SpatialEPI/intro-tmap.html>) and compare with mapview, and ggplot2.

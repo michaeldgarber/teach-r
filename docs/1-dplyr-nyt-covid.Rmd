@@ -1,7 +1,7 @@
 ---
 title: "R for data wrangling 1: learning the ground rules of dplyr with publicly available COVID-19 data"
 author: "Michael D. Garber, PhD MPH"
-date: "Revised August 4, 2022"
+date: "`r Sys.Date()`"
 output:
   html_document:
     toc: true
@@ -383,7 +383,7 @@ The number of variables is four: the grouping variable (`state`) and each of the
 
 Note that the two cumulative values differ slightly for some of the states. This discrepancy could be explained by the [nuances of the NYT's reporting system](https://github.com/nytimes/covid-19-data/blob/master/PROBABLE-CASES-NOTE.md), which contains a mix of both probable and confirmed cases. The most trustworthy value is probably `cases_cumul_way2`, which takes the most recent reported cumulative value.
 
-### group_by and summarise (continued)
+### group_by() and summarise() (continued)
 
 The group-by-summarise syntax can also be applied if we want to calculate overall summary estimates of the whole dataset. For example, as a double check, we can check to confirm the data we're using lines up with what the NYT is reporting on their website for the total number of cumulative cases to date.
 
@@ -458,7 +458,7 @@ deaths_cumul_by_state_greatlakes = nyt_state_wrangle %>%
   
 ```
 
-It should be a small dataset of 8 rows (one for each state) by 2 columns. Let's print to check:
+It should be a small dataset of 8 rows (one for each state) by 2 columns. Print to confirm:
 
 ```{r great lakes check, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
 deaths_cumul_by_state_greatlakes

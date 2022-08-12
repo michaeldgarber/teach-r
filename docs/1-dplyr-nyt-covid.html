@@ -11,6 +11,7 @@
 
 <meta name="author" content="Michael D. Garber, PhD MPH" />
 
+<meta name="date" content="2022-08-12" />
 
 <title>R for data wrangling 1: learning the ground rules of dplyr with publicly available COVID-19 data</title>
 
@@ -347,7 +348,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">R for data wrangling 1: learning the ground rules of dplyr with publicly available COVID-19 data</h1>
 <h4 class="author">Michael D. Garber, PhD MPH</h4>
-<h4 class="date">Revised August 4, 2022</h4>
+<h4 class="date">2022-08-12</h4>
 
 </div>
 
@@ -781,7 +782,7 @@ dim(nyt_cases_summary)</code></pre>
 <p>Note that the two cumulative values differ slightly for some of the states. This discrepancy could be explained by the <a href="https://github.com/nytimes/covid-19-data/blob/master/PROBABLE-CASES-NOTE.md">nuances of the NYT’s reporting system</a>, which contains a mix of both probable and confirmed cases. The most trustworthy value is probably <code>cases_cumul_way2</code>, which takes the most recent reported cumulative value.</p>
 </div>
 <div id="group_by-and-summarise-continued" class="section level3" number="4.6.3">
-<h3><span class="header-section-number">4.6.3</span> group_by and summarise (continued)</h3>
+<h3><span class="header-section-number">4.6.3</span> group_by() and summarise() (continued)</h3>
 <p>The group-by-summarise syntax can also be applied if we want to calculate overall summary estimates of the whole dataset. For example, as a double check, we can check to confirm the data we’re using lines up with what the NYT is reporting on their website for the total number of cumulative cases to date.</p>
 <p>At this writing (8/2/22), NYT reports a total of ~91.3 million cases (<a href="https://www.nytimes.com/interactive/2021/us/covid-cases.html" class="uri">https://www.nytimes.com/interactive/2021/us/covid-cases.html</a>). Can we reproduce that? To summarize over the whole dataset, create a dummy variable with the same value for every observation and then sum over that variable.</p>
 <pre class="r"><code>nyt_cases_overall = nyt_state_wrangle %&gt;% 
@@ -844,7 +845,7 @@ nyt_cases_overall</code></pre>
   summarise(
     deaths_cumul = max(deaths_cumul, na.rm=TRUE)
   )</code></pre>
-<p>It should be a small dataset of 8 rows (one for each state) by 2 columns. Let’s print to check:</p>
+<p>It should be a small dataset of 8 rows (one for each state) by 2 columns. Print to confirm:</p>
 <pre class="r"><code>deaths_cumul_by_state_greatlakes</code></pre>
 <pre><code>## # A tibble: 8 × 2
 ##   state        deaths_cumul

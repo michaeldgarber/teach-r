@@ -505,7 +505,7 @@ getwd() #check</code></pre>
 <p>As mentioned, the tidyverse contains lots of packages. One of them is <strong>datasets</strong>, which includes, well, several datasets that can be used for demos like this one. I’m a Michigander, so let’s grab the dataset on the water levels of Lake Huron from 1875 - 1972, make a few changes to it, and save it to a local folder.</p>
 <p><img src="images/description-lake-huron-data.png" width="500" /></p>
 <p>The below code chunk simply creates a copy of the LakeHuron dataset and calls it lake_huron_raw. In the next line of code, we print the object by typing its name: <code>lake_huron_raw.</code></p>
-<p><strong>Side-note</strong>: the <code>package_name::object</code> syntax, as in <code>datasets::LakeHuron</code>, is R’s way of explicitly stating which package the object is coming from. We could have equally have written <code>lake_huron_raw = LakeHuron</code>, but, for clarity, it can help to be explicit. This is especially important if the same word is used by multiple packages.</p>
+<p><strong>Side-note</strong>: the <code>package_name::object</code> syntax, as in <code>datasets::LakeHuron</code>, is R’s way of explicitly stating which package the object is coming from. Technically, it loads the package via namespace, elaborated upon here: <a href="https://michaeldgarber.github.io/teach-r/0-manage-packages.html" class="uri">https://michaeldgarber.github.io/teach-r/0-manage-packages.html</a>. If the package has been attached via <code>library(package_name)</code>, then we could write, <code>lake_huron_raw = LakeHuron</code>.</p>
 <pre class="r"><code>#Define new object called lake_huron_raw.
 lake_huron_raw = datasets::LakeHuron 
 
