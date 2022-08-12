@@ -1,7 +1,7 @@
 ---
 title: "First things first: background and setup before dplyr"
 author: "Michael D. Garber, PhD MPH"
-date: "Revised August 5, 2022"
+date: "`r Sys.Date()`"
 output:
   html_document:
     toc: true
@@ -33,7 +33,7 @@ This [post](https://www.jessesadler.com/post/excel-vs-r/) by Jesse Adler (a digi
 
 -   There is a **clear division between data entry and data manipulation and analysis**: it's easier to avoid the temptation of editing the raw data. Although you can certainly make a copy of raw data in Excel (e.g., copy to new sheet), it can be tempting to edit the raw data.
 
--   **Easier to automate similar tasks**. Frequently in data analysis, we'd like to repeat very similar steps, maybe just by changing one element. The ability to automate similar steps becomes especially important for bootstrapping where we effectively repeat the analysis hundreds of times while allowing some of the steps to randomly vary. This would be much more challenging in Excel.
+-   **Easier to automate similar tasks**. Frequently in data analysis, we repeat very similar steps, maybe just by changing one element. The ability to automate similar steps becomes especially important for bootstrapping where we effectively repeat the analysis hundreds of times while allowing some of the steps to randomly vary. This iteration of similar steps would be much more challenging in Excel.
 
 To be clear, I think Excel is great, too. I use it often for simple analyses or for data entry. But I don't use it as much as I once did for more involved analyses.
 
@@ -43,10 +43,10 @@ Okay, but there are other programming tools for data analysis (e.g., SAS, STATA,
 
 1.  It's free. SAS and STATA cost money.
 2.  It has an active, helpful, and friendly user community. Googling a topic along with "R" often leads to useful public discussion on forums like [stackoverflow](https://stackoverflow.com/questions/tagged/r) or [RStudio community](https://community.rstudio.com/).
-3.  It can manipulate spatial data and make maps. No need to switch software for GIS. In an analysis with a spatial component, this is **very** important.
-4.  R can do a lot of cool stuff beyond the usual data wrangling and analysis. For example, with RMarkdown, you can generate html files to make websites like this [one](https://michaeldgarber.github.io/), create [interactive dashboards](https://rmarkdown.rstudio.com/gallery.html), and do lots more (see this amazing [talk](https://www.youtube.com/watch?v=qLEkUjxk7e8) by R Markdown's creator).
+3.  It can manipulate spatial data and make maps. No need to switch software for GIS. In a data-manipulation workflow involving spatial data, the ability to switch seamlessly between aspatial and spatial data is **very** important.
+4.  R can do a lot of cool stuff beyond the usual data wrangling and analysis. For example, with RMarkdown, you can generate html files to make websites (like this [one](https://michaeldgarber.github.io/)), create [interactive dashboards](https://rmarkdown.rstudio.com/gallery.html), and do lots more (see this amazing [talk](https://www.youtube.com/watch?v=qLEkUjxk7e8) by R Markdown's creator).
 
-I know many people use and like Python, which is also free and shares many of R's advantages. I don't have much Python experience, so I can't really comment on it. Every now and then, I encounter a situation where I wish I had some Python skills (e.g., to use this [package](https://github.com/gboeing/osmnx) to compute measures on street networks from OpenStreetMap), but those situations are rare.
+I know many people use and like Python, which is also free and shares many of R's advantages. I don't have much Python experience, so I can't really comment on it. Every now and then, I encounter a situation where I wish I had Python skills (e.g., to use this [package](https://github.com/gboeing/osmnx) to compute measures on street networks from OpenStreetMap), but those situations are rare.
 
 # Install R and RStudio and become familiar with the user interface.
 
@@ -75,17 +75,15 @@ Here's a screenshot of what the script window might look like:
 
 ## Writing code vs writing a comment
 
-On a particular line of code, anything followed by a `#` is considered by R to be a comment and will not be evaluated as code. Comments are a way to annotate your code to your future self or other collaborators. Text considered by R to be comments will change to a different color. In the default R Studio setup, they're green.
+On a particular line of code, anything followed by a `#` is considered by R to be a comment and will not be evaluated as code. Comments are a way to annotate your code to communicate with your future self or other collaborators. Text considered by R to be comments will change to a different color. Using RStudio's default display settings, a comment in an R script will turn green.
 
 ```{r}
 #This is a comment.
 
 #The below line is code:
 x=1:2
-x
+x #this prints the object
 ```
-
-For exampleAnything in your code followed by a \# is considered by R to
 
 # Functions and packages
 
@@ -99,7 +97,7 @@ Two often-[quoted](https://adv-r.hadley.nz/functions.html) slogans describing R 
 >
 > \-[John Chambers](https://www.r-bloggers.com/2016/07/extending-r/).
 
-So, at its core, when using R, you are using functions to perform actions on objects. As we'll see explicitly when going over [purrr](https://purrr.tidyverse.org/), [functions are themselves objects](https://cran.r-project.org/doc/manuals/r-devel/R-lang.html#Function-objects) and can be manipulated by other functions.
+Fundamentally, when using R, you are using functions to perform actions on objects. As we'll see explicitly when going over [purrr](https://purrr.tidyverse.org/), [functions are themselves objects](https://cran.r-project.org/doc/manuals/r-devel/R-lang.html#Function-objects) and can be manipulated by other functions.
 
 R comes pre-loaded with a set of functions that can be used to analyze data. This is called "base R" and is the foundation upon which everything else in R is built.
 
@@ -153,7 +151,7 @@ The folder in which R reads and writes files is called the working directory. Fo
 2.  Typing file paths is prone to error. (How do I type the back-slash, \\ or /? Do I need the : on a Windows path?)
 3.  It's hard-coded: If you were to change computers or share your code with someone, those working directories won't work.
 
-Fortunately, there's a very simple solution to these issues: Use the [here](https://here.r-lib.org/) package. This package creates a working directory [relative]{.underline} to the location of the R project (described below) you are working in. This means that wherever your project is in the folder structure of your computer, the `here()` function to define your working directory and thus any read/write commands that rely on it will just work.
+Fortunately, there's a simple solution to these issues: Use the [here](https://here.r-lib.org/) package. This package creates a working directory [relative]{.underline} to the folder containing the R project file (described below). This means that wherever your project is in the folder structure of your computer, the `here()` function to define your working directory and thus any read/write commands that rely on it will just work.
 
 This code returns the current working directory.
 
@@ -168,7 +166,7 @@ here()
 
 ![](images/open-project-rstudio-top-right.png){width="300"}
 
-or by using the "File" as in,
+or by using the "File" dropdown, as in,
 
 ![](images/open-project-rstudio-file.png)
 
@@ -176,11 +174,11 @@ Note that in the screenshot below, all of folders in the same folder as the **.R
 
 ![](images/project-teach-r-screenshot-rstudio.png){width="500"}
 
-This folder structure mirrors the folder structure of your computer; it's simply a convenient way to access and manage files from directly within the RStudio interface. Here's my corresponding Finder window (Mac):
+This folder structure mirrors the folder structure of your computer; it's simply a way to access and manage files from directly within the RStudio interface. Here's my corresponding Finder window (Mac):
 
 ![](images/project-teach-r-screenshot-finder.png){width="500"}
 
-It's worth giving some thought to the project's folder structure. There are no hard-and-fast rules, but I have taken [this advice](https://chrisvoncsefalvay.com/2018/08/09/structuring-r-projects/) and, minimally, create separate folders for code (folder called scripts), input data that should never be modified (data-input), and processed data that is a result of code (data-processed).
+It's worth giving some thought to the project's folder structure. There are no hard-and-fast rules, but I have taken [this advice](https://chrisvoncsefalvay.com/2018/08/09/structuring-r-projects/) and, minimally, create separate folders for code (folder called scripts), input data that should never be modified (data-input), and processed data that is a result of code (data-processed). To make best use of the here package, these folders for scripts and data must be beneath the folder containing the .Rproj file.
 
 You don't have to use projects to use R or RStudio, but I've [been convinced](https://www.tidyverse.org/blog/2017/12/workflow-vs-script/) that it's a good idea, in part because of how well projects pair with the **here** package.
 
@@ -207,7 +205,7 @@ setwd(here("data-input"))
 getwd() #check
 ```
 
-Note if we wanted to set the working directory to two folders beneath data-input, we would write: `setwd(here("data-input","sub-folder","sub-sub-folder")`. That is, we would write the name of each sub-folder in quotes after a comma. Note that `here::here()`, like [`base::file.path()`](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/file.path), allows us to quote each folder in the path rather than use slashes. This makes the path easier to write and more likely to work on another operating system than if we had to write, say `"data-input/sub-folder/sub-sub-folder"`.
+If we wanted to set the working directory to two folders beneath data-input, we would write: `setwd(here("data-input","sub-folder","sub-sub-folder")`. That is, we would write the name of each sub-folder in quotes after a comma. Note that `here::here()`, like [`base::file.path()`](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/file.path), allows us to quote each folder in the path rather than use slashes. This makes the path easier to write and more robust for switching between operating systems than if we had to write, say `"data-input/sub-folder/sub-sub-folder"`.
 
 If we want to change it back to the original directory containing the project? Simply use `here()` without specifying an argument.
 
@@ -218,7 +216,7 @@ getwd() #check
 
 ## Example: save a file to a working directory and a taste of dplyr
 
-Okay, as mentioned, the tidyverse contains lots of packages. One of them is **datasets**, which includes, well, several datasets that can be used for demos like this one. I'm a Michigander, so let's grab the dataset on the water levels of Lake Huron from 1875 - 1972, make a few changes to it, and save it to a local folder.
+As mentioned, the tidyverse contains lots of packages. One of them is **datasets**, which includes, well, several datasets that can be used for demos like this one. I'm a Michigander, so let's grab the dataset on the water levels of Lake Huron from 1875 - 1972, make a few changes to it, and save it to a local folder.
 
 ![](images/description-lake-huron-data.png){width="500"}
 
@@ -255,4 +253,4 @@ getwd() #check to confirm
 save(lake_huron_transformed, file = "lake_huron_transformed.RData")
 ```
 
-That concludes the background material. Now onto our first dplyr module (<https://michaeldgarber.github.io/teach-r/1-dplyr-nyt-covid.html>)!
+That concludes the background material. Now onto our first dplyr module (<https://michaeldgarber.github.io/teach-r/1-dplyr-nyt-covid.html>).
