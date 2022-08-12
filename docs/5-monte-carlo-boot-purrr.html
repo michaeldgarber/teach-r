@@ -414,7 +414,7 @@ div.tocify {
 <blockquote>
 <p>“In statistics…, bootstrapping has come to mean to resampling [with replacement] repeatedly and randomly from an original, initial sample using each bootstrapped sample to compute a statistic. The resulting empirical distribution of the statistic is then examined and interpreted as an approximation to the true sampling distribution.”<span class="citation"><sup><a href="#ref-barreto2005" role="doc-biblioref">5</a></sup></span></p>
 </blockquote>
-<p>The bootstrap was introduced by Brad Efron in the late 1970s.<span class="citation"><sup><a href="#ref-bootstra2022b" role="doc-biblioref">6</a></sup></span> There are many forms of bootstrapping, including ways to bootstrap residuals from regression models.<span class="citation"><sup><a href="#ref-efron2016" role="doc-biblioref">7</a></sup></span> The most essential is simply re-sampling entire observations from the sample, summarizing each new sample, and using the distribution of those summary statistics to infer the sampling distribution.</p>
+<p>The bootstrap was introduced by Brad Efron in the late 1970s.<span class="citation"><sup><a href="#ref-bootstra2022c" role="doc-biblioref">6</a>,<a href="#ref-efron1979" role="doc-biblioref">7</a></sup></span> There are many forms of bootstrapping, including ways to bootstrap residuals from regression models.<span class="citation"><sup><a href="#ref-efron2016" role="doc-biblioref">8</a></sup></span> In its most basic form, to bootstrap means to re-sample observations from the sample, compute summary statistics from each re-sampled sample, and use the distribution of those summary statistics to infer the sampling distribution.</p>
 <p>The bootstrap is similar conceptually with Monte Carlo techniques because it involves randomly changing the data over repeated iterations and summarizing results of those iterations. The key difference is that the bootstrap estimates a distribution using data we have, and, under the Monte Carlo technique described, the distribution of each variable is specified by the analyst.</p>
 </div>
 </div>
@@ -537,16 +537,16 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 <pre><code>## # A tibble: 50,000 × 7
 ##    county_id state   pop   dem  prev n_cases rep_id
 ##        &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt;   &lt;int&gt;  &lt;int&gt;
-##  1         1     1  9885     0 0.142    1403      1
-##  2         2     1  9907     0 0.312    3093      1
-##  3         3     1  9995     1 0.325    3250      1
-##  4         4     1  9939     1 0.250    2486      1
-##  5         5     1 10051     1 0.476    4781      1
-##  6         6     1  9943     0 0.145    1445      1
-##  7         7     1 10062     1 0.264    2655      1
-##  8         8     1 10024     0 0.165    1650      1
-##  9         9     1 10195     1 0.110    1119      1
-## 10        10     1  9974     0 0.369    3682      1
+##  1         1     1  9961     1 0.385    3835      1
+##  2         2     1  9956     1 0.418    4160      1
+##  3         3     1 10079     0 0.220    2220      1
+##  4         4     1  9981     1 0.414    4132      1
+##  5         5     1  9915     1 0.226    2243      1
+##  6         6     1 10183     1 0.348    3545      1
+##  7         7     1 10015     0 0.292    2926      1
+##  8         8     1  9741     0 0.242    2352      1
+##  9         9     1 10027     1 0.361    3619      1
+## 10        10     1  9960     0 0.183    1826      1
 ## # … with 49,990 more rows
 ## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 <p>How many rows?</p>
@@ -590,7 +590,7 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 <pre><code>## # A tibble: 1 × 5
 ##   state n_cases_mean_ll n_cases_mean_med n_cases_mean_ul simulation_type
 ##   &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;           &lt;dbl&gt; &lt;chr&gt;          
-## 1     1           2762.            3005.           3238. monte-carlo</code></pre>
+## 1     1           2773.            3014.           3261. monte-carlo</code></pre>
 </div>
 </div>
 <div id="bootstrap" class="section level2" number="4.2">
@@ -602,18 +602,18 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 <p>Take a look:</p>
 <pre class="r"><code>monte_carlo_sim_one_boot</code></pre>
 <pre><code>## # A tibble: 100 × 6
-##    county_id state   pop   dem  prev n_cases
-##        &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt;   &lt;int&gt;
-##  1         6     1 10062     1 0.435    4378
-##  2        34     1  9924     1 0.440    4363
-##  3        95     1  9891     0 0.215    2130
-##  4        11     1  9885     1 0.329    3251
-##  5        89     1 10073     1 0.431    4337
-##  6        18     1  9779     0 0.287    2802
-##  7       100     1 10128     1 0.222    2252
-##  8       100     1 10128     1 0.222    2252
-##  9        19     1 10000     0 0.527    5271
-## 10        59     1  9931     1 0.330    3275
+##    county_id state   pop   dem   prev n_cases
+##        &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt;  &lt;dbl&gt;   &lt;int&gt;
+##  1        72     1 10051     0 0.0820     823
+##  2        28     1 10154     1 0.446     4533
+##  3         8     1  9995     1 0.634     6340
+##  4        40     1  9936     0 0.172     1707
+##  5        60     1 10036     0 0.237     2382
+##  6        54     1 10045     0 0.348     3496
+##  7        58     1 10015     0 0.0619     619
+##  8        67     1 10035     1 0.497     4991
+##  9        39     1  9977     1 0.290     2888
+## 10        78     1  9947     0 0.255     2535
 ## # … with 90 more rows
 ## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 <p>As expected, we have the same number of rows, but fewer unique values for <code>county_id.</code> Some are repeating.</p>
@@ -642,16 +642,16 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 <pre><code>## # A tibble: 50,000 × 7
 ##    county_id state   pop   dem  prev n_cases rep_id
 ##        &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt;   &lt;int&gt;  &lt;int&gt;
-##  1        18     1  9779     0 0.287    2802      1
-##  2        96     1  9936     0 0.513    5096      1
-##  3        16     1  9998     0 0.337    3370      1
-##  4        19     1 10000     0 0.527    5271      1
-##  5        23     1 10068     0 0.350    3523      1
-##  6        65     1  9910     0 0.312    3089      1
-##  7        61     1  9910     1 0.520    5148      1
-##  8        81     1 10048     0 0.206    2072      1
-##  9         6     1 10062     1 0.435    4378      1
-## 10        42     1 10054     1 0.224    2251      1
+##  1         3     1  9863     1 0.492    4849      1
+##  2        89     1 10073     1 0.431    4337      1
+##  3        38     1 10078     0 0.394    3974      1
+##  4        43     1  9984     0 0.234    2336      1
+##  5        43     1  9984     0 0.234    2336      1
+##  6        19     1 10000     0 0.527    5271      1
+##  7        86     1 10100     1 0.338    3408      1
+##  8        28     1 10154     1 0.446    4533      1
+##  9        47     1  9904     0 0.206    2042      1
+## 10        47     1  9904     0 0.206    2042      1
 ## # … with 49,990 more rows
 ## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 <p>What’s the distribution of <code>n_cases_mean</code> over bootstrap replications?</p>
@@ -686,15 +686,15 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 <pre><code>## # A tibble: 1 × 5
 ##   state n_cases_mean_ll n_cases_mean_med n_cases_mean_ul simulation_type
 ##   &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;           &lt;dbl&gt; &lt;chr&gt;          
-## 1     1           2825.            3064.           3307. bootstrap</code></pre>
+## 1     1           2807.            3047.           3284. bootstrap</code></pre>
 <p>How does this estimate of the sampling distribution of <code>n_cases_mean</code> align with the truth? We happen to know the truth here. It’s the distribution of <code>n_cases_mean</code> between the Monte Carlo simulations, defined above.</p>
 <pre class="r"><code>monte_carlo_sim_lots_summary %&gt;% 
   bind_rows(boot_lots_summary)</code></pre>
 <pre><code>## # A tibble: 2 × 5
 ##   state n_cases_mean_ll n_cases_mean_med n_cases_mean_ul simulation_type
 ##   &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;           &lt;dbl&gt; &lt;chr&gt;          
-## 1     1           2762.            3005.           3238. monte-carlo    
-## 2     1           2825.            3064.           3307. bootstrap</code></pre>
+## 1     1           2773.            3014.           3261. monte-carlo    
+## 2     1           2807.            3047.           3284. bootstrap</code></pre>
 </div>
 </div>
 </div>
@@ -714,7 +714,7 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 <ol style="list-style-type: decimal">
 <li>Define a function that contains steps of the analysis with variability.</li>
 <li>Run that function lots of times using <code>purrr::map_dfr()</code></li>
-<li>Summarize the distribution of the results. Conventionally, to report percentile-based confidence intervals,<span class="citation"><sup><a href="#ref-efron2016a" role="doc-biblioref">8</a></sup></span> take the median, 2.5th, and 97.5th percentiles.</li>
+<li>Summarize the distribution of the results. Conventionally, to report percentile-based confidence intervals,<span class="citation"><sup><a href="#ref-efron2016a" role="doc-biblioref">9</a></sup></span> take the median, 2.5th, and 97.5th percentiles.</li>
 </ol>
 </div>
 <div id="more-on-functions" class="section level1" number="6">
@@ -740,7 +740,7 @@ function_result_one_county</code></pre>
 <pre><code>## # A tibble: 1 × 5
 ##   state county_id example_var_x example_var_y example_var_z
 ##   &lt;dbl&gt;     &lt;int&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;int&gt;
-## 1     1         2        -0.229             4             0</code></pre>
+## 1     1         2        0.0604             4             0</code></pre>
 </div>
 <div id="references" class="section level1 unnumbered">
 <h1><strong>References</strong></h1>
@@ -760,14 +760,17 @@ function_result_one_county</code></pre>
 <div id="ref-barreto2005" class="csl-entry">
 <div class="csl-left-margin">5. </div><div class="csl-right-inline">Barreto H, Howland FM. Chapter 23: Bootstrap. In:; 2005. <a href="http://www3.wabash.edu/econometrics/EconometricsBook/chap23.htm">http://www3.wabash.edu/econometrics/EconometricsBook/chap23.htm</a></div>
 </div>
-<div id="ref-bootstra2022b" class="csl-entry">
-<div class="csl-left-margin">6. </div><div class="csl-right-inline">Bootstrapping (statistics). Published online July 24, 2022. <a href="https://en.wikipedia.org/w/index.php?title=Bootstrapping_(statistics)&amp;oldid=1100235056">https://en.wikipedia.org/w/index.php?title=Bootstrapping_(statistics)&amp;oldid=1100235056</a></div>
+<div id="ref-bootstra2022c" class="csl-entry">
+<div class="csl-left-margin">6. </div><div class="csl-right-inline">Bootstrapping (statistics). Published online July 24, 2022. <a href="https://en.wikipedia.org/wiki/Bootstrapping_(statistics)">https://en.wikipedia.org/wiki/Bootstrapping_(statistics)</a></div>
+</div>
+<div id="ref-efron1979" class="csl-entry">
+<div class="csl-left-margin">7. </div><div class="csl-right-inline">Efron B. Bootstrap methods: Another look at the jacknife. <em>The Annals of Statistics</em>. 1979;7(1):1-26.</div>
 </div>
 <div id="ref-efron2016" class="csl-entry">
-<div class="csl-left-margin">7. </div><div class="csl-right-inline">Efron B, Hastie T. <em>Computer Age Statistical Inference: Algorithms, Evidence, and Data Science</em>. Cambridge University Press; 2016.</div>
+<div class="csl-left-margin">8. </div><div class="csl-right-inline">Efron B, Hastie T. <em>Computer Age Statistical Inference: Algorithms, Evidence, and Data Science</em>. Cambridge University Press; 2016.</div>
 </div>
 <div id="ref-efron2016a" class="csl-entry">
-<div class="csl-left-margin">8. </div><div class="csl-right-inline">Efron B, Hastie T. Bootstrap confidence intervals. In: Cambridge University Press; 2016:181-2014.</div>
+<div class="csl-left-margin">9. </div><div class="csl-right-inline">Efron B, Hastie T. Bootstrap confidence intervals. In: Cambridge University Press; 2016:181-2014.</div>
 </div>
 </div>
 </div>
