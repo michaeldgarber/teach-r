@@ -11,7 +11,7 @@
 
 <meta name="author" content="Michael D Garber" />
 
-<meta name="date" content="2022-08-11" />
+<meta name="date" content="2022-08-12" />
 
 <title>Monte Carlo simulations and boots with the purrr::map_dfr()</title>
 
@@ -370,7 +370,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Monte Carlo simulations and boots with the purrr::map_dfr()</h1>
 <h4 class="author">Michael D Garber</h4>
-<h4 class="date">2022-08-11</h4>
+<h4 class="date">2022-08-12</h4>
 
 </div>
 
@@ -481,8 +481,8 @@ monte_carlo_sim_frozen</code></pre>
 <p><img src="5-monte-carlo-boot-purrr_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 <div id="define-a-function-for-replications" class="section level3" number="4.1.1">
 <h3><span class="header-section-number">4.1.1</span> Define a function for replications</h3>
-<p>Now let’s randomly vary values of the variables over several replications. In this code, we will create a function that will create new variables that will change. Functions are described in the <a href="https://r4ds.had.co.nz/functions.html#functions">functions chapter</a> of R 4 Data Science. At the end of this module, I have another example of how to use a function in a dplyr pipe.</p>
-<p>Create a function for the creation of this dataset, run it 500 times, and find the mean of the means over those 500 iterations. The argument our function takes is <code>rep_id_val</code>. Its value is in the <code>mutate()</code> step to create a variable called <code>rep_id</code>.</p>
+<p>Now let’s randomly vary values of the variables over several replications. In this code, we will create a function that will create new variables whose values will randomly change. Functions are described in the <a href="https://r4ds.had.co.nz/functions.html#functions">functions chapter</a> of R 4 Data Science. At the end of this module, I have another example of how to use a function in a dplyr pipe.</p>
+<p>Create a function for the creation of this dataset, run it 500 times, and find the mean of the means over those 500 iterations. Our function’s one argument is <code>rep_id_val</code>. Its value is used in the <code>mutate()</code> step to create a variable called <code>rep_id</code>.</p>
 <pre class="r"><code>monte_carlo_sim_fun = function(rep_id_val){
   monte_carlo_sim_df = 1:100 %&gt;% 
     as_tibble() %&gt;% 
@@ -526,27 +526,27 @@ class(rep_id_val_list)</code></pre>
 </div>
 <div id="run-the-replications" class="section level3" number="4.1.2">
 <h3><span class="header-section-number">4.1.2</span> Run the replications</h3>
-<p>Simulate 500 versions of this state. In each replication, the values for the variables <code>pop</code>, <code>dem</code>, <code>prev</code>, and <code>n_cases</code> randomly vary according to their specified distribution. We use <a href="https://purrr.tidyverse.org/reference/map.html"><code>map_dfr()</code></a> from the <a href="https://purrr.tidyverse.org/">purrr</a> package to run the simulation and then stack the results on top of one another, akin to <code>dplyr::bind_rows()</code>.</p>
-<p>Take note the unusual structure of this code. The function we created above, <code>monte_carlo_sim_fun</code> is inside <code>map_dfr()</code>, and the list of replication ids, <code>rep_id_val_list,</code> is the object that begins the pipe sequence.</p>
+<p>Simulate 500 versions of this state. In each replication, the values for the variables <code>pop</code>, <code>dem</code>, <code>prev</code>, and <code>n_cases</code> randomly vary according to their specified distribution. We use <a href="https://purrr.tidyverse.org/reference/map.html"><code>map_dfr()</code></a> from the <a href="https://purrr.tidyverse.org/">purrr</a> package to run the simulation and then stack the results from each iteration on top of one another, akin to <code>dplyr::bind_rows()</code>.</p>
+<p>Take note of the unusual structure of this code. The function we created above, <code>monte_carlo_sim_fun</code> is inside of <code>map_dfr()</code>, and the list of replication ids, <code>rep_id_val_list,</code> is the object that begins the pipe sequence.</p>
 <pre class="r"><code>library(purrr) #make sure it&#39;s attached
 set.seed(NULL) #allow it to vary differently each time.
 monte_carlo_sim_lots  = rep_id_val_list %&gt;% 
   map_dfr(monte_carlo_sim_fun) </code></pre>
-<p>Take a look at output.</p>
+<p>Take a look at the output.</p>
 <pre class="r"><code>monte_carlo_sim_lots</code></pre>
 <pre><code>## # A tibble: 50,000 × 7
-##    county_id state   pop   dem   prev n_cases rep_id
-##        &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt;  &lt;dbl&gt;   &lt;int&gt;  &lt;int&gt;
-##  1         1     1 10006     0 0.178     1779      1
-##  2         2     1 10011     1 0.129     1291      1
-##  3         3     1  9923     1 0.460     4565      1
-##  4         4     1 10068     0 0.226     2271      1
-##  5         5     1  9827     0 0.0526     516      1
-##  6         6     1  9833     1 0.209     2051      1
-##  7         7     1  9927     0 0.171     1701      1
-##  8         8     1 10028     0 0.180     1801      1
-##  9         9     1 10139     1 0.292     2963      1
-## 10        10     1  9961     1 0.341     3398      1
+##    county_id state   pop   dem  prev n_cases rep_id
+##        &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt;   &lt;int&gt;  &lt;int&gt;
+##  1         1     1  9885     0 0.142    1403      1
+##  2         2     1  9907     0 0.312    3093      1
+##  3         3     1  9995     1 0.325    3250      1
+##  4         4     1  9939     1 0.250    2486      1
+##  5         5     1 10051     1 0.476    4781      1
+##  6         6     1  9943     0 0.145    1445      1
+##  7         7     1 10062     1 0.264    2655      1
+##  8         8     1 10024     0 0.165    1650      1
+##  9         9     1 10195     1 0.110    1119      1
+## 10        10     1  9974     0 0.369    3682      1
 ## # … with 49,990 more rows
 ## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 <p>How many rows?</p>
@@ -558,7 +558,7 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 </div>
 <div id="summarize-results" class="section level3" number="4.1.3">
 <h3><span class="header-section-number">4.1.3</span> Summarize results</h3>
-<p>What’s the distribution of <code>n_cases_mean</code> over Monte Carlo replications? This is not the variability of the number of cases within the state between counties but rather the variability of the mean number of cases over counties between replications.</p>
+<p>What’s the distribution of <code>n_cases_mean</code> over Monte Carlo replications? This is not the variability of the number of cases within the state between counties but rather the variability of the mean number of county-level cases between replications.</p>
 <pre class="r"><code>monte_carlo_sim_lots %&gt;% 
   group_by(rep_id,state) %&gt;% 
   summarise(
@@ -590,37 +590,37 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 <pre><code>## # A tibble: 1 × 5
 ##   state n_cases_mean_ll n_cases_mean_med n_cases_mean_ul simulation_type
 ##   &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;           &lt;dbl&gt; &lt;chr&gt;          
-## 1     1           2777.            3013.           3245. monte-carlo</code></pre>
+## 1     1           2762.            3005.           3238. monte-carlo</code></pre>
 </div>
 </div>
 <div id="bootstrap" class="section level2" number="4.2">
 <h2><span class="header-section-number">4.2</span> Bootstrap</h2>
-<p>Now let’s bootstrap <code>monte_carlo_sim_frozen</code>, again supposing that even though it was generated randomly, it is now viewed as a single frozen sample - the one we drew and have access to. We can estimate the sampling distribution by re-sampling it <strong>with replacement</strong> with sampling probability of 1, meaning all rows will be re-sampled. This means that, in a given sample, some counties will repeat, and some will not appear at all.</p>
+<p>Now let’s bootstrap <code>monte_carlo_sim_frozen</code>, again supposing that even though it was generated randomly, it is now viewed as a single frozen sample - the one we drew and have access to. We can estimate the sampling distribution by re-sampling it <strong>with replacement</strong> with sampling probability of 1, meaning all rows will be re-sampled. Because we are sampling <em>with replacement</em>, in a given sample, some counties will repeat, and some will not appear at all.</p>
 <p>Here’s one sample:</p>
 <pre class="r"><code>monte_carlo_sim_one_boot = monte_carlo_sim_frozen %&gt;% 
   slice_sample(prop=1,replace=TRUE)</code></pre>
 <p>Take a look:</p>
 <pre class="r"><code>monte_carlo_sim_one_boot</code></pre>
 <pre><code>## # A tibble: 100 × 6
-##    county_id state   pop   dem   prev n_cases
-##        &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt;  &lt;dbl&gt;   &lt;int&gt;
-##  1        30     1  9922     1 0.303     3010
-##  2        61     1  9910     1 0.520     5148
-##  3        85     1 10002     0 0.0276     276
-##  4        66     1  9870     1 0.570     5628
-##  5        86     1 10100     1 0.338     3408
-##  6        77     1 10070     0 0.395     3975
-##  7         2     1  9780     1 0.455     4448
-##  8        49     1 10033     1 0.347     3486
-##  9        69     1  9963     0 0.119     1184
-## 10        60     1 10036     0 0.237     2382
+##    county_id state   pop   dem  prev n_cases
+##        &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt;   &lt;int&gt;
+##  1         6     1 10062     1 0.435    4378
+##  2        34     1  9924     1 0.440    4363
+##  3        95     1  9891     0 0.215    2130
+##  4        11     1  9885     1 0.329    3251
+##  5        89     1 10073     1 0.431    4337
+##  6        18     1  9779     0 0.287    2802
+##  7       100     1 10128     1 0.222    2252
+##  8       100     1 10128     1 0.222    2252
+##  9        19     1 10000     0 0.527    5271
+## 10        59     1  9931     1 0.330    3275
 ## # … with 90 more rows
 ## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 <p>As expected, we have the same number of rows, but fewer unique values for <code>county_id.</code> Some are repeating.</p>
 <pre class="r"><code>nrow(monte_carlo_sim_one_boot)</code></pre>
 <pre><code>## [1] 100</code></pre>
 <pre class="r"><code>n_distinct(monte_carlo_sim_one_boot$county_id)</code></pre>
-<pre><code>## [1] 69</code></pre>
+<pre><code>## [1] 63</code></pre>
 <p>Repeat this bootstrap procedure 500 times by first writing a function and then iterating replications through that function using <code>purrr::map_dfr()</code></p>
 <div id="define-a-function-for-replications-1" class="section level3" number="4.2.1">
 <h3><span class="header-section-number">4.2.1</span> Define a function for replications</h3>
@@ -632,7 +632,7 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 </div>
 <div id="run-the-replications-1" class="section level3" number="4.2.2">
 <h3><span class="header-section-number">4.2.2</span> Run the replications</h3>
-<p>Simulate 500 versions of this re-sampling. We again use <code>map_dfr()</code> from the purrr package to run the function and then stack the results on top of one another. Note the unusual structure of this code. The function we created above, <code>monte_carlo_sim_fun(),</code> is inside <code>map_dfr()</code>, and the list of replication ids, <code>rep_id_val_list,</code> begins the pipe sequence.</p>
+<p>Simulate 500 versions of this re-sampling. We again use <code>map_dfr()</code> from the purrr package to run the function and then stack the results on top of one another. Again take note of the unusual structure of this code. The function, <code>boot_fun</code>, is inside of <code>map_dfr()</code>, and the vector of replication ids, <code>rep_id_val_list,</code> begins the pipe sequence.</p>
 <pre class="r"><code>boot_lots  = rep_id_val_list %&gt;% 
   map_dfr(boot_fun) </code></pre>
 </div>
@@ -640,18 +640,18 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 <h3><span class="header-section-number">4.2.3</span> Summarize results</h3>
 <pre class="r"><code>boot_lots</code></pre>
 <pre><code>## # A tibble: 50,000 × 7
-##    county_id state   pop   dem   prev n_cases rep_id
-##        &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt;  &lt;dbl&gt;   &lt;int&gt;  &lt;int&gt;
-##  1        19     1 10000     0 0.527     5271      1
-##  2        97     1 10028     1 0.456     4568      1
-##  3        48     1  9804     0 0.157     1539      1
-##  4        40     1  9936     0 0.172     1707      1
-##  5        58     1 10015     0 0.0619     619      1
-##  6        45     1 10006     1 0.396     3961      1
-##  7        66     1  9870     1 0.570     5628      1
-##  8        50     1 10047     1 0.354     3557      1
-##  9        40     1  9936     0 0.172     1707      1
-## 10        63     1  9934     0 0.329     3271      1
+##    county_id state   pop   dem  prev n_cases rep_id
+##        &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt;   &lt;int&gt;  &lt;int&gt;
+##  1        18     1  9779     0 0.287    2802      1
+##  2        96     1  9936     0 0.513    5096      1
+##  3        16     1  9998     0 0.337    3370      1
+##  4        19     1 10000     0 0.527    5271      1
+##  5        23     1 10068     0 0.350    3523      1
+##  6        65     1  9910     0 0.312    3089      1
+##  7        61     1  9910     1 0.520    5148      1
+##  8        81     1 10048     0 0.206    2072      1
+##  9         6     1 10062     1 0.435    4378      1
+## 10        42     1 10054     1 0.224    2251      1
 ## # … with 49,990 more rows
 ## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 <p>What’s the distribution of <code>n_cases_mean</code> over bootstrap replications?</p>
@@ -666,7 +666,7 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 ## `.groups` argument.
 ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
 <p><img src="5-monte-carlo-boot-purrr_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
-<p>We can use the empirical distribution of resampled results to estimate a confidence interval for the sampling distribution. This is a confidence interval for the estimated mean number of cases in the state:</p>
+<p>We can use the empirical distribution of re-sampled results to estimate a confidence interval for the sampling distribution. This is a confidence interval for the estimated mean number of cases in the state:</p>
 <pre class="r"><code>boot_lots_summary = boot_lots %&gt;% 
   group_by(rep_id,state) %&gt;% #group by both rep id and state
   summarise(
@@ -686,15 +686,15 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 <pre><code>## # A tibble: 1 × 5
 ##   state n_cases_mean_ll n_cases_mean_med n_cases_mean_ul simulation_type
 ##   &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;           &lt;dbl&gt; &lt;chr&gt;          
-## 1     1           2826.            3054.           3295. bootstrap</code></pre>
+## 1     1           2825.            3064.           3307. bootstrap</code></pre>
 <p>How does this estimate of the sampling distribution of <code>n_cases_mean</code> align with the truth? We happen to know the truth here. It’s the distribution of <code>n_cases_mean</code> between the Monte Carlo simulations, defined above.</p>
 <pre class="r"><code>monte_carlo_sim_lots_summary %&gt;% 
   bind_rows(boot_lots_summary)</code></pre>
 <pre><code>## # A tibble: 2 × 5
 ##   state n_cases_mean_ll n_cases_mean_med n_cases_mean_ul simulation_type
 ##   &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;           &lt;dbl&gt; &lt;chr&gt;          
-## 1     1           2777.            3013.           3245. monte-carlo    
-## 2     1           2826.            3054.           3295. bootstrap</code></pre>
+## 1     1           2762.            3005.           3238. monte-carlo    
+## 2     1           2825.            3064.           3307. bootstrap</code></pre>
 </div>
 </div>
 </div>
@@ -719,7 +719,7 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 </div>
 <div id="more-on-functions" class="section level1" number="6">
 <h1><span class="header-section-number">6</span> More on functions</h1>
-<p>In addition to their use for simulations as above, functions can also be used simply to reduce repetition in code. Sometimes you end up writing the same or similar code many times and apply that code to several datasets. For example, above we wrote an almost identical equence of dplyr functions to define both <code>monte_carlo_sim_frozen</code> and the function, <code>monte_carlo_sim_fun()</code>.</p>
+<p>In addition to their use for simulations as above, functions can also be used simply to reduce repetition in code. Sometimes you end up writing the same or similar code many times and apply that code to several datasets. For example, above, we wrote an almost identical sequence of dplyr functions to define both <code>monte_carlo_sim_frozen</code> and the function, <code>monte_carlo_sim_fun()</code>.</p>
 <p>Here is an example sequence of dplyr steps combined into one function.</p>
 <pre class="r"><code>do_some_dplyr_stuff = function(df){ 
   df %&gt;%
@@ -740,7 +740,7 @@ function_result_one_county</code></pre>
 <pre><code>## # A tibble: 1 × 5
 ##   state county_id example_var_x example_var_y example_var_z
 ##   &lt;dbl&gt;     &lt;int&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;int&gt;
-## 1     1         2        -0.908             4             1</code></pre>
+## 1     1         2        -0.229             4             0</code></pre>
 </div>
 <div id="references" class="section level1 unnumbered">
 <h1><strong>References</strong></h1>

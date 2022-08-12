@@ -109,9 +109,9 @@ monte_carlo_sim_frozen %>%
 
 ### Define a function for replications
 
-Now let's randomly vary values of the variables over several replications. In this code, we will create a function that will create new variables that will change. Functions are described in the [functions chapter](https://r4ds.had.co.nz/functions.html#functions) of R 4 Data Science. At the end of this module, I have another example of how to use a function in a dplyr pipe.
+Now let's randomly vary values of the variables over several replications. In this code, we will create a function that will create new variables whose values will randomly change. Functions are described in the [functions chapter](https://r4ds.had.co.nz/functions.html#functions) of R 4 Data Science. At the end of this module, I have another example of how to use a function in a dplyr pipe.
 
-Create a function for the creation of this dataset, run it 500 times, and find the mean of the means over those 500 iterations. The argument our function takes is `rep_id_val`. Its value is in the `mutate()` step to create a variable called `rep_id`.
+Create a function for the creation of this dataset, run it 500 times, and find the mean of the means over those 500 iterations. Our function's one argument is `rep_id_val`. Its value is used in the `mutate()` step to create a variable called `rep_id`.
 
 ```{r}
 monte_carlo_sim_fun = function(rep_id_val){
@@ -150,9 +150,9 @@ class(rep_id_val_list)
 
 ### Run the replications
 
-Simulate 500 versions of this state. In each replication, the values for the variables `pop`, `dem`, `prev`, and `n_cases` randomly vary according to their specified distribution. We use [`map_dfr()`](https://purrr.tidyverse.org/reference/map.html) from the [purrr](https://purrr.tidyverse.org/) package to run the simulation and then stack the results on top of one another, akin to `dplyr::bind_rows()`.
+Simulate 500 versions of this state. In each replication, the values for the variables `pop`, `dem`, `prev`, and `n_cases` randomly vary according to their specified distribution. We use [`map_dfr()`](https://purrr.tidyverse.org/reference/map.html) from the [purrr](https://purrr.tidyverse.org/) package to run the simulation and then stack the results from each iteration on top of one another, akin to `dplyr::bind_rows()`.
 
-Take note the unusual structure of this code. The function we created above, `monte_carlo_sim_fun` is inside `map_dfr()`, and the list of replication ids, `rep_id_val_list,` is the object that begins the pipe sequence.
+Take note of the unusual structure of this code. The function we created above, `monte_carlo_sim_fun` is inside of `map_dfr()`, and the list of replication ids, `rep_id_val_list,` is the object that begins the pipe sequence.
 
 ```{r}
 library(purrr) #make sure it's attached
@@ -161,7 +161,7 @@ monte_carlo_sim_lots  = rep_id_val_list %>%
   map_dfr(monte_carlo_sim_fun) 
 ```
 
-Take a look at output.
+Take a look at the output.
 
 ```{r}
 monte_carlo_sim_lots
@@ -181,7 +181,7 @@ n_distinct(monte_carlo_sim_lots$rep_id)
 
 ### Summarize results
 
-What's the distribution of `n_cases_mean` over Monte Carlo replications? This is not the variability of the number of cases within the state between counties but rather the variability of the mean number of cases over counties between replications.
+What's the distribution of `n_cases_mean` over Monte Carlo replications? This is not the variability of the number of cases within the state between counties but rather the variability of the mean number of county-level cases between replications.
 
 ```{r}
 monte_carlo_sim_lots %>% 
@@ -215,7 +215,7 @@ monte_carlo_sim_lots_summary
 
 ## Bootstrap
 
-Now let's bootstrap `monte_carlo_sim_frozen`, again supposing that even though it was generated randomly, it is now viewed as a single frozen sample - the one we drew and have access to. We can estimate the sampling distribution by re-sampling it **with replacement** with sampling probability of 1, meaning all rows will be re-sampled. This means that, in a given sample, some counties will repeat, and some will not appear at all.
+Now let's bootstrap `monte_carlo_sim_frozen`, again supposing that even though it was generated randomly, it is now viewed as a single frozen sample - the one we drew and have access to. We can estimate the sampling distribution by re-sampling it **with replacement** with sampling probability of 1, meaning all rows will be re-sampled. Because we are sampling *with replacement*, in a given sample, some counties will repeat, and some will not appear at all.
 
 Here's one sample:
 
@@ -251,7 +251,7 @@ boot_fun = function(rep_id_val){
 
 ### Run the replications
 
-Simulate 500 versions of this re-sampling. We again use `map_dfr()` from the purrr package to run the function and then stack the results on top of one another. Note the unusual structure of this code. The function we created above, `monte_carlo_sim_fun(),` is inside `map_dfr()`, and the list of replication ids, `rep_id_val_list,` begins the pipe sequence.
+Simulate 500 versions of this re-sampling. We again use `map_dfr()` from the purrr package to run the function and then stack the results on top of one another. Again take note of the unusual structure of this code. The function, `boot_fun`, is inside of `map_dfr()`, and the vector of replication ids, `rep_id_val_list,` begins the pipe sequence.
 
 ```{r}
 boot_lots  = rep_id_val_list %>% 
@@ -276,7 +276,7 @@ boot_lots %>%
   geom_histogram()
 ```
 
-We can use the empirical distribution of resampled results to estimate a confidence interval for the sampling distribution. This is a confidence interval for the estimated mean number of cases in the state:
+We can use the empirical distribution of re-sampled results to estimate a confidence interval for the sampling distribution. This is a confidence interval for the estimated mean number of cases in the state:
 
 ```{r}
 boot_lots_summary = boot_lots %>% 
@@ -325,7 +325,7 @@ Broad steps for each:
 
 # More on functions
 
-In addition to their use for simulations as above, functions can also be used simply to reduce repetition in code. Sometimes you end up writing the same or similar code many times and apply that code to several datasets. For example, above we wrote an almost identical equence of dplyr functions to define both `monte_carlo_sim_frozen` and the function, `monte_carlo_sim_fun()`.
+In addition to their use for simulations as above, functions can also be used simply to reduce repetition in code. Sometimes you end up writing the same or similar code many times and apply that code to several datasets. For example, above, we wrote an almost identical sequence of dplyr functions to define both `monte_carlo_sim_frozen` and the function, `monte_carlo_sim_fun()`.
 
 Here is an example sequence of dplyr steps combined into one function.
 
