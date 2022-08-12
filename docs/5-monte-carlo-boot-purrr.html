@@ -535,18 +535,18 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 <p>Take a look at the output.</p>
 <pre class="r"><code>monte_carlo_sim_lots</code></pre>
 <pre><code>## # A tibble: 50,000 × 7
-##    county_id state   pop   dem   prev n_cases rep_id
-##        &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt;  &lt;dbl&gt;   &lt;int&gt;  &lt;int&gt;
-##  1         1     1 10161     1 0.431     4376      1
-##  2         2     1 10056     0 0.139     1394      1
-##  3         3     1  9983     1 0.272     2716      1
-##  4         4     1  9976     1 0.481     4802      1
-##  5         5     1  9951     1 0.508     5056      1
-##  6         6     1 10004     1 0.0977     977      1
-##  7         7     1 10037     1 0.400     4011      1
-##  8         8     1 10065     1 0.544     5479      1
-##  9         9     1 10123     1 0.271     2738      1
-## 10        10     1  9919     0 0.214     2120      1
+##    county_id state   pop   dem  prev n_cases rep_id
+##        &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt;   &lt;int&gt;  &lt;int&gt;
+##  1         1     1  9995     1 0.641    6408      1
+##  2         2     1  9920     1 0.331    3285      1
+##  3         3     1  9912     1 0.323    3197      1
+##  4         4     1  9955     1 0.387    3853      1
+##  5         5     1 10173     0 0.203    2060      1
+##  6         6     1 10033     0 0.118    1179      1
+##  7         7     1  9961     1 0.373    3715      1
+##  8         8     1  9998     0 0.491    4905      1
+##  9         9     1 10014     0 0.139    1389      1
+## 10        10     1 10057     0 0.248    2497      1
 ## # … with 49,990 more rows
 ## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 <p>How many rows?</p>
@@ -566,9 +566,6 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
     n_cases_sd = sd(n_cases)) %&gt;% 
   ggplot(aes(n_cases_mean))+
   geom_histogram()</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;rep_id&#39;. You can override using the
-## `.groups` argument.
-## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
 <p><img src="5-monte-carlo-boot-purrr_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
 <p>What is the 2.5th, 50th (median), and 97.5th percentile of the mean number of cases between replications? This could be used to report a confidence interval around that estimated mean.</p>
 <pre class="r"><code>monte_carlo_sim_lots_summary = monte_carlo_sim_lots %&gt;% 
@@ -583,14 +580,13 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
     n_cases_mean_ul = quantile(n_cases_mean, probs = 0.975, na.rm=TRUE)
     ) %&gt;% 
   ungroup() %&gt;% 
-  mutate(simulation_type = &quot;monte-carlo&quot;)</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;rep_id&#39;. You can override using the
-## `.groups` argument.</code></pre>
-<pre class="r"><code>monte_carlo_sim_lots_summary</code></pre>
+  mutate(simulation_type = &quot;monte-carlo&quot;)
+
+monte_carlo_sim_lots_summary</code></pre>
 <pre><code>## # A tibble: 1 × 5
 ##   state n_cases_mean_ll n_cases_mean_med n_cases_mean_ul simulation_type
 ##   &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;           &lt;dbl&gt; &lt;chr&gt;          
-## 1     1           2760.            3006.           3266. monte-carlo</code></pre>
+## 1     1           2805.            3018.           3274. monte-carlo</code></pre>
 </div>
 </div>
 <div id="bootstrap" class="section level2" number="4.2">
@@ -604,23 +600,23 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 <pre><code>## # A tibble: 100 × 6
 ##    county_id state   pop   dem  prev n_cases
 ##        &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt;   &lt;int&gt;
-##  1        70     1  9897     1 0.345    3413
-##  2        59     1  9931     1 0.330    3275
-##  3        75     1 10060     0 0.249    2501
-##  4        70     1  9897     1 0.345    3413
-##  5        12     1  9955     0 0.198    1969
-##  6        18     1  9779     0 0.287    2802
-##  7        73     1  9964     1 0.246    2448
-##  8        51     1 10006     1 0.420    4205
-##  9        89     1 10073     1 0.431    4337
-## 10        34     1  9924     1 0.440    4363
+##  1        19     1 10000     0 0.527    5271
+##  2        93     1 10016     1 0.503    5042
+##  3        78     1  9947     0 0.255    2535
+##  4        97     1 10028     1 0.456    4568
+##  5        71     1  9944     1 0.410    4077
+##  6         2     1  9780     1 0.455    4448
+##  7        49     1 10033     1 0.347    3486
+##  8        77     1 10070     0 0.395    3975
+##  9        80     1  9987     1 0.452    4513
+## 10         5     1 10132     0 0.243    2464
 ## # … with 90 more rows
 ## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 <p>As expected, we have the same number of rows, but fewer unique values for <code>county_id.</code> Some are repeating.</p>
 <pre class="r"><code>nrow(monte_carlo_sim_one_boot)</code></pre>
 <pre><code>## [1] 100</code></pre>
 <pre class="r"><code>n_distinct(monte_carlo_sim_one_boot$county_id)</code></pre>
-<pre><code>## [1] 63</code></pre>
+<pre><code>## [1] 58</code></pre>
 <p>Repeat this bootstrap procedure 500 times by first writing a function and then iterating replications through that function using <code>purrr::map_dfr()</code></p>
 <div id="define-a-function-for-replications-1" class="section level3" number="4.2.1">
 <h3><span class="header-section-number">4.2.1</span> Define a function for replications</h3>
@@ -640,18 +636,18 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
 <h3><span class="header-section-number">4.2.3</span> Summarize results</h3>
 <pre class="r"><code>boot_lots</code></pre>
 <pre><code>## # A tibble: 50,000 × 7
-##    county_id state   pop   dem   prev n_cases rep_id
-##        &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt;  &lt;dbl&gt;   &lt;int&gt;  &lt;int&gt;
-##  1        12     1  9955     0 0.198     1969      1
-##  2        27     1  9981     0 0.338     3369      1
-##  3        29     1  9938     1 0.350     3476      1
-##  4        18     1  9779     0 0.287     2802      1
-##  5        66     1  9870     1 0.570     5628      1
-##  6        48     1  9804     0 0.157     1539      1
-##  7        58     1 10015     0 0.0619     619      1
-##  8        70     1  9897     1 0.345     3413      1
-##  9        25     1  9909     1 0.554     5488      1
-## 10         5     1 10132     0 0.243     2464      1
+##    county_id state   pop   dem  prev n_cases rep_id
+##        &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt;   &lt;int&gt;  &lt;int&gt;
+##  1        28     1 10154     1 0.446    4533      1
+##  2        49     1 10033     1 0.347    3486      1
+##  3        70     1  9897     1 0.345    3413      1
+##  4        45     1 10006     1 0.396    3961      1
+##  5        49     1 10033     1 0.347    3486      1
+##  6        99     1  9864     0 0.232    2285      1
+##  7        76     1 10019     0 0.340    3411      1
+##  8        60     1 10036     0 0.237    2382      1
+##  9        33     1  9912     0 0.121    1203      1
+## 10        38     1 10078     0 0.394    3974      1
 ## # … with 49,990 more rows
 ## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 <p>What’s the distribution of <code>n_cases_mean</code> over bootstrap replications?</p>
@@ -662,9 +658,6 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
     n_cases_sd = sd(n_cases)) %&gt;% 
   ggplot(aes( n_cases_mean))+
   geom_histogram()</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;rep_id&#39;. You can override using the
-## `.groups` argument.
-## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
 <p><img src="5-monte-carlo-boot-purrr_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
 <p>We can use the empirical distribution of re-sampled results to estimate a confidence interval for the sampling distribution. This is a confidence interval for the estimated mean number of cases in the state:</p>
 <pre class="r"><code>boot_lots_summary = boot_lots %&gt;% 
@@ -679,22 +672,21 @@ monte_carlo_sim_lots  = rep_id_val_list %&gt;%
     n_cases_mean_ul = quantile(n_cases_mean, probs = 0.975, na.rm=TRUE)
     ) %&gt;% 
   ungroup() %&gt;% 
-  mutate(simulation_type = &quot;bootstrap&quot;)</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;rep_id&#39;. You can override using the
-## `.groups` argument.</code></pre>
-<pre class="r"><code>boot_lots_summary</code></pre>
+  mutate(simulation_type = &quot;bootstrap&quot;)
+
+boot_lots_summary</code></pre>
 <pre><code>## # A tibble: 1 × 5
 ##   state n_cases_mean_ll n_cases_mean_med n_cases_mean_ul simulation_type
 ##   &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;           &lt;dbl&gt; &lt;chr&gt;          
-## 1     1           2837.            3062.           3276. bootstrap</code></pre>
+## 1     1           2821.            3054.           3295. bootstrap</code></pre>
 <p>How does this estimate of the sampling distribution of <code>n_cases_mean</code> align with the truth? We happen to know the truth here. It’s the distribution of <code>n_cases_mean</code> between the Monte Carlo simulations, defined above.</p>
 <pre class="r"><code>monte_carlo_sim_lots_summary %&gt;% 
   bind_rows(boot_lots_summary)</code></pre>
 <pre><code>## # A tibble: 2 × 5
 ##   state n_cases_mean_ll n_cases_mean_med n_cases_mean_ul simulation_type
 ##   &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;           &lt;dbl&gt; &lt;chr&gt;          
-## 1     1           2760.            3006.           3266. monte-carlo    
-## 2     1           2837.            3062.           3276. bootstrap</code></pre>
+## 1     1           2805.            3018.           3274. monte-carlo    
+## 2     1           2821.            3054.           3295. bootstrap</code></pre>
 </div>
 </div>
 </div>
@@ -740,7 +732,7 @@ function_result_one_county</code></pre>
 <pre><code>## # A tibble: 1 × 5
 ##   state county_id example_var_x example_var_y example_var_z
 ##   &lt;dbl&gt;     &lt;int&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;int&gt;
-## 1     1         2        -0.107             4             0</code></pre>
+## 1     1         2        -0.968             4             0</code></pre>
 </div>
 <div id="references" class="section level1 unnumbered">
 <h1><strong>References</strong></h1>

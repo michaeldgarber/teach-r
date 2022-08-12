@@ -58,7 +58,7 @@ The bootstrap is similar conceptually with Monte Carlo techniques because it inv
 
 Suppose we have a state with 100 counties. We simulate one single dataset, specifying that the mean county population is 1,000 and the probability of a binary demographic variable (`dem`; say urban versus rural) is 0.5. The prevalence (`prev`) depends in part on `pop` and `dem`, and the number of cases in the county is estimated from `pop` and `prev`.
 
-```{r, message=FALSE}
+```{r, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(truncnorm)
 set.seed(11)#set the seed so this dataset is always the same.
@@ -183,7 +183,7 @@ n_distinct(monte_carlo_sim_lots$rep_id)
 
 What's the distribution of `n_cases_mean` over Monte Carlo replications? This is not the variability of the number of cases within the state between counties but rather the variability of the mean number of county-level cases between replications.
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 monte_carlo_sim_lots %>% 
   group_by(rep_id,state) %>% 
   summarise(
@@ -195,7 +195,7 @@ monte_carlo_sim_lots %>%
 
 What is the 2.5th, 50th (median), and 97.5th percentile of the mean number of cases between replications? This could be used to report a confidence interval around that estimated mean.
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 monte_carlo_sim_lots_summary = monte_carlo_sim_lots %>% 
   group_by(rep_id,state) %>% #group by both rep id and state
   summarise(
@@ -266,7 +266,7 @@ boot_lots
 
 What's the distribution of `n_cases_mean` over bootstrap replications?
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 boot_lots %>% 
   group_by(rep_id,state) %>% 
   summarise(
@@ -278,7 +278,7 @@ boot_lots %>%
 
 We can use the empirical distribution of re-sampled results to estimate a confidence interval for the sampling distribution. This is a confidence interval for the estimated mean number of cases in the state:
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 boot_lots_summary = boot_lots %>% 
   group_by(rep_id,state) %>% #group by both rep id and state
   summarise(
