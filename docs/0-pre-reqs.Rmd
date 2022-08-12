@@ -145,7 +145,7 @@ library(tidyverse)
 
 ## Here package and projects
 
-The folder in which R reads and writes files is called the working directory. For years, I had set the working directory by typing the entire file path. This is not ideal practice for a few of reasons:
+The folder in which R reads and writes files is called the working directory. For years, I used to set the working directory by typing the entire file path. This is not ideal practice for a few of reasons:
 
 1.  It takes a long time to type a long file path.
 2.  Typing file paths is prone to error. (How do I type the back-slash, \\ or /? Do I need the : on a Windows path?)
@@ -170,7 +170,7 @@ or by using the "File" dropdown, as in,
 
 ![](images/open-project-rstudio-file.png)
 
-Note that in the screenshot below, all of folders in the same folder as the **.Rproj** file will conveniently appear in the "Files" tab (bottom right pane of a default RStudio session).
+Note that in the screenshot below, all of folders and files in the folder containing the **.Rproj** file will conveniently appear in the "Files" tab (bottom right pane of a default RStudio session).
 
 ![](images/project-teach-r-screenshot-rstudio.png){width="500"}
 
