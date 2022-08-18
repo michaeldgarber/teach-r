@@ -46,7 +46,7 @@ An important aspect of a traditional Monte Carlo simulation is that the distribu
 
 Monte Carlo simulation in its typical implementation cannot, however, directly estimate the sampling distribution. But bootstrapping can.
 
-> "In statistics..., bootstrapping has come to mean to resampling [with replacement] repeatedly and randomly from an original, initial sample using each bootstrapped sample to compute a statistic. The resulting empirical distribution of the statistic is then examined and interpreted as an approximation to the true sampling distribution."[@barreto2005]
+> "In statistics..., bootstrapping has come to mean to re-sample [with replacement] repeatedly and randomly from an original, initial sample using each bootstrapped sample to compute a statistic. The resulting empirical distribution of the statistic is then examined and interpreted as an approximation to the true sampling distribution."[@barreto2005]
 
 The bootstrap was introduced by Bradley Efron in the late 1970s.[@bootstra2022c; @efron1979] There are many forms of bootstrapping, including ways to bootstrap residuals from regression models.[@efron2016] In its most basic form, to bootstrap means to re-sample observations from the sample, compute summary statistics from each re-sampled sample, and use the distribution of those summary statistics to infer the sampling distribution.
 
