@@ -11,7 +11,7 @@
 
 <meta name="author" content="Michael D. Garber, PhD MPH" />
 
-<meta name="date" content="2022-08-11" />
+<meta name="date" content="2022-08-23" />
 
 <title>R course</title>
 
@@ -348,7 +348,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">R course</h1>
 <h4 class="author">Michael D. Garber, PhD MPH</h4>
-<h4 class="date">2022-08-11</h4>
+<h4 class="date">2022-08-23</h4>
 
 </div>
 
@@ -369,29 +369,29 @@ div.tocify {
 <ol style="list-style-type: decimal">
 <li><p><strong>Background and set-up</strong></p>
 <p>This module is intended for those who have never used R. It describes key terms, shows how to install R and RStudio, and offers some tips for managing projects and files.</p>
-<p>Link: <a href="https://michaeldgarber.github.io/teach-r/0-pre-reqs" class="uri">https://michaeldgarber.github.io/teach-r/0-pre-reqs</a></p></li>
+<p>Link: <a href="https://michaeldgarber.github.io/teach-r/pre-reqs.html" class="uri">https://michaeldgarber.github.io/teach-r/pre-reqs.html</a></p></li>
 <li><p><strong>Managing packages: attached vs loaded via a namespace and other nuances</strong></p>
 <p>R’s vast package ecosystem provides abundant functionality, but packages can also be a source of frustration if they don’t load as expected. In this module, we explore some technical details on ways packages are loaded that may facilitate troubleshooting and understanding. We specifically cover the difference between a package being <em>attached to the search path</em> versus <em>loaded via a namespace</em> and how to check this distinction. We also learn how to remove packages, both from the current session and from the computer altogether. This module has a fair amount of technical detail and doesn’t necessarily need to be reviewed before proceeding with the main modules.</p>
-<p>Link: <a href="https://michaeldgarber.github.io/teach-r/0-manage-packages.html" class="uri">https://michaeldgarber.github.io/teach-r/0-manage-packages.html</a></p></li>
+<p>Link: <a href="https://michaeldgarber.github.io/teach-r/manage-packages.html" class="uri">https://michaeldgarber.github.io/teach-r/manage-packages.html</a></p></li>
 </ol>
 <p><u>Main course modules:</u></p>
 <ol style="list-style-type: decimal">
 <li><p><strong>Introduction to R and data wrangling: learning the basics of dplyr with publicly available COVID-19 data.</strong></p>
 <p>Dplyr, as stated on its documentation page, “is a grammar of data manipulation providing a consistent set of verbs that help you solve the most common data manipulation challenges.” In this module, we learn the fundamentals of dplyr in the context of an applied example with publicly available COVID-19 data from the <em>New York Times</em>.</p>
-<p>Link: <a href="https://michaeldgarber.github.io/teach-r/1-dplyr-nyt-covid.html" class="uri">https://michaeldgarber.github.io/teach-r/1-dplyr-nyt-covid.html</a></p></li>
+<p>Link: <a href="https://michaeldgarber.github.io/teach-r/dplyr-1-nyt-covid.html" class="uri">https://michaeldgarber.github.io/teach-r/dplyr-1-nyt-covid.html</a></p></li>
 <li><p><strong>R for data wrangling 2: more dplyr with tidycensus, mapview, and ggplot2</strong></p>
 <p>In this module, we continue with the COVID-19 example from the first tutorial and introduce four additional packages throughout the example: tidycensus, mapview, sf, and ggplot2. Tidycensus allows you to conveniently download census data into R. Mapview lets you make an interactive map with one line of code, sf is a toolbox for managing and manipulating spatial data, and ggplot2 is a prominent package for making graphs and figures. The next sessions elaborate on sf and mapview.</p>
-<p>Link: <a href="https://michaeldgarber.github.io/teach-r/2-dplyr-mapview-tidycensus.html" class="uri">https://michaeldgarber.github.io/teach-r/2-dplyr-mapview-tidycensus.html</a></p></li>
+<p>Link: <a href="https://michaeldgarber.github.io/teach-r/dplyr-2-mapview-tidycensus" class="uri">https://michaeldgarber.github.io/teach-r/dplyr-2-mapview-tidycensus</a></p></li>
 <li><p><strong>R for spatial data wrangling: using sf to wrangle OpenStreetMap-downloaded pharmacies in Atlanta and assess population living nearby</strong></p>
 <p>The sf package and its corresponding object class have become standard tools for managing and representing (vector-based) spatial data in R. An appealing aspect of the sf object class is that it behaves like regular rectangular data and is thus amenable to common data manipulation techniques. In this module, we will work through an example analysis of pharmacies downloaded from OpenStreetMap in the Atlanta area. Through the example, we describe several operations in the sf ecosystem, including ways to merge spatial data, manipulate coordinate systems, and create buffers.</p>
-<p>Part 1: <a href="https://michaeldgarber.github.io/teach-r/3-sf-atl-pharm.html" class="uri">https://michaeldgarber.github.io/teach-r/3-sf-atl-pharm.html</a></p>
-<p>Part 2: <a href="https://michaeldgarber.github.io/teach-r/3-sf-atl-pharm-part-2.html" class="uri">https://michaeldgarber.github.io/teach-r/3-sf-atl-pharm-part-2.html</a></p></li>
+<p>Part 1: <a href="https://michaeldgarber.github.io/teach-r/sf-atl-pharm-part-1.html" class="uri">https://michaeldgarber.github.io/teach-r/sf-atl-pharm-part-1.html</a></p>
+<p>Part 2: <a href="https://michaeldgarber.github.io/teach-r/sf-atl-pharm-part-2.html" class="uri">https://michaeldgarber.github.io/teach-r/sf-atl-pharm-part-2.html</a></p></li>
 <li><p><strong>Making static and interactive maps in R</strong></p>
 <p>This module will elaborate upon the capabilities of some of R’s mapping tools covered in previous sessions. Specifically, it will illustrate tools for both static maps (as in an image) and interactive maps (as in zooming in and out like Google Maps). Mapview and ggplot2 will again be covered, and tmap will be introduced. This module will also cover color palettes available in R for visualizing continuous and categorical data.</p>
-<p>Link: <a href="https://michaeldgarber.github.io/teach-r/4-map-making.html" class="uri">https://michaeldgarber.github.io/teach-r/4-map-making.html</a> (work in progress)</p></li>
+<p>Link: <a href="https://michaeldgarber.github.io/teach-r/map-making.html" class="uri">https://michaeldgarber.github.io/teach-r/map-making.html</a> (work in progress)</p></li>
 <li><p><strong>Monte Carlo simulations and boots with the purrr::map_dfr()</strong></p>
 <p>Creating your own functions can help reduce tedious and error-prone repetition in code. Functions can also be used to iteratively modify steps in the data analysis to estimate uncertainty of results through Monte Carlo simulation techniques and bootstrap resampling. This module will motivate, describe, and provide demo examples of Monte Carlo simulations and bootstrapping using <code>map_dfr()</code> from purrr.</p>
-<p>Link: <a href="https://michaeldgarber.github.io/teach-r/5-monte-carlo-boot-purrr.html" class="uri">https://michaeldgarber.github.io/teach-r/5-monte-carlo-boot-purrr.html</a></p></li>
+<p>Link: <a href="https://michaeldgarber.github.io/teach-r/monte-carlo-sim-bootstrapping-purrr.html" class="uri">https://michaeldgarber.github.io/teach-r/monte-carlo-sim-bootstrapping-purrr.html</a></p></li>
 </ol>
 <p><br /></p>
 </div>
@@ -406,8 +406,8 @@ div.tocify {
 <li><p>Session <a href="https://drive.google.com/file/d/13miuMQ-qFwC0d-alyABu5-RbaZ8xmQGH/view?usp=sharing">recording</a> on Google Drive</p></li>
 <li><p>Modules covered:</p>
 <ul>
-<li><p><a href="https://michaeldgarber.github.io/teach-r/0-pre-reqs" class="uri">https://michaeldgarber.github.io/teach-r/0-pre-reqs</a></p></li>
-<li><p><a href="https://michaeldgarber.github.io/teach-r/1-dplyr-nyt-covid.html" class="uri">https://michaeldgarber.github.io/teach-r/1-dplyr-nyt-covid.html</a></p></li>
+<li><p><a href="https://michaeldgarber.github.io/teach-r/pre-reqs.html" class="uri">https://michaeldgarber.github.io/teach-r/pre-reqs.html</a></p></li>
+<li><p><a href="https://michaeldgarber.github.io/teach-r/dplyr-1-nyt-covid.html" class="uri">https://michaeldgarber.github.io/teach-r/dplyr-1-nyt-covid.html</a></p></li>
 </ul></li>
 <li><p>R scripts used during session</p>
 <ul>
@@ -419,14 +419,14 @@ div.tocify {
 <ul>
 <li><p>Session <a href="https://www.dropbox.com/s/eitst7w7kytl7bm/r-course-session-2-video.mp4?dl=0">recording</a> on Dropbox</p></li>
 <li><p>Session <a href="https://drive.google.com/file/d/11M9PlQJTO8PGgFX7dJm5OytRYMUBQYdS/view?usp=sharing">recording</a> on Google Drive</p></li>
-<li><p>Module covered: <a href="https://michaeldgarber.github.io/teach-r/2-dplyr-mapview-tidycensus.html" class="uri">https://michaeldgarber.github.io/teach-r/2-dplyr-mapview-tidycensus.html</a></p></li>
+<li><p>Module covered: <a href="https://michaeldgarber.github.io/teach-r/dplyr-2-mapview-tidycensus" class="uri">https://michaeldgarber.github.io/teach-r/dplyr-2-mapview-tidycensus</a></p></li>
 <li><p>R script used during session: <a href="https://github.com/michaeldgarber/teach-r/blob/main/scripts/2-dplyr-mapview-tidycensus.R" class="uri">https://github.com/michaeldgarber/teach-r/blob/main/scripts/2-dplyr-mapview-tidycensus.R</a></p></li>
 </ul>
 <p><em>Session 3 (August 4, 2022)</em></p>
 <ul>
 <li><p>Session <a href="https://www.dropbox.com/s/3vvvb24e0k64ont/r-course-session-3-video.mp4?dl=0">recording</a> on Dropbox</p></li>
 <li><p>Session <a href="https://drive.google.com/file/d/1W0kDHMFHqLp0ZCd9U2stzBauMCQQJ2XV/view?usp=sharing">recording</a> on Google Drive</p></li>
-<li><p>Module covered: <a href="https://michaeldgarber.github.io/teach-r/3-sf-atl-pharm.html" class="uri">https://michaeldgarber.github.io/teach-r/3-sf-atl-pharm.html</a></p></li>
+<li><p>Module covered: <a href="https://michaeldgarber.github.io/teach-r/sf-atl-pharm-part-1.html" class="uri">https://michaeldgarber.github.io/teach-r/sf-atl-pharm-part-1.html</a></p></li>
 <li><p>R script used during session: <a href="https://github.com/michaeldgarber/teach-r/blob/main/scripts/3-sf-atl-pharm.R" class="uri">https://github.com/michaeldgarber/teach-r/blob/main/scripts/3-sf-atl-pharm.R</a></p></li>
 </ul>
 <p><em>Session 4 (August 8, 2022)</em></p>
@@ -435,8 +435,8 @@ div.tocify {
 <li><p>Session <a href="https://drive.google.com/file/d/1ZYGZ8hMzN6vFHs_j-dflT18yC-yC9QUA/view?usp=sharing">recording</a> on Google Drive</p></li>
 <li><p>Modules covered:</p>
 <ul>
-<li><p><a href="https://michaeldgarber.github.io/teach-r/0-manage-packages.html" class="uri">https://michaeldgarber.github.io/teach-r/0-manage-packages.html</a></p></li>
-<li><p><a href="https://michaeldgarber.github.io/teach-r/3-sf-atl-pharm-part-2.html" class="uri">https://michaeldgarber.github.io/teach-r/3-sf-atl-pharm-part-2.html</a></p></li>
+<li><p><a href="https://michaeldgarber.github.io/teach-r/manage-packages.html" class="uri">https://michaeldgarber.github.io/teach-r/manage-packages.html</a></p></li>
+<li><p><a href="https://michaeldgarber.github.io/teach-r/sf-atl-pharm-part-2.html" class="uri">https://michaeldgarber.github.io/teach-r/sf-atl-pharm-part-2.html</a></p></li>
 </ul></li>
 <li><p>R scripts used during session:</p>
 <ul>
@@ -450,10 +450,10 @@ div.tocify {
 <li><p>Session <a href="https://drive.google.com/file/d/1QNBcQ-cR9Og6JBpGTIt1KG-NvNqrp2Xl/view?usp=sharing">recording</a> on Google Drive</p></li>
 <li><p>Modules covered:</p>
 <ul>
-<li><p><a href="https://michaeldgarber.github.io/teach-r/5-monte-carlo-boot-purrr.html" class="uri">https://michaeldgarber.github.io/teach-r/5-monte-carlo-boot-purrr.html</a></p></li>
-<li><p><a href="https://michaeldgarber.github.io/teach-r/4-map-making.html" class="uri">https://michaeldgarber.github.io/teach-r/4-map-making.html</a></p></li>
+<li><p><a href="https://michaeldgarber.github.io/teach-r/monte-carlo-sim-bootstrapping-purrr.html" class="uri">https://michaeldgarber.github.io/teach-r/monte-carlo-sim-bootstrapping-purrr.html</a></p></li>
+<li><p><a href="https://michaeldgarber.github.io/teach-r/map-making.html" class="uri">https://michaeldgarber.github.io/teach-r/map-making.html</a></p></li>
 </ul></li>
-<li><p>R scripts used during session:</p>
+<li><p>R script used during session:</p>
 <ul>
 <li><a href="https://github.com/michaeldgarber/teach-r/blob/main/scripts/5-monte-carlo-boot-purrr.R" class="uri">https://github.com/michaeldgarber/teach-r/blob/main/scripts/5-monte-carlo-boot-purrr.R</a></li>
 </ul></li>

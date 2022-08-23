@@ -35,13 +35,13 @@ This short course will introduce participants to popular tools in R for manipula
 
     This module is intended for those who have never used R. It describes key terms, shows how to install R and RStudio, and offers some tips for managing projects and files.
 
-    Link: <https://michaeldgarber.github.io/teach-r/0-pre-reqs>
+    Link: <https://michaeldgarber.github.io/teach-r/pre-reqs.html>
 
 2.  **Managing packages: attached vs loaded via a namespace and other nuances**
 
     R's vast package ecosystem provides abundant functionality, but packages can also be a source of frustration if they don't load as expected. In this module, we explore some technical details on ways packages are loaded that may facilitate troubleshooting and understanding. We specifically cover the difference between a package being *attached to the search path* versus *loaded via a namespace* and how to check this distinction. We also learn how to remove packages, both from the current session and from the computer altogether. This module has a fair amount of technical detail and doesn't necessarily need to be reviewed before proceeding with the main modules.
 
-    Link: <https://michaeldgarber.github.io/teach-r/0-manage-packages.html>
+    Link: <https://michaeldgarber.github.io/teach-r/manage-packages.html>
 
 [Main course modules:]{.underline}
 
@@ -49,33 +49,33 @@ This short course will introduce participants to popular tools in R for manipula
 
     Dplyr, as stated on its documentation page, "is a grammar of data manipulation providing a consistent set of verbs that help you solve the most common data manipulation challenges." In this module, we learn the fundamentals of dplyr in the context of an applied example with publicly available COVID-19 data from the *New York Times*.
 
-    Link: <https://michaeldgarber.github.io/teach-r/1-dplyr-nyt-covid.html>
+    Link: <https://michaeldgarber.github.io/teach-r/dplyr-1-nyt-covid.html>
 
 2.  **R for data wrangling 2: more dplyr with tidycensus, mapview, and ggplot2**
 
     In this module, we continue with the COVID-19 example from the first tutorial and introduce four additional packages throughout the example: tidycensus, mapview, sf, and ggplot2. Tidycensus allows you to conveniently download census data into R. Mapview lets you make an interactive map with one line of code, sf is a toolbox for managing and manipulating spatial data, and ggplot2 is a prominent package for making graphs and figures. The next sessions elaborate on sf and mapview.
 
-    Link: <https://michaeldgarber.github.io/teach-r/2-dplyr-mapview-tidycensus.html>
+    Link: <https://michaeldgarber.github.io/teach-r/dplyr-2-mapview-tidycensus>
 
 3.  **R for spatial data wrangling: using sf to wrangle OpenStreetMap-downloaded pharmacies in Atlanta and assess population living nearby**
 
     The sf package and its corresponding object class have become standard tools for managing and representing (vector-based) spatial data in R. An appealing aspect of the sf object class is that it behaves like regular rectangular data and is thus amenable to common data manipulation techniques. In this module, we will work through an example analysis of pharmacies downloaded from OpenStreetMap in the Atlanta area. Through the example, we describe several operations in the sf ecosystem, including ways to merge spatial data, manipulate coordinate systems, and create buffers.
 
-    Part 1: <https://michaeldgarber.github.io/teach-r/3-sf-atl-pharm.html>
+    Part 1: <https://michaeldgarber.github.io/teach-r/sf-atl-pharm-part-1.html>
 
-    Part 2: <https://michaeldgarber.github.io/teach-r/3-sf-atl-pharm-part-2.html>
+    Part 2: <https://michaeldgarber.github.io/teach-r/sf-atl-pharm-part-2.html>
 
 4.  **Making static and interactive maps in R**
 
     This module will elaborate upon the capabilities of some of R's mapping tools covered in previous sessions. Specifically, it will illustrate tools for both static maps (as in an image) and interactive maps (as in zooming in and out like Google Maps). Mapview and ggplot2 will again be covered, and tmap will be introduced. This module will also cover color palettes available in R for visualizing continuous and categorical data.
 
-    Link: <https://michaeldgarber.github.io/teach-r/4-map-making.html> (work in progress)
+    Link: <https://michaeldgarber.github.io/teach-r/map-making.html> (work in progress)
 
 5.  **Monte Carlo simulations and boots with the purrr::map_dfr()**
 
     Creating your own functions can help reduce tedious and error-prone repetition in code. Functions can also be used to iteratively modify steps in the data analysis to estimate uncertainty of results through Monte Carlo simulation techniques and bootstrap resampling. This module will motivate, describe, and provide demo examples of Monte Carlo simulations and bootstrapping using `map_dfr()` from purrr.
 
-    Link: <https://michaeldgarber.github.io/teach-r/5-monte-carlo-boot-purrr.html>
+    Link: <https://michaeldgarber.github.io/teach-r/monte-carlo-sim-bootstrapping-purrr.html>
 
 <br />
 
@@ -95,9 +95,9 @@ Google Drive [folder](https://drive.google.com/drive/folders/125F0jIChEAPEqTKQx5
 
 -   Modules covered:
 
-    -   <https://michaeldgarber.github.io/teach-r/0-pre-reqs>
+    -   <https://michaeldgarber.github.io/teach-r/pre-reqs.html>
 
-    -   <https://michaeldgarber.github.io/teach-r/1-dplyr-nyt-covid.html>
+    -   <https://michaeldgarber.github.io/teach-r/dplyr-1-nyt-covid.html>
 
 -   R scripts used during session
 
@@ -111,7 +111,7 @@ Google Drive [folder](https://drive.google.com/drive/folders/125F0jIChEAPEqTKQx5
 
 -   Session [recording](https://drive.google.com/file/d/11M9PlQJTO8PGgFX7dJm5OytRYMUBQYdS/view?usp=sharing) on Google Drive
 
--   Module covered: <https://michaeldgarber.github.io/teach-r/2-dplyr-mapview-tidycensus.html>
+-   Module covered: <https://michaeldgarber.github.io/teach-r/dplyr-2-mapview-tidycensus>
 
 -   R script used during session: <https://github.com/michaeldgarber/teach-r/blob/main/scripts/2-dplyr-mapview-tidycensus.R>
 
@@ -121,7 +121,7 @@ Google Drive [folder](https://drive.google.com/drive/folders/125F0jIChEAPEqTKQx5
 
 -   Session [recording](https://drive.google.com/file/d/1W0kDHMFHqLp0ZCd9U2stzBauMCQQJ2XV/view?usp=sharing) on Google Drive
 
--   Module covered: <https://michaeldgarber.github.io/teach-r/3-sf-atl-pharm.html>
+-   Module covered: <https://michaeldgarber.github.io/teach-r/sf-atl-pharm-part-1.html>
 
 -   R script used during session: <https://github.com/michaeldgarber/teach-r/blob/main/scripts/3-sf-atl-pharm.R>
 
@@ -133,9 +133,9 @@ Google Drive [folder](https://drive.google.com/drive/folders/125F0jIChEAPEqTKQx5
 
 -   Modules covered:
 
-    -   <https://michaeldgarber.github.io/teach-r/0-manage-packages.html>
+    -   <https://michaeldgarber.github.io/teach-r/manage-packages.html>
 
-    -   <https://michaeldgarber.github.io/teach-r/3-sf-atl-pharm-part-2.html>
+    -   <https://michaeldgarber.github.io/teach-r/sf-atl-pharm-part-2.html>
 
 -   R scripts used during session:
 
@@ -151,11 +151,11 @@ Google Drive [folder](https://drive.google.com/drive/folders/125F0jIChEAPEqTKQx5
 
 -   Modules covered:
 
-    -   <https://michaeldgarber.github.io/teach-r/5-monte-carlo-boot-purrr.html>
+    -   <https://michaeldgarber.github.io/teach-r/monte-carlo-sim-bootstrapping-purrr.html>
 
-    -   <https://michaeldgarber.github.io/teach-r/4-map-making.html>
+    -   <https://michaeldgarber.github.io/teach-r/map-making.html>
 
--   R scripts used during session:
+-   R script used during session:
 
     -   <https://github.com/michaeldgarber/teach-r/blob/main/scripts/5-monte-carlo-boot-purrr.R>
 
