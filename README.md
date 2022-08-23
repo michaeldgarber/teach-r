@@ -44,8 +44,8 @@ This short course will introduce participants to popular tools in R for manipula
 
 4.  Making static and interactive maps in R
 
-    <https://michaeldgarber.github.io/teach-r/map-making.html>
+    <https://michaeldgarber.github.io/teach-r/map-making>
 
 5.  Monte Carlo simulations and boots with the `purrr::map_dfr()`
 
-    <https://michaeldgarber.github.io/teach-r/monte-carlo-sim-bootstrapping-purrr.html>
+    <https://michaeldgarber.github.io/teach-r/monte-carlo-sim-bootstrapping-purrr>
