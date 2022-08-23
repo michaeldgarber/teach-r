@@ -30,7 +30,7 @@ This short course will introduce participants to popular tools in R for manipula
 
 1.  Introduction to R and data wrangling: learning the basics of dplyr with publicly available COVID-19 data:
 
-    <https://michaeldgarber.github.io/teach-r/dplyr-1-nyt-covid.html>
+    [https://michaeldgarber.github.io/teach-r/dplyr-1-nyt-covid](https://michaeldgarber.github.io/teach-r/dplyr-1-nyt-covid.html)
 
 2.  R for data wrangling 2: more dplyr with tidycensus, mapview, and ggplot2
 
