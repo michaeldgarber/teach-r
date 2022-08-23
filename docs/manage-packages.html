@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Michael D. Garber, PhD MPH" />
+
+<meta name="date" content="2022-08-23" />
+
+<title>Managing packages: attached vs loaded via a namespace and other nuances</title>
+
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="https://michaeldgarber.github.io/">
+    <span class="fa fa-home"></span>
+     
+    MDG
+  </a>
+</li>
+<li>
+  <a href="index.html">R course</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Managing packages: attached vs loaded via a namespace and other nuances</h1>
+<h4 class="author">Michael D. Garber, PhD MPH</h4>
+<h4 class="date">2022-08-23</h4>
+
+</div>
+
+
+<div id="background" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> Background</h1>
+<p>R’s vast package ecosystem provides abundant functionality, but packages can also be a source of frustration. Sometimes packages don’t load as expected, and sometimes their dependencies on one another can cause code to break. In this module, we explore some technical details on packages, including how to:</p>
+<ul>
+<li><p>check what packages are <strong>attached</strong> during the current R session and those that are <strong>loaded</strong> (technically different)</p></li>
+<li><p>check what packages have been installed (i.e., downloaded), even if they’re not attached or loaded in the current session</p></li>
+<li><p>find where installed packages are in your computer</p></li>
+<li><p>remove (detach) packages from the current session</p></li>
+<li><p>unload a package that was loaded via a namespace</p></li>
+<li><p>remove packages from your computer altogether</p></li>
+<li><p>check what packages a package depends on</p></li>
+</ul>
+<div id="vocabulary-attached-to-search-path-vs-loaded-via-a-namespace" class="section level2" number="1.1">
+<h2><span class="header-section-number">1.1</span> Vocabulary: attached to search path vs loaded via a namespace</h2>
+<p>An “attached” package is one that has been loaded via <code>library()</code> and whose functions are accessible without having to use the <code>::</code> operator as in <code>package_name::package_function()</code>. For example, if dplyr is attached, I can simply write <code>mutate()</code>; I don’t have to write <code>dplyr::mutate()</code>. Packages that are attached are accessible via what R calls the <em>search path</em> or <em>search list</em>. When a function is used without the double-colon syntax [e.g., <code>mutate()]</code>, R looks for a function with that name in the first package on the path, and if it doesn’t find it, it looks in the second package on the path, and so on. The order of the search path can be obtained via <code>searchpaths()</code>. Packages loaded with <code>library()</code> more recently will rank earlier in the search path, which can have consequences for function conflicts.</p>
+<p>Packages can also be “loaded via a namespace.” This means that the packages have been loaded because the user called the function using the <a href="https://stat.ethz.ch/R-manual/R-devel/library/base/html/ns-dblcolon.html">double-colon operator</a> (<code>package_name::package_function()</code> but has not <em>attached</em> the package to the search path via <code>library()</code>; because <a href="https://github.com/rstudio/rstudio/issues/8072">R Studio sees that the package is used somewhere in the script</a>, even if the user has not run that code yet; or because the package is needed by the IDE to perform a behind-the-scenes operation. For example, knitr is loaded via a namespace in my current session because I am using R Markdown even though that package does not appear in a script in my current session.</p>
+<p>In common usage, I cannot glean any difference between use of a package that has been loaded via namespace versus one that has been installed (e.g., using <code>install.packages("package_name")</code> but has not been loaded at all. To use a function from a package that has already been loaded via a namespace, you still must use the double-colon notation of <code>package_name::package_function()</code>, as you would a function from a package that has not (yet) been loaded via a namespace.</p>
+<p>That a package has been loaded via a namespace may, however, have implications for troubleshooting. For example, if you try to install a package that has already been loaded via a namespace, this dialogue box may appear:</p>
+<p><img src="images/updating-loaded-packages.png" /></p>
+<p>To summarize this section, all attached packages are loaded, but not all loaded packages are attached. We will deduce this relationship using functions from the <a href="https://r-lib.github.io/sessioninfo/">sessioninfo</a> package below. If a package is attached, we can write the function name by itself without its corresponding package name (mindful of potential conflicts); if not, we must use the double-colon notation, <code>::</code>, and write the package as well.</p>
+</div>
+<div id="vocabulary-package-dependencies" class="section level2" number="1.2">
+<h2><span class="header-section-number">1.2</span> Vocabulary: package dependencies</h2>
+<p>Information related to package dependencies appears, for a given package, in the following fields: <code>Depends</code>, <code>Imports</code>, <code>and Suggests.</code> Package dependencies are covered in this work-in-progress <a href="https://r-pkgs.org/dependencies.html">chapter</a> of the book <a href="https://r-pkgs.org">R Packages</a>.</p>
+<p>In brief, sometimes you will notice that the installation of a package causes other packages to be installed. This is because that package <code>Imports</code> that package. For any package, this information can be obtained via the <code>available.packages()</code> function, described further below. <code>Suggests</code> is softer. If a package suggests another package, it won’t install that package automatically, but that some features of the package may benefit from functions in that package.</p>
+</div>
+<div id="resources-and-references" class="section level2" number="1.3">
+<h2><span class="header-section-number">1.3</span> Resources and references</h2>
+<ul>
+<li><p><a href="https://cran.rstudio.com/web/packages/sessioninfo/readme/README.html">sessioninfo</a>: A package for getting information about your packages and other information about the current session, co-authored by some RStudio team members.</p></li>
+<li><p>Chapter13 “Packages” in <u>An Introduction to R</u>. Technical but precisely written.</p>
+<ul>
+<li><p>Official CRAN link: <a href="https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf" class="uri">https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf</a></p></li>
+<li><p>Direct link to Chapter 13, which discusses packages and namespaces, via an adapted Bookdown interface: <a href="https://colinfay.me/intro-to-r/packages.html" class="uri">https://colinfay.me/intro-to-r/packages.html</a></p></li>
+</ul></li>
+<li><p>Loaded via a namespace vs attached: <a href="https://stackoverflow.com/questions/14988722/in-r-what-does-loaded-via-a-namespace-and-not-attached-mean" class="uri">https://stackoverflow.com/questions/14988722/in-r-what-does-loaded-via-a-namespace-and-not-attached-mean</a></p></li>
+<li><p>The search path: <a href="https://stat.ethz.ch/R-manual/R-devel/library/base/html/search.html" class="uri">https://stat.ethz.ch/R-manual/R-devel/library/base/html/search.html</a></p></li>
+<li><p>RStudio automatically loading packages via a namespace: <a href="https://github.com/rstudio/rstudio/issues/8072" class="uri">https://github.com/rstudio/rstudio/issues/8072</a></p></li>
+<li><p>Working chapter by Hadley Wickham and Jenny Bryanm on package dependencies: <a href="https://r-pkgs.org/dependencies.html" class="uri">https://r-pkgs.org/dependencies.html</a></p></li>
+</ul>
+</div>
+</div>
+<div id="functions-to-print-information-about-packages-currently-loaded-and-otherwise" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Functions to print information about packages, currently loaded and otherwise</h1>
+<div id="base-r" class="section level2" number="2.1">
+<h2><span class="header-section-number">2.1</span> base R</h2>
+<p>The following base-R functions provide information about currently loaded or installed packages.</p>
+<ul>
+<li><p><code>utils::sessionInfo()</code>: view R version, attached packages, and packages loaded via a namespace. Also includes package version.</p></li>
+<li><p><code>base::search()</code>: shows attached packages. Note this also shows other objects on the search path, including the Global Environment.</p></li>
+<li><p><code>base::loadedNamespaces()</code>: display a list of packages loaded via a namespace.</p></li>
+<li><p><code>utils::installed.packages()</code> returns all installed packages, whether they’ve been loaded or not.</p></li>
+<li><p><code>.libPaths()</code> returns the folder location in your computer where packages are stored.</p></li>
+<li><p>All available packages in R (whether installed or not) can be obtained via <code>available.packages()</code>, which returns a matrix of information about every package available in R, including the fields <code>Depends</code>, <code>Imports</code>, <code>LinkingTo</code>, and <code>Suggests</code> These terms are described in the Dependencies chapter of the book <a href="https://r-pkgs.org">R Packages</a> by Hadley Wickham and Jenny Bryan. If a package <code>imports</code> a package, that means it will automatically install that package if the package has not been otherwise installed. This information can then be saved as a dataframe or tibble and explored, demoed below.</p></li>
+</ul>
+<p>These two base-R functions remove (detach) attached packages and unload packages that have been loaded via a namespace. I use the sf package as an example. Note the single colon in <code>"package:sf"</code> is <a href="https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/detach">intentional</a>.</p>
+</div>
+<div id="sessioninfo" class="section level2" number="2.2">
+<h2><span class="header-section-number">2.2</span> sessioninfo</h2>
+<p><a href="https://r-lib.github.io/sessioninfo/">sessioninfo</a> is a package with functionality similar to that of <code>utils::sessionInfo()</code> but has a nicer output and includes more information about packages.</p>
+<ul>
+<li><p><code>sessioninfo::session_info()</code> prints session information, including a list of packages, their version, and the date the package was built, and the package source (e.g., CRAN or GitHub).</p></li>
+<li><p><code>sessioninfo::package_info()</code>. <a href="https://cran.r-project.org/web/packages/sessioninfo/sessioninfo.pdf">By default</a>, this function returns a list of packages that have been loaded in the current session, either by attaching them or via a namespace. In contrast with <code>utils::sessionInfo()</code>, this function by default does not show base-R functions. Note that at the bottom of the output, the location where packages are stored is shown. You can further specify what types of packages are returned by <code>sessioninfo::package_info()</code>:</p></li>
+<li><p><code>sessioninfo::package_info(pkgs = "loaded")</code> returns all loaded packages (default called explicitly).</p></li>
+<li><p><code>sessioninfo::package_info(pkgs = "attached")</code> returns only those packages have been attached to the search path, i.e., via <code>library()</code>.</p></li>
+<li><p><code>sessioninfo::package_info(pkgs = "installed")</code> returns all installed packages, whether they’ve been loaded or not.</p></li>
+</ul>
+</div>
+</div>
+<div id="functions-to-install-update-and-remove-packages-base-r" class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Functions to install, update, and remove packages (base R)</h1>
+<p>We already know that packages are installed via <code>install.packages("package_name")</code>. We can use the dependencies argument to further specify whether or not to also install dependencies. The default behavior is NA, elaborated upon <a href="https://www.rdocumentation.org/packages/utils/versions/3.6.2/topics/install.packages">here</a>.</p>
+<ul>
+<li><code>install.packages("package_name", dependencies = FALSE)</code> will install the package without its dependencies. This may be useful if you already know that all dependencies for a given package have been installed.</li>
+</ul>
+<p>To update packages that are already loaded, use</p>
+<p><code>update.packages(checkBuilt = T, ask = F)</code>.</p>
+<p>To remove packages from either the search path or a namespace, use:</p>
+<ul>
+<li><p><code>base::detach("package:sf", unload = TRUE)</code>. Note if <code>unload=FALSE</code>, the package may remain in a namespace.</p></li>
+<li><p><code>base::unloadNamespace("package_name")</code> unloads a namespace.</p></li>
+</ul>
+<p>To remove packages that have been instaslled:</p>
+<ul>
+<li><p><code>remove.packages("package_name")</code></p></li>
+<li><p>To <strong>remove all installed packages</strong> that do not come with R, my suggestion would be to remove the R program altogether via the usual way to remove programs in the operating system (Windows or Mac). You can also follow guidance here: <a href="https://stackoverflow.com/questions/16382647/remove-all-packages-that-do-not-come-with-r" class="uri">https://stackoverflow.com/questions/16382647/remove-all-packages-that-do-not-come-with-r</a></p></li>
+</ul>
+</div>
+<div id="demo-of-functions" class="section level1" number="4">
+<h1><span class="header-section-number">4</span> Demo of functions</h1>
+<p>I’m going to load attach two packages, here and ggplot2, and demo some of the above functions. Note that the base R <code>sessionInfo()</code> tells us that just one package, here, was attached. Some other packages have been loaded via a namespace.</p>
+<pre class="r"><code>library(here)</code></pre>
+<pre><code>## here() starts at /Users/michaeldgarber/Dropbox/Work/teach/teach-r</code></pre>
+<pre class="r"><code>library(ggplot2)
+sessionInfo()</code></pre>
+<pre><code>## R version 4.2.0 (2022-04-22)
+## Platform: aarch64-apple-darwin20 (64-bit)
+## Running under: macOS Monterey 12.5.1
+## 
+## Matrix products: default
+## BLAS:   /Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/lib/libRblas.0.dylib
+## LAPACK: /Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/lib/libRlapack.dylib
+## 
+## locale:
+## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+## 
+## attached base packages:
+## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## 
+## other attached packages:
+## [1] ggplot2_3.3.6 here_1.0.1   
+## 
+## loaded via a namespace (and not attached):
+##  [1] bslib_0.4.0      compiler_4.2.0   pillar_1.8.0     jquerylib_0.1.4 
+##  [5] tools_4.2.0      digest_0.6.29    jsonlite_1.8.0   evaluate_0.15   
+##  [9] lifecycle_1.0.1  tibble_3.1.8     gtable_0.3.0     pkgconfig_2.0.3 
+## [13] rlang_1.0.4      DBI_1.1.3        cli_3.3.0        rstudioapi_0.13 
+## [17] yaml_2.3.5       xfun_0.31        fastmap_1.1.0    withr_2.5.0     
+## [21] dplyr_1.0.9      stringr_1.4.0    knitr_1.39       generics_0.1.3  
+## [25] sass_0.4.2       vctrs_0.4.1      tidyselect_1.1.2 rprojroot_2.0.3 
+## [29] grid_4.2.0       glue_1.6.2       R6_2.5.1         fansi_1.0.3     
+## [33] rmarkdown_2.14   bookdown_0.27    purrr_0.3.4      magrittr_2.0.3  
+## [37] scales_1.2.0     htmltools_0.5.3  assertthat_0.2.1 colorspace_2.0-3
+## [41] utf8_1.2.2       stringi_1.7.8    munsell_0.5.0    cachem_1.0.6</code></pre>
+<div id="general-session-info" class="section level2" number="4.1">
+<h2><span class="header-section-number">4.1</span> General session info</h2>
+<p><code>sessioninfo::session_info()</code></p>
+<p>Now let’s get the same information using <code>sessioninfo::session_info()</code>. Note the asterisk next to the packages we attached.</p>
+<pre class="r"><code>sessioninfo::session_info()</code></pre>
+<pre><code>## ─ Session info ───────────────────────────────────────────────────────────────
+##  setting  value
+##  version  R version 4.2.0 (2022-04-22)
+##  os       macOS Monterey 12.5.1
+##  system   aarch64, darwin20
+##  ui       X11
+##  language (EN)
+##  collate  en_US.UTF-8
+##  ctype    en_US.UTF-8
+##  tz       America/Denver
+##  date     2022-08-23
+##  pandoc   2.18 @ /Applications/RStudio.app/Contents/MacOS/quarto/bin/tools/ (via rmarkdown)
+## 
+## ─ Packages ───────────────────────────────────────────────────────────────────
+##  package     * version date (UTC) lib source
+##  assertthat    0.2.1   2019-03-21 [1] CRAN (R 4.2.0)
+##  bookdown      0.27    2022-06-14 [1] CRAN (R 4.2.0)
+##  bslib         0.4.0   2022-07-16 [1] CRAN (R 4.2.0)
+##  cachem        1.0.6   2021-08-19 [1] CRAN (R 4.2.0)
+##  cli           3.3.0   2022-04-25 [1] CRAN (R 4.2.0)
+##  colorspace    2.0-3   2022-02-21 [1] CRAN (R 4.2.0)
+##  DBI           1.1.3   2022-06-18 [1] CRAN (R 4.2.0)
+##  digest        0.6.29  2021-12-01 [1] CRAN (R 4.2.0)
+##  dplyr         1.0.9   2022-04-28 [1] CRAN (R 4.2.0)
+##  evaluate      0.15    2022-02-18 [1] CRAN (R 4.2.0)
+##  fansi         1.0.3   2022-03-24 [1] CRAN (R 4.2.0)
+##  fastmap       1.1.0   2021-01-25 [1] CRAN (R 4.2.0)
+##  generics      0.1.3   2022-07-05 [1] CRAN (R 4.2.0)
+##  ggplot2     * 3.3.6   2022-05-03 [1] CRAN (R 4.2.0)
+##  glue          1.6.2   2022-02-24 [1] CRAN (R 4.2.0)
+##  gtable        0.3.0   2019-03-25 [1] CRAN (R 4.2.0)
+##  here        * 1.0.1   2020-12-13 [1] CRAN (R 4.2.0)
+##  htmltools     0.5.3   2022-07-18 [1] CRAN (R 4.2.0)
+##  jquerylib     0.1.4   2021-04-26 [1] CRAN (R 4.2.0)
+##  jsonlite      1.8.0   2022-02-22 [1] CRAN (R 4.2.0)
+##  knitr         1.39    2022-04-26 [1] CRAN (R 4.2.0)
+##  lifecycle     1.0.1   2021-09-24 [1] CRAN (R 4.2.0)
+##  magrittr      2.0.3   2022-03-30 [1] CRAN (R 4.2.0)
+##  munsell       0.5.0   2018-06-12 [1] CRAN (R 4.2.0)
+##  pillar        1.8.0   2022-07-18 [1] CRAN (R 4.2.0)
+##  pkgconfig     2.0.3   2019-09-22 [1] CRAN (R 4.2.0)
+##  purrr         0.3.4   2020-04-17 [1] CRAN (R 4.2.0)
+##  R6            2.5.1   2021-08-19 [1] CRAN (R 4.2.0)
+##  rlang         1.0.4   2022-07-12 [1] CRAN (R 4.2.0)
+##  rmarkdown     2.14    2022-04-25 [1] CRAN (R 4.2.0)
+##  rprojroot     2.0.3   2022-04-02 [1] CRAN (R 4.2.0)
+##  rstudioapi    0.13    2020-11-12 [1] CRAN (R 4.2.0)
+##  sass          0.4.2   2022-07-16 [1] CRAN (R 4.2.0)
+##  scales        1.2.0   2022-04-13 [1] CRAN (R 4.2.0)
+##  sessioninfo   1.2.2   2021-12-06 [1] CRAN (R 4.2.0)
+##  stringi       1.7.8   2022-07-11 [1] CRAN (R 4.2.0)
+##  stringr       1.4.0   2019-02-10 [1] CRAN (R 4.2.0)
+##  tibble        3.1.8   2022-07-22 [1] CRAN (R 4.2.0)
+##  tidyselect    1.1.2   2022-02-21 [1] CRAN (R 4.2.0)
+##  utf8          1.2.2   2021-07-24 [1] CRAN (R 4.2.0)
+##  vctrs         0.4.1   2022-04-13 [1] CRAN (R 4.2.0)
+##  withr         2.5.0   2022-03-03 [1] CRAN (R 4.2.0)
+##  xfun          0.31    2022-05-10 [1] CRAN (R 4.2.0)
+##  yaml          2.3.5   2022-02-21 [1] CRAN (R 4.2.0)
+## 
+##  [1] /Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library
+## 
+## ──────────────────────────────────────────────────────────────────────────────</code></pre>
+</div>
+<div id="explore-package-info-and-detach-packages" class="section level2" number="4.2">
+<h2><span class="header-section-number">4.2</span> Explore package info and detach packages</h2>
+<p>Now let’s specify what type of packages we want to see from <code>sessioninfo::package_info()</code></p>
+<p>Look at all packages that have been loaded.</p>
+<pre class="r"><code>sessioninfo::package_info(&quot;loaded&quot;)</code></pre>
+<pre><code>##  package     * version date (UTC) lib source
+##  assertthat    0.2.1   2019-03-21 [1] CRAN (R 4.2.0)
+##  bookdown      0.27    2022-06-14 [1] CRAN (R 4.2.0)
+##  bslib         0.4.0   2022-07-16 [1] CRAN (R 4.2.0)
+##  cachem        1.0.6   2021-08-19 [1] CRAN (R 4.2.0)
+##  cli           3.3.0   2022-04-25 [1] CRAN (R 4.2.0)
+##  colorspace    2.0-3   2022-02-21 [1] CRAN (R 4.2.0)
+##  DBI           1.1.3   2022-06-18 [1] CRAN (R 4.2.0)
+##  digest        0.6.29  2021-12-01 [1] CRAN (R 4.2.0)
+##  dplyr         1.0.9   2022-04-28 [1] CRAN (R 4.2.0)
+##  evaluate      0.15    2022-02-18 [1] CRAN (R 4.2.0)
+##  fansi         1.0.3   2022-03-24 [1] CRAN (R 4.2.0)
+##  fastmap       1.1.0   2021-01-25 [1] CRAN (R 4.2.0)
+##  generics      0.1.3   2022-07-05 [1] CRAN (R 4.2.0)
+##  ggplot2     * 3.3.6   2022-05-03 [1] CRAN (R 4.2.0)
+##  glue          1.6.2   2022-02-24 [1] CRAN (R 4.2.0)
+##  gtable        0.3.0   2019-03-25 [1] CRAN (R 4.2.0)
+##  here        * 1.0.1   2020-12-13 [1] CRAN (R 4.2.0)
+##  htmltools     0.5.3   2022-07-18 [1] CRAN (R 4.2.0)
+##  jquerylib     0.1.4   2021-04-26 [1] CRAN (R 4.2.0)
+##  jsonlite      1.8.0   2022-02-22 [1] CRAN (R 4.2.0)
+##  knitr         1.39    2022-04-26 [1] CRAN (R 4.2.0)
+##  lifecycle     1.0.1   2021-09-24 [1] CRAN (R 4.2.0)
+##  magrittr      2.0.3   2022-03-30 [1] CRAN (R 4.2.0)
+##  munsell       0.5.0   2018-06-12 [1] CRAN (R 4.2.0)
+##  pillar        1.8.0   2022-07-18 [1] CRAN (R 4.2.0)
+##  pkgconfig     2.0.3   2019-09-22 [1] CRAN (R 4.2.0)
+##  purrr         0.3.4   2020-04-17 [1] CRAN (R 4.2.0)
+##  R6            2.5.1   2021-08-19 [1] CRAN (R 4.2.0)
+##  rlang         1.0.4   2022-07-12 [1] CRAN (R 4.2.0)
+##  rmarkdown     2.14    2022-04-25 [1] CRAN (R 4.2.0)
+##  rprojroot     2.0.3   2022-04-02 [1] CRAN (R 4.2.0)
+##  rstudioapi    0.13    2020-11-12 [1] CRAN (R 4.2.0)
+##  sass          0.4.2   2022-07-16 [1] CRAN (R 4.2.0)
+##  scales        1.2.0   2022-04-13 [1] CRAN (R 4.2.0)
+##  sessioninfo   1.2.2   2021-12-06 [1] CRAN (R 4.2.0)
+##  stringi       1.7.8   2022-07-11 [1] CRAN (R 4.2.0)
+##  stringr       1.4.0   2019-02-10 [1] CRAN (R 4.2.0)
+##  tibble        3.1.8   2022-07-22 [1] CRAN (R 4.2.0)
+##  tidyselect    1.1.2   2022-02-21 [1] CRAN (R 4.2.0)
+##  utf8          1.2.2   2021-07-24 [1] CRAN (R 4.2.0)
+##  vctrs         0.4.1   2022-04-13 [1] CRAN (R 4.2.0)
+##  withr         2.5.0   2022-03-03 [1] CRAN (R 4.2.0)
+##  xfun          0.31    2022-05-10 [1] CRAN (R 4.2.0)
+##  yaml          2.3.5   2022-02-21 [1] CRAN (R 4.2.0)
+## 
+##  [1] /Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library</code></pre>
+<p>Look at only those package(s) that have been attached:</p>
+<pre class="r"><code>sessioninfo::package_info(&quot;attached&quot;)</code></pre>
+<pre><code>##  package * version date (UTC) lib source
+##  ggplot2 * 3.3.6   2022-05-03 [1] CRAN (R 4.2.0)
+##  here    * 1.0.1   2020-12-13 [1] CRAN (R 4.2.0)
+## 
+##  [1] /Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library</code></pre>
+<p>Note that the result of <code>sessioninfo::package_info("attached")</code> is a subset of <code>sessioninfo::package_info("loaded")</code>, implying that all attached packages are loaded.</p>
+<p>I’m not going to print all installed packages, because the list is long, but that would be done by</p>
+<pre class="r"><code>sessioninfo::package_info(&quot;installed&quot;)</code></pre>
+<p>If we remove here using <code>detach()</code>, is it removed from the list of attached packages?</p>
+<pre class="r"><code>base::detach(&quot;package:here&quot;, unload = TRUE)
+sessioninfo::package_info(&quot;attached&quot;)</code></pre>
+<pre><code>##  package * version date (UTC) lib source
+##  ggplot2 * 3.3.6   2022-05-03 [1] CRAN (R 4.2.0)
+## 
+##  [1] /Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library</code></pre>
+</div>
+<div id="remove-a-package" class="section level2" number="4.3">
+<h2><span class="header-section-number">4.3</span> Remove a package</h2>
+<p>Above, we detached the here package from the current session, but it’s still available as an installed package. We can check this via <code>sessioninfo::package_info("installed")</code>. Rather than print the entire list of installed packages in this demo (long), I’m going to create an object corresponding to the installed packages and then filter only to the here package using dplyr functions.</p>
+<pre class="r"><code>library(tidyverse) #so that the pipe will work</code></pre>
+<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
+## ✔ tibble  3.1.8     ✔ dplyr   1.0.9
+## ✔ tidyr   1.2.0     ✔ stringr 1.4.0
+## ✔ readr   2.1.2     ✔ forcats 0.5.1
+## ✔ purrr   0.3.4     
+## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>installed_packages_here = sessioninfo::package_info(&quot;installed&quot;) %&gt;% 
+  dplyr::as_tibble() %&gt;% 
+  dplyr::filter(package == &quot;here&quot;)
+
+installed_packages_here</code></pre>
+<pre><code>## # A tibble: 1 × 11
+##   package ondiskversion loade…¹ path  loade…² attac…³ is_base date  source md5ok
+##   &lt;chr&gt;   &lt;chr&gt;         &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;   &lt;lgl&gt;   &lt;lgl&gt;   &lt;chr&gt; &lt;chr&gt;  &lt;lgl&gt;
+## 1 here    1.0.1         &lt;NA&gt;    /Lib… &lt;NA&gt;    FALSE   FALSE   2020… CRAN … NA   
+## # … with 1 more variable: library &lt;fct&gt;, and abbreviated variable names
+## #   ¹​loadedversion, ²​loadedpath, ³​attached
+## # ℹ Use `colnames()` to see all variable names</code></pre>
+<p>Remove the here package. Note we now get an error when we try to run <code>here::here()</code> because the package is nowhere to be found.</p>
+<pre class="r"><code>remove.packages(&quot;here&quot;)</code></pre>
+<pre><code>## Removing package from &#39;/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library&#39;
+## (as &#39;lib&#39; is unspecified)</code></pre>
+<pre class="r"><code>here::here()</code></pre>
+<pre><code>## Error in loadNamespace(x): there is no package called &#39;here&#39;</code></pre>
+<p>Re-install it.</p>
+<pre class="r"><code>install.packages(&quot;here&quot;)</code></pre>
+<pre><code>## 
+## The downloaded binary packages are in
+##  /var/folders/sd/fx5w2bb91wxbnndc3hpqvtcr0000gn/T//Rtmp8nrJAd/downloaded_packages</code></pre>
+</div>
+<div id="examine-package-dependencies" class="section level2" number="4.4">
+<h2><span class="header-section-number">4.4</span> Examine package dependencies</h2>
+<p>We can save the information about all available R packages to an object called packages and then convert that object (a matrix) into an easier-to-manage tibble, and then use dplyr functions to filter to one specific package.</p>
+<p>We see, for example, that <strong>tidycensus</strong> <code>Imports</code> <strong>sf</strong>, among other packages.</p>
+<pre class="r"><code>packages  = utils::available.packages()
+
+library(tidyverse) #so the pipe works
+packages_tibble_tidycensus = packages %&gt;% 
+  dplyr::as_tibble() %&gt;% 
+  dplyr::filter(Package == &quot;tidycensus&quot;)
+
+#Just select these two fields.
+packages_tibble_tidycensus %&gt;% 
+  dplyr::select(Package, Imports)</code></pre>
+<pre><code>## # A tibble: 1 × 2
+##   Package    Imports                                                            
+##   &lt;chr&gt;      &lt;chr&gt;                                                              
+## 1 tidycensus &quot;httr, sf, dplyr (&gt;= 1.0.0), tigris, stringr, jsonlite (&gt;=\n1.5.0)…</code></pre>
+</div>
+</div>
+<div id="use-the-graphical-user-interface-to-manage-packages" class="section level1" number="5">
+<h1><span class="header-section-number">5</span> Use the graphical user interface to manage packages</h1>
+<p>In R Studio, many (not all, to my knowledge) of the above functions to load packages, examine which packages are loaded or installed, and update packages can be done via the point-and-click interface.</p>
+<p>For example, to install packages, we can use the Tools dropdown,</p>
+<p><img src="images/install-package-tools-dropdown.png" width="500" /></p>
+<p>which leads to</p>
+<p><img src="images/install-package-tools-dropdown-2-usethis.png" width="500" /></p>
+<p>Checking for package updates can also be done from the Tools dropdown,</p>
+<p><img src="images/check-for-package-updates-dropdown.png" width="500" height="49" /></p>
+<p>or from the Packages tab (usually bottom right) of R Studio by clicking the “Update” icon.</p>
+<p>This pane shows a list of all packages that have been installed, and those that have been attached have a check mark.</p>
+<p><img src="images/check-for-package-updates-packages-pane-2.png" width="500" /></p>
+<p>Packages on the search path (attached) can also be seen from this dropdown. The only package of the below that I loaded explicitly was here.</p>
+<p><img src="images/search-path-screenshot.png" width="500" /></p>
+<p>This shows the same information as <code>searchpaths()</code>.</p>
+</div>
+
+<br>
+<br>
+<p>Copyright &copy; 2022 Michael D. Garber </p>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3,h4",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

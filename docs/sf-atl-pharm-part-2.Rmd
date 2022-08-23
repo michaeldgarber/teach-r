@@ -1,0 +1,204 @@
+---
+title: "R for spatial data wrangling: using sf to wrangle pharmacies in Atlanta and assess population living nearby (Part 2)"
+author: "Michael D. Garber, PhD MPH"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+---
+
+# Objective and background
+
+**Overall goal**: Illustrate use of **sf** through example analyses with spatially referenced pharmacy data downloaded from OpenStreetMap via **osmdata** and spatially referenced census data in the Atlanta area downloaded via **tidycensus**.
+
+Specifically:
+
+1.  According to OpenStreetMap, how many pharmacies are there in Fulton and Dekalb counties (Atlanta area)?
+
+2.  How many people live within 1/2 mile of these pharmacies in these counties?
+
+*In part 1, we answer the first question. In part 2, we answer the second.*
+
+<br />
+
+# Load and re-acquaint with the data from part 1
+
+```{r, message=FALSE, warning=FALSE}
+library(here)
+library(sf)
+library(tidyverse)
+library(mapview)
+library(tmap)
+```
+
+Load the census-tract-level data with demographic information.
+
+```{r}
+setwd(here("data-processed"))
+load(file = "tract_ga_wrangle.RData")
+```
+
+Load the cleaned-up dataset of pharmacies, all of which are represented by points.
+
+```{r}
+setwd(here("data-processed"))
+load("pharm_fd_combined.RData")
+```
+
+Remind ourselves what we're looking at. Return basic information (variable names, object type) for the tract-level data.
+
+```{r}
+names(tract_ga_wrangle)
+class(tract_ga_wrangle)
+
+```
+
+Map one of the socio-demographic variables (median household income) in the Atlanta area only, accepting defaults:
+
+```{r}
+tract_ga_wrangle %>% 
+  filter(atlanta_metro == 1) %>% 
+  mapview(
+    layer.name = "Median household income (USD)",
+    zcol = "hh_inc_med_E")
+```
+
+And do the same steps for the pharmacies.
+
+```{r}
+names(pharm_fd_combined)
+class(pharm_fd_combined)
+pharm_fd_combined %>% 
+  mapview()
+```
+
+# Estimate population within a half-mile of a pharmacy
+
+## Create a half-mile buffer around each pharmacy
+
+```{r}
+pharm_fd_combined_buff_halfmile = pharm_fd_combined %>% 
+  sf::st_transform(2240) %>% 
+  sf::st_buffer(5280/2)
+```
+
+Use `mapview()` to look at the pharmacies as points compared with their buffer areas.
+
+```{r}
+mv_pharm_point = pharm_fd_combined %>% 
+  mapview(
+    layer.name = "Points",
+    col.regions = "yellow",
+          color = "yellow")
+mv_pharm_buff =pharm_fd_combined_buff_halfmile %>% 
+  mapview(
+    layer.name = "Buffers",
+    col.regions = "blue",
+    color = "blue"
+  )
+mv_pharm_point+mv_pharm_buff
+```
+
+Combine them into a single object. We will then intersect that single object with the census tracts to determine which parts of census tracts intersect the buffer areas of any pharmacy. Recall, we can use `st_union()` for this task.
+
+```{r}
+pharm_fd_combined_buff_halfmile_union = pharm_fd_combined_buff_halfmile %>% 
+  st_union() %>% 
+  st_as_sf() 
+```
+
+Confirm it has just one row:
+
+```{r}
+nrow(pharm_fd_combined_buff_halfmile_union)
+```
+
+## Assess proportion each census tract is overlapped by this object.
+
+### Find parts of census tracts that overlap the buffers
+
+First, restrict the census tracts to Fulton County and Dekalb County
+
+```{r}
+tract_fulton_dekalb = tract_ga_wrangle %>% 
+  dplyr::filter(county_fips == "13121" | county_fips == "13089") 
+```
+
+Then use `st_intersection()` to find the intersecting geometry between these census tracts and the (single-object) buffer area around the pharmacies
+
+```{r}
+tract_fulton_dekalb_int_pharm_buff = tract_fulton_dekalb %>% 
+  sf::st_transform(2240) %>% #coordinate system in feet.
+  st_intersection(pharm_fd_combined_buff_halfmile_union) %>% 
+  #measure the overlapping area for each census tract.
+  mutate(
+    area_overlap_ft2 = as.numeric(st_area(geometry)),
+    #proportion of this overlapping slice of the whole census tract.
+    prop_area_overlap_ft2 = area_overlap_ft2/area_ft2
+  ) %>% 
+  #just grab those two variables and then re-link with the original
+  #totals
+  #geometry is sticky, but it doesn't hurt to be explicit
+  dplyr::select(geo_id, contains("overlap"), geometry) %>% 
+  mutate(number_for_vis = row_number()) #alternate to visualize
+```
+
+Map the result. Note the number_for_vis column is simply the row number to facilitate visualization. It's not the official census tract ID.
+
+```{r}
+tract_fulton_dekalb_int_pharm_buff %>% 
+  mapview(zcol = "number_for_vis",
+          layer.name = "Intersecting census tracts")
+```
+
+Link the overlapping parts with all of the census tracts in Dekalb and Fulton County using `left_join()`. We first strip geomery from the intersected geometry and then link with the main dataset of tracts from Fulton and Dekalb County. We then estimate the population in the intersections by using the proportion of the area of each census tract that overlapped multiplied by the population total.
+
+This calculation assumes population is uniformly distributed within the census tract, probably a reasonable assumption for census tracts, maybe not for a county or a state.
+
+```{r}
+#remove geometry from these intersected pieces befoe linking.
+tract_fulton_dekalb_int_pharm_buff_nogeo =tract_fulton_dekalb_int_pharm_buff %>% 
+  st_set_geometry(NULL) %>% 
+  as_tibble()
+
+tract_fulton_dekalb_linked = tract_fulton_dekalb %>% 
+  left_join(tract_fulton_dekalb_int_pharm_buff_nogeo, by = "geo_id") %>% 
+  #if the linked values are missing, make them zero
+  mutate(
+    prop_area_overlap_ft2_linked = case_when(
+      is.na(prop_area_overlap_ft2)==TRUE ~ 0,
+      TRUE ~ prop_area_overlap_ft2 
+    ),
+
+    pop_overlap = prop_area_overlap_ft2_linked*pop
+  )
+```
+
+## Summarize results: total population in area vs those living within a half-mile of a pharmacy
+
+```{r}
+tract_fulton_dekalb_linked_summary = tract_fulton_dekalb_linked %>% 
+  st_set_geometry(NULL) %>% 
+  mutate(dummy=1) %>% 
+  group_by(dummy) %>% 
+  summarise(
+    pop = sum(pop, na.rm = TRUE),
+    pop_overlap = sum(pop_overlap, na.rm=TRUE)
+  ) %>% 
+  ungroup() %>% 
+  mutate(
+    prop_pop_overlap = pop_overlap/pop
+  )
+
+tract_fulton_dekalb_linked_summary
+```
+
+We estimate that about 13% of people live within a half-mile of a pharmacy.
+
+**Next steps to consider**:
+
+-   Assess sociodemographic distribution of living near a pharmacy.
+
+-   Visualize the pharmacies and the sociodemographic characteristics on the same map using tmap (<https://mkram01.github.io/EPI563-SpatialEPI/intro-tmap.html>) and compare with mapview, and ggplot2.
