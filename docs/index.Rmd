@@ -77,13 +77,13 @@ This short course will introduce participants to popular tools in R for manipula
 
     Link: <https://michaeldgarber.github.io/teach-r/monte-carlo-sim-bootstrapping-purrr.html>
 
-**Bonus sessions:**
+**Extra material:**
 
-Using R to gather bicycle infrastructure data from OpenStreetMap
+*Using R to gather bicycle infrastructure data from OpenStreetMap*
 
--   Part 1 url: <https://michaeldgarber.github.io/teach-r/osmdata-for-bikes-part-1>
+Part 1 (background): <https://michaeldgarber.github.io/teach-r/osmdata-for-bikes-part-1>
 
--   Part 2 url: <https://michaeldgarber.github.io/teach-r/osmdata-for-bikes-part-2>
+Part 2 (code demo): <https://michaeldgarber.github.io/teach-r/osmdata-for-bikes-part-2>
 
 <br />
 
