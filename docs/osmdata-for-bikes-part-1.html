@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Michael D. Garber, PhD MPH" />
+
+
+<title>Using R to gather bicycle infrastructure data from OpenStreetMap (part 1)</title>
+
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="https://michaeldgarber.github.io/">
+    <span class="fa fa-home"></span>
+     
+    MDG
+  </a>
+</li>
+<li>
+  <a href="index.html">R course</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Using R to gather bicycle infrastructure data from OpenStreetMap (part 1)</h1>
+<h4 class="author">Michael D. Garber, PhD MPH</h4>
+<h4 class="date">Revised November 18, 2022</h4>
+
+</div>
+
+
+<div id="introduction" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> Introduction</h1>
+<p>An important element of research on the health effects of the built environment is accurate and accessible data on the built environment. Traditionally, spatial data on bicycle lanes and paths have been difficult to collect. In-person audits of the built environment are time-consuming to conduct at scale, even if done <a href="https://journals.sagepub.com/doi/abs/10.1177/0002716216681488">virtually</a>. And identifying the appropriate contact with access to local digital files, perhaps someone in city government, is not always feasible.</p>
+<p>To facilitate access to data, municipalities have begun posting data on transportation infrastructure (i.e., roadways and paths) on publicly available online web portals. For example, the Atlanta Regional Commission has shared a publicly available <a href="https://opendata.atlantaregional.com/datasets/5c40e76746374d71acaa0a7b3973b195_120">inventory</a> of bicycle infrastructure for the Atlanta metropolitan area. These online portals have made data access easier, but they nonetheless have limitations for some applications. Not every agency posts data on bicycle infrastructure, making between-city comparisons relying on these portals difficult. In addition, naming conventions may differ between posted datasets. Finally, staffing constraints may mean that data that are not updated regularly.</p>
+<p>OpenStreetMap (OSM) is an appealing alternative to agency portals for gathering data on the transportation environment because it is a single source with (mostly) common naming conventions. And because anyone can contribute, the data may be updated more regularly.</p>
+<p>The goal of this demo series (<a href="https://htmlpreview.github.io/?https://github.com/michaeldgarber/osmdata_for_bikes/blob/main/r_teach_osmdata_p1.html">1</a> and <a href="https://rpubs.com/michaeldgarber/osm_data_for_bikes_2">2</a>) is to illustrate use of an R package, <strong>osmdata</strong>, to download OpenStreetMap data, with a focus on gathering bicycle infrastructure in Atlanta. The present document focuses on the data structure.</p>
+</div>
+<div id="outline" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Outline</h1>
+<ul>
+<li>Overview of OpenStreetMap’s data structure</li>
+<li>Overview of OpenStreetMap’s representation of bicycle infrastructure data</li>
+<li>Use of osmdata to download OpenStreetMap data (<a href="https://rpubs.com/michaeldgarber/osm_data_for_bikes_2">part 2</a>)</li>
+</ul>
+</div>
+<div id="overview-of-openstreetmap-and-bicycle-infrastructure" class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Overview of OpenStreetMap and bicycle infrastructure</h1>
+<div id="openstreetmap-data-structure" class="section level2" number="3.1">
+<h2><span class="header-section-number">3.1</span> OpenStreetMap data structure</h2>
+<p>As stated on its <a href="https://en.wikipedia.org/wiki/OpenStreetMap">Wikipedia entry</a>, “OpenStreetMap is a collaborative project to create a free editable map of the world.” The project began in 2004. The map’s main landing page is <a href="https://www.openstreetmap.org" class="uri">https://www.openstreetmap.org</a>.</p>
+<p>Data underlying OpenStreetMap fall into 3 categories.</p>
+<ul>
+<li><strong>Nodes</strong> are points, stored as coordinates, which represent features which do not have a size or shape.</li>
+<li><strong>Ways</strong> are features in the shape of a line or polygon, such as streets, rivers, parks, or buildings.</li>
+<li><strong>Relations</strong> are used to organize collections of ways and nodes according to a common theme or attribute.</li>
+</ul>
+<p>These data elements are characterized by a tagging system of <strong>keys</strong> and the key’s corresponding <strong>value</strong>, coded as <em>key=value</em>. For example, the <em>highway</em> key is used to describe attributes of the roads and footpaths. Keys and values are free text, but the mapping community has agreed upon a set of <a href="https://wiki.openstreetmap.org/wiki/Map_features">naming conventions</a>.</p>
+</div>
+<div id="osm-data-and-bicycle-infrastructure" class="section level2" number="3.2">
+<h2><span class="header-section-number">3.2</span> OSM data and bicycle infrastructure</h2>
+<div id="bicycle-infrastructure-definitions" class="section level3" number="3.2.1">
+<h3><span class="header-section-number">3.2.1</span> Bicycle infrastructure definitions</h3>
+<p>With the goal of making bicycling more appealing and safer, municipalities across the world have been installing bicycling-specific infrastructure.</p>
+<ul>
+<li><strong>Conventional bike lanes</strong> are the most common type of bicycle infrastructure in U.S. cities. They are a paint-demarcated lane designating space for bicyclists to ride parallel to motor-vehicle traffic without a buffer or physical separation.</li>
+</ul>
+<p><img src="images/RUG-osmdata-pres/g-photos-edits/conventional-bike-lane-edgewood.PNG" width="50%" style="display: block; margin: auto auto auto 0;" /></p>
+<p><em>Edgewood Ave NE. A screenshot from Google Street View. Image capture: March 2020</em></p>
+<ul>
+<li><strong>Buffered bike lanes</strong> include some additional space between the motor-vehicle lane and the bicyclist lane but do not include a physical barrier between the two lanes.</li>
+</ul>
+<p><img src="images/RUG-osmdata-pres/g-photos-edits/buffered-rda.png" width="50%" style="display: block; margin: auto auto auto 0;" /></p>
+<p><em>Ralph David Abernathy Blvd SW. Photo by author.</em></p>
+<ul>
+<li><strong>Protected bike lanes</strong>, also called cycle-tracks, use a curb-like barrier, parked cars, or delineator posts to physically separate bicyclists from motorized traffic. Here is one in Atlanta along Luckie St NW with a mix of a curb-like barrier and delineator posts.</li>
+</ul>
+<p><img src="images/RUG-osmdata-pres/g-photos-edits/luckie-st-posts.png" width="50%" style="display: block; margin: auto auto auto 0;" /></p>
+<p><em>Luckie St NW. Photo by author.</em></p>
+<ul>
+<li><strong>Shared-lane markings</strong>, also called sharrows, use pavement markings to indicate a shared-lane environment between bicyclists and motor vehicles. They are often accompanied by comforting signs stating that “bicyclists may use the full lane.”</li>
+</ul>
+<p><img src="images/RUG-osmdata-pres/g-photos-edits/sharrow-clifton.png" width="50%" style="display: block; margin: auto auto auto 0;" /></p>
+<p><em>Clifton Rd. Photo by author.</em></p>
+<ul>
+<li><strong>Off-street paved trails</strong> are physically separated from roadways and are designed for use by bicyclists, pedestrians, or users of other modes of light, individual transit like electric bikes and scooters. Off-street paved trails might not follow the road network. The Atlanta BeltLine Eastside Trail is an off-street paved trail:</li>
+</ul>
+<p><img src="images/RUG-osmdata-pres/g-photos-edits/beltline-2017.png" width="50%" style="display: block; margin: auto auto auto 0;" /></p>
+<p><em>Atlanta Beltline Eastside Trail, circa 2017. Photo by author.</em></p>
+</div>
+<div id="how-osm-characterizes-bicycle-infrastructure-and-paths" class="section level3" number="3.2.2">
+<h3><span class="header-section-number">3.2.2</span> How OSM characterizes bicycle infrastructure and paths</h3>
+<p>Broadly, bicycle infrastructure in OSM are <strong>ways</strong> of key <a href="https://wiki.openstreetmap.org/wiki/Key:highway"><strong>highway</strong></a>. As described by Ferster &amp; colleagues (<a href="https://www.tandfonline.com/doi/full/10.1080/15568318.2018.1519746">2020</a>), bicycle infrastructure may either be</p>
+<ul>
+<li>part of an existing way (e.g., a conventional bike lane along a roadway), or</li>
+<li>it can be its own separate way (e.g., an off-street trail).</li>
+</ul>
+<p>For <strong>on-street bike infrastructure</strong>, the highway value will typically correspond to the roadway type itself (e.g., <code>highway=secondary</code> for a secondary roadway), and there may be a separate <em>cycleway</em> key, which could take a range of possible values (e.g., <code>cycleway=lane</code> for a conventional bike lane or <code>cycleway=shared</code> for a sharrow). Here is an example of a conventional bike lane (Edgewood Ave):</p>
+<p><img src="images/RUG-osmdata-pres/osm-interface-edgewood.PNG" width="75%" style="display: block; margin: auto auto auto 0;" /></p>
+<p>Roadway types where bicycle infrastructure might be found include <code>highway=</code>:</p>
+<ul>
+<li><em>primary</em>: a minor arterial in <a href="https://wiki.openstreetmap.org/wiki/User:UltimateRiff/HFCS">US Highway Functional Class</a> parlance. These are often state-run roadways, such as Ponce de Leon Ave NE in Atlanta.</li>
+<li><em>secondary</em>: a major collector, such as 10th St NE in Atlanta.</li>
+<li><em>tertiary</em>: a minor collector. An example in Atlanta is McLendon Ave NE.</li>
+<li><em>residential</em>: also referred to as a local road. These roads primarily serve as access to housing.</li>
+</ul>
+<p>If the <strong>bike infrastructure is a stand-alone feature</strong>, like a paved trail, then the highway value may any of the following:</p>
+<ul>
+<li><code>highway=path</code> is the generic highway type for <a href="https://wiki.openstreetmap.org/wiki/Tag:highway%3Dpath">paths</a> intended for non-motorized vehicles. A path could be paved or unpaved. Here is an unpaved path that I proudly mapped.</li>
+</ul>
+<p><img src="images/RUG-osmdata-pres/osm-interface-11-switchbacks.PNG" width="75%" style="display: block; margin: auto auto auto 0;" /></p>
+<ul>
+<li><code>highway=cycleway</code> is used to specify that the path is intended for bicyclists. Objects with this tag are typically off-street paved trails but, as I note below, might also refer to on-road bike infrastructure. This segment of the Atlanta Beltline Trail is classified as a cycleway:</li>
+</ul>
+<p><img src="images/RUG-osmdata-pres/osm-interface-beltline-eastside.PNG" width="75%" style="display: block; margin: auto auto auto 0;" /></p>
+<ul>
+<li><code>highway=footway</code> is a more specific version of <code>path</code>. A footway might be a walking path in a park, for example:</li>
+</ul>
+<p><img src="images/RUG-osmdata-pres/osm-interface-piedmont-footway.PNG" width="75%" style="display: block; margin: auto auto auto 0;" /></p>
+<p>Some other tags that can help to classify the type of infrastructure:</p>
+<ul>
+<li><code>surface=paved</code> can be helpful for finding off-street paved trails among objects with <code>highway=path.</code></li>
+<li><code>bicycle=designated</code> is used to indicate that bicycling is explicitly intended. This tag is implied if <code>highway=cycleway</code> so is usually applied where the highway is a roadway.</li>
+<li><code>cycleway:right=lane</code> or <a href="https://wiki.openstreetmap.org/wiki/Key:cycleway">similar variations</a> can be used to further specify the type of conventional bike lane, like what side of the street the lane is on. This tag is used for a stretch of Clifton Rd across from CDC:</li>
+</ul>
+<p><img src="images/RUG-osmdata-pres/osm-interface-clifton.PNG" width="75%" style="display: block; margin: auto auto auto 0;" /></p>
+<ul>
+<li><code>bicycle=no</code> may apply on certain roadways or paths where cycling is explicitly not allowed.</li>
+</ul>
+<p>Some example combinations of these tags are summarized in this table.</p>
+<p><img src="images/RUG-osmdata-pres/osm-bike-table.png" width="75%" style="display: block; margin: auto auto auto 0;" /></p>
+<p>These examples are not exhaustive.</p>
+<p>It’s also worth noting that <strong>protected bike lanes</strong> and <strong>off-street paved trails</strong> are frequently both coded as <strong><code>highway=cycleway</code></strong>. Sometimes, additional tags are available to differentiate between the two even if they are coded as the same highway type.</p>
+<p>For example, both the Luckie St protected bike lane and the Stone Mountain Trail (an off-street paved trail) in Freedom Park are classified as cycleways. The non-empty <code>lanes</code> attribute is a clue suggesting the Luckie St lane (called PATH Parkway here) is a protected bike lane. And the Stone Mountain Trail through Freedom Park explicitly says motor vehicles are not permitted (motor_vehicle=<code>no</code>), suggesting it’s not part of a roadway.</p>
+<p><img src="images/RUG-osmdata-pres/osm-interface-luckie-st.PNG" width="75%" style="display: block; margin: auto auto auto 0;" /></p>
+<p><img src="images/RUG-osmdata-pres/osm-interface-freedom-park.PNG" width="75%" style="display: block; margin: auto auto auto 0;" /></p>
+<p>These clues are not always available, however. To correctly classify the infrastructure, it may be necessary to check with personal knowledge, other data sources, or a Google Street View virtual audit.</p>
+<p>That concludes this part. In the <a href="https://rpubs.com/michaeldgarber/osm_data_for_bikes_2">next one</a>, we’ll dive into the R code.</p>
+</div>
+</div>
+</div>
+
+<br>
+<br>
+<p>Copyright &copy; 2022 Michael D. Garber </p>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3,h4",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
