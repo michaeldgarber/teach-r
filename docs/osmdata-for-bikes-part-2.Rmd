@@ -9,14 +9,20 @@ output:
     number_sections: true
 ---
 
-In [part 1](https://htmlpreview.github.io/?https://github.com/michaeldgarber/osmdata_for_bikes/blob/main/r_teach_osmdata_p1.html ), I described OpenStreetMap's data structure for bicycle infrastructure and paths. In this one, let's dive into some R code to manage and visualize those data.
+Part 1 url: <https://michaeldgarber.github.io/teach-r/osmdata-for-bikes-part-1>
+
+Part 2 url: <https://michaeldgarber.github.io/teach-r/osmdata-for-bikes-part-2>
+
+In [part 1](https://michaeldgarber.github.io/teach-r/osmdata-for-bikes-part-1), I described OpenStreetMap's data structure for bicycle infrastructure and paths. In this one, let's dive into some R code to manage and visualize those data.
 
 The package I use to get OpenStreetMap data is [osmdata](https://cran.r-project.org/web/packages/osmdata/vignettes/osmdata.html), authored by Mark Padgham and Robin Lovelace. The purpose of this package is to download vector data from OSM, for example the roadways and bike infrastructure described previously.
 
-First, let's get a feel for the **osmdata** package by downloading Atlanta's roads. Then we'll focus on a smaller area to explore bike infrastructure. 
+First, let's get a feel for the **osmdata** package by downloading Atlanta's roads. Then we'll focus on a smaller area to explore bike infrastructure.
 
 # Use osmdata to download Atlanta's roads
+
 Install and load **osmdata.** I'll also use the **tidyverse**, **sf**, **mapview**, and **ggmap.**
+
 ```{r install packages, eval=FALSE, echo=FALSE, warning=FALSE, message=TRUE}
 install.packages("osmdata")
 
@@ -26,6 +32,7 @@ install.packages("sf")
 #install.packages("mapview")
 install.packages("ggmap")
 ```
+
 ```{r load, eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
 library(osmdata)
 library(tidyverse)
@@ -36,11 +43,12 @@ library(ggmap)
 
 The three workhorse functions of this package are `opq()`, `add_osm_feature()`, and `osmdata_sf()`.
 
-* `opq()`, short for overpass query, uses the [overpass API](https://www.overpass-api.de/) to query OpenStreetMap data. The great thing about this package is one need not know about the overpass API to make use of the data. The important argument it takes is a bounding box (`bbox=`), which can be simply the name of a place like a city. Or, alternatively, four lat/lon values can be used. This function can be used on its own to simply request all of the data within a bounding box. It's often more useful to request specific features, which is done using:
-* `add_osm_feature()`. This function takes a `key` and returns objects with values for that key. Recall, a *highway* (i.e., a roadway or path) is a type of key. 
-* `osm_data_sf()` passes the queries specified by the bounding box and the requested features to the overpass API and returns an `sf` object.
+-   `opq()`, short for overpass query, uses the [overpass API](https://www.overpass-api.de/) to query OpenStreetMap data. The great thing about this package is one need not know about the overpass API to make use of the data. The important argument it takes is a bounding box (`bbox=`), which can be simply the name of a place like a city. Or, alternatively, four lat/lon values can be used. This function can be used on its own to simply request all of the data within a bounding box. It's often more useful to request specific features, which is done using:
+-   `add_osm_feature()`. This function takes a `key` and returns objects with values for that key. Recall, a *highway* (i.e., a roadway or path) is a type of key.
+-   `osm_data_sf()` passes the queries specified by the bounding box and the requested features to the overpass API and returns an `sf` object.
 
 These three functions can be piped (`%>%`) together. For example, suppose we'd like vector data corresponding to the primary roadways (minor arterials) in Atlanta. The `.$osm_lines` line of code extracts the line-based geometry, specifically. Polygons might also be included.
+
 ```{r atlprimary, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
 atl_primary = opq(bbox = "Atlanta, Georgia, USA") %>%
   add_osm_feature(key = "highway", value = "primary") %>%
@@ -54,6 +62,7 @@ atl_primary %>% mapview()
 ```
 
 For context, let's add secondary roads, tertiary roads, trunk roads, and the interstate highways. We'll leave out residential roads, as the data become too big. The code is repetitive, but I've had better luck creating an `sf` object for each highway type than calling all types in one query using sequential `add_osm_feature()` function calls.
+
 ```{r atlallroads, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE, cache=TRUE}
 atl_motorway = opq(bbox = "Atlanta, Georgia, USA") %>%
   add_osm_feature(key = "highway", value = "motorway") %>%
@@ -79,11 +88,15 @@ atl_tertiary = opq(bbox = "Atlanta, Georgia, USA") %>%
   .$osm_lines %>%  
   st_as_sf()  
 ```
+
 Each of those objects are `sf` objects, so they can be manipulated using *dplyr* verbs.
+
 ```{r checktype, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
 class(atl_primary)
 ```
+
 Accordingly, we can bind the `sf` data together using `bind_rows()`.
+
 ```{r rbindroads, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
 atl_roads =  atl_primary %>%
   bind_rows(
@@ -96,19 +109,24 @@ atl_roads =  atl_primary %>%
 #Take a look at the number of features of each highway type.
 table(atl_roads$highway)
 ```
+
 ### Tangent to visualize a smaller radius
+
 To visualize these all together, I'm going to pare down to a 1-mile radius around Five Points, as I was having issues rendering the larger `mapview` to html. In your own console, this simple call to `mapview(atl_roads)` should work.
+
 ```{r mapvviewlarge, eval=FALSE, echo=TRUE, warning=FALSE, message=TRUE}
 atl_roads %>% 
   mapview(zcol = "highway")
 ```
 
 To visualize in a smaller radius, I'll use `mutate_geocode()` from **ggmap** to geocode Five Points and will create a 1-mile buffer around it using `st_buffer()` from **sf**.
+
 ```{r registerkey, include=FALSE, eval=TRUE, echo=FALSE, warning=FALSE, message=TRUE}
 library(ggmap)
 #Note to self: my key is registered here:
 #configure-r/configure_register_ggmap.R
 ```
+
 ```{r registerkeyfake, eval=FALSE, echo=TRUE, warning=FALSE, message=TRUE}
 library(ggmap)
 register_google(key = "your_ggmap_key") #https://cran.r-project.org/web/packages/ggmap/readme/README.html
@@ -128,6 +146,7 @@ five_points_1mi_rad = as_tibble("Five Points, GA")  %>%
 ```
 
 Find the intersection of the OSM vector data with this buffer radius using `st_intersection()`, and visualize using `mapview()`.
+
 ```{r ggmap-mapview, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
 library(RColorBrewer) #to get a better palette.
 set1_5 = RColorBrewer::brewer.pal(n=5, name  = "Set1") 
@@ -146,9 +165,11 @@ atl_roads %>%
 ```
 
 # Use osmdata to gather bicycle infrastructure around the intersection of Monroe and Ponce.
+
 Let's now construct a dataset of bicycle infrastructure. We'll focus on a 1-mile radius around Monroe St NE and Ponce de Leon Ave NE, as there is a diverse mix of bicycle infrastructure in that area.
 
 Define the bounding box using coordinates. The sequence is xmin, ymin, xmax, ymax, where x is longitude and y is latitude.
+
 ```{r monroeponcebbox, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
 ponce_monroe_bbox =  osmdata::opq(bbox =c(-84.38882296093993, 33.786737, -84.352018, 33.759368705358256))
 ```
@@ -156,6 +177,7 @@ ponce_monroe_bbox =  osmdata::opq(bbox =c(-84.38882296093993, 33.786737, -84.352
 ## Gather roadway features for 1-mile radius around Ponce and Monroe.
 
 We'd only expect to find on-road bicycle infrastructure on primary, secondary, tertiary, or residential roadways, so we need not pull in other types like motorways.
+
 ```{r addmotorfeatures, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
 pm_primary = ponce_monroe_bbox %>% 
   add_osm_feature(key = "highway", value = "primary") %>%
@@ -181,7 +203,9 @@ pm_residential = ponce_monroe_bbox %>%
   .$osm_lines %>%  
   st_as_sf()  
 ```
+
 As mentioned, because these are each `sf` objects, we can wrangle them using **sf** and **dplyr** functions. Use `dplyr::select()` to narrow down the relevant variables (keys) and `dplyr::mutate()` to add an indicator variable.
+
 ```{r motorfeatureswrangle, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
 pm_roadways = pm_primary %>% 
   bind_rows(
@@ -211,15 +235,17 @@ pm_roadways %>%
   )
   
 ```
+
 Some observations:
 
-* On 10th St NE, there is a second `highway` key called `highway_1`. Its value is `cycleway`, referring to the protected bike lane along that corridor. It's not clear if one would have enough information on this alone to know that this is a protected bike lane and not a conventional or buffered bike lane, though.
-* Lanier Boulevard Northeast has a tag that bicycles are designated. From experiencce, this seems right. It is a pleasant biking street.
-* Ponce de Leon Ave NE has a buffered bike lane. The OSM data does indicate that Ponce has a bike lane (`cycleway = lane`), but there is no note about it being buffered.
-* 5th St NE west of Piedmont is correctly noted as having a lane.
-* Peachtree Center (osm_id = 591623771) has a protected bike lane, but it does not appear as a cycleway here. Perhaps it's coded as its own feature below?
+-   On 10th St NE, there is a second `highway` key called `highway_1`. Its value is `cycleway`, referring to the protected bike lane along that corridor. It's not clear if one would have enough information on this alone to know that this is a protected bike lane and not a conventional or buffered bike lane, though.
+-   Lanier Boulevard Northeast has a tag that bicycles are designated. From experiencce, this seems right. It is a pleasant biking street.
+-   Ponce de Leon Ave NE has a buffered bike lane. The OSM data does indicate that Ponce has a bike lane (`cycleway = lane`), but there is no note about it being buffered.
+-   5th St NE west of Piedmont is correctly noted as having a lane.
+-   Peachtree Center (osm_id = 591623771) has a protected bike lane, but it does not appear as a cycleway here. Perhaps it's coded as its own feature below?
 
 Explore the `cycleway` and `bicycle` keys.
+
 ```{r cycleway table, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
 table(pm_roadways$cycleway)
 table(pm_roadways$cycleway.left)
@@ -230,6 +256,7 @@ table(pm_roadways$bicycle)
 ```
 
 Create a new variable indicating the type of on-street infrastructure per OSM.
+
 ```{r cycleway_not_miss, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
 pm_roadways_wrangle = pm_roadways %>%  
   mutate(
@@ -255,9 +282,11 @@ pm_roadways_wrangle %>%
   mapview(zcol = "bike_infra", color = dark2_3)
 
 ```
+
 ## Gather paths for 1-mile radius around Ponce and Monroe
 
-Grab the generic paths, cycleways, and footways. 
+Grab the generic paths, cycleways, and footways.
+
 ```{r addnonmotorfeatures, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
 pm_path = ponce_monroe_bbox %>% 
   add_osm_feature(key = "highway", value = "path") %>%
@@ -278,7 +307,9 @@ pm_footway = ponce_monroe_bbox %>%
   st_as_sf()  
 
 ```
+
 Bind them together and visualize.
+
 ```{r rbindnonmotor, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
 pm_non_motor = pm_path %>% 
   bind_rows(
@@ -306,14 +337,16 @@ pm_non_motor %>%
   )
 
 ```
+
 Some additional observations:
 
-* The Beltline Eastside Trail is clearly coded as a cycleway, as is most of the Freedom Parkway aka Stone Mountain Trail.
-* It looks like most of the footways are sidewalks, although the footway key is also grabbing some paths in Piedmont Park. Let's omit footways from consideration for parsimony here.
-* Along 10th St, another feature (`osm_id=741964056`) is coded as a cycleway, in addition to the `highway_1=cycleway` noted above. That is, the same roadway has two geometries - one for the roadway itself and one for the protected bike lane paralleling it. As we noted 
-* It's not clear what the difference between some of the paths and cycleways are. For example, `osm_id=169957934` in Freedom Park is coded as a path, but is adjacent to very similar paved trails coded as cycleways.
+-   The Beltline Eastside Trail is clearly coded as a cycleway, as is most of the Freedom Parkway aka Stone Mountain Trail.
+-   It looks like most of the footways are sidewalks, although the footway key is also grabbing some paths in Piedmont Park. Let's omit footways from consideration for parsimony here.
+-   Along 10th St, another feature (`osm_id=741964056`) is coded as a cycleway, in addition to the `highway_1=cycleway` noted above. That is, the same roadway has two geometries - one for the roadway itself and one for the protected bike lane paralleling it. As we noted
+-   It's not clear what the difference between some of the paths and cycleways are. For example, `osm_id=169957934` in Freedom Park is coded as a path, but is adjacent to very similar paved trails coded as cycleways.
 
 Consolidate the off-road infrastructure so it can be visualized together with the other on-road infrastructure.
+
 ```{r rbindnonmotor1, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
 pm_non_motor_wrangle = pm_non_motor %>% 
   mutate(
@@ -335,9 +368,10 @@ pm_non_motor_wrangle %>%
   mapview(
     lwd=4,
     zcol = "bike_infra" ,color = c("purple", "green"))
-```  
+```
 
 Combine the on-street infrastructure with the off-street infrastructure.
+
 ```{r visall, eval=TRUE, echo=TRUE, warning=FALSE, message=TRUE}
 dark2_5 = RColorBrewer::brewer.pal(n=4, name  = "Dark2") 
 pm_non_motor_wrangle %>% 
@@ -353,21 +387,25 @@ pm_non_motor_wrangle %>%
   
 ```
 
-
 # Summary
+
 ## Advantages of using OpenStreetMap for gathering bicycle-infrastructure data
-* *osmdata* makes it pretty simple to bring OpenStreetMap vector data into R as an sf object, where it can then be managed using **sf** and **dplyr**.
-* It's a single source. You don't have to hunt down data from several portals or bug people at government agencies.
-* It's used by many apps and additional data sources, which can make linking data easier. For example, I used Strava data for a project, and Strava delivered their data snapped to the OpenStreetMap basemap. As a result, I could link some of the values using an aspatial cross-walk rather than having to merge on spatial attributes.
-* It's regularly updated by the OSM community.
-* Any edits to the map you might make for a particular project can be used by the worldwide mapping community (hooray for citizen science).
-* It's free.
+
+-   *osmdata* makes it pretty simple to bring OpenStreetMap vector data into R as an sf object, where it can then be managed using **sf** and **dplyr**.
+-   It's a single source. You don't have to hunt down data from several portals or bug people at government agencies.
+-   It's used by many apps and additional data sources, which can make linking data easier. For example, I used Strava data for a project, and Strava delivered their data snapped to the OpenStreetMap basemap. As a result, I could link some of the values using an aspatial cross-walk rather than having to merge on spatial attributes.
+-   It's regularly updated by the OSM community.
+-   Any edits to the map you might make for a particular project can be used by the worldwide mapping community (hooray for citizen science).
+-   It's free.
 
 ## Some caveats
-* The data on bicycle infrastructure are not without their issues.
- + The same type of infrastructure may be coded in many ways.
- + The same coding scheme may refer to different types of infrastructure.
-* There is no clear classification scheme for buffered bike lanes.
-* It will still be wise to check with other sources, such as Google Streetview or some spot in-person audits.
 
-For further reading, I'd suggest the article by Ferster & colleagues ([2020](https://www.tandfonline.com/doi/full/10.1080/15568318.2018.1519746)) entitled *Using OpenStreetMap to inventory bicycle infrastructure: A comparison with open data from cities*.
+-   The data on bicycle infrastructure are not without their issues.
+-   The same type of infrastructure may be coded in many ways.
+-   The same coding scheme may refer to different types of infrastructure.
+-   There is no clear classification scheme for buffered bike lanes.
+-   It will still be wise to check with other sources, such as Google Streetview or some spot in-person audits.
+
+For further reading, I'd suggest the article by Ferster & colleagues ([2020](https://www.tandfonline.com/doi/full/10.1080/15568318.2018.1519746)):
+
+*Using OpenStreetMap to inventory bicycle infrastructure: A comparison with open data from cities*.

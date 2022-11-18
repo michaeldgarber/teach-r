@@ -9,6 +9,10 @@ output:
     number_sections: true
 ---
 
+Part 1 url: <https://michaeldgarber.github.io/teach-r/osmdata-for-bikes-part-1>
+
+Part 2 url: <https://michaeldgarber.github.io/teach-r/osmdata-for-bikes-part-2>
+
 # Introduction
 
 An important element of research on the health effects of the built environment is accurate and accessible data on the built environment. Traditionally, spatial data on bicycle lanes and paths have been difficult to collect. In-person audits of the built environment are time-consuming to conduct at scale, even if done [virtually](https://journals.sagepub.com/doi/abs/10.1177/0002716216681488). And identifying the appropriate contact with access to local digital files, perhaps someone in city government, is not always feasible.
@@ -17,13 +21,13 @@ To facilitate access to data, municipalities have begun posting data on transpor
 
 OpenStreetMap (OSM) is an appealing alternative to agency portals for gathering data on the transportation environment because it is a single source with (mostly) common naming conventions. And because anyone can contribute, the data may be updated more regularly.
 
-The goal of this demo series ([1](https://htmlpreview.github.io/?https://github.com/michaeldgarber/osmdata_for_bikes/blob/main/r_teach_osmdata_p1.html) and [2](https://rpubs.com/michaeldgarber/osm_data_for_bikes_2)) is to illustrate use of an R package, **osmdata**, to download OpenStreetMap data, with a focus on gathering bicycle infrastructure in Atlanta. The present document focuses on the data structure.
+The goal of this demo series ([part 1](https://michaeldgarber.github.io/teach-r/osmdata-for-bikes-part-1) and [part 2](https://michaeldgarber.github.io/teach-r/osmdata-for-bikes-part-2)) is to illustrate use of an R package, **osmdata**, to download OpenStreetMap data, with a focus on gathering bicycle infrastructure in Atlanta. The present document focuses on the data structure.
 
 # Outline
 
 -   Overview of OpenStreetMap's data structure
 -   Overview of OpenStreetMap's representation of bicycle infrastructure data
--   Use of osmdata to download OpenStreetMap data ([part 2](https://rpubs.com/michaeldgarber/osm_data_for_bikes_2))
+-   Use of osmdata to download OpenStreetMap data ([part 2](https://michaeldgarber.github.io/teach-r/osmdata-for-bikes-part-2))
 
 # Overview of OpenStreetMap and bicycle infrastructure
 
@@ -161,4 +165,4 @@ knitr::include_graphics("images/RUG-osmdata-pres/osm-interface-freedom-park.png"
 
 These clues are not always available, however. To correctly classify the infrastructure, it may be necessary to check with personal knowledge, other data sources, or a Google Street View virtual audit.
 
-That concludes this part. In the [next one](https://rpubs.com/michaeldgarber/osm_data_for_bikes_2), we'll dive into the R code.
+That concludes this part. In [part 2](https://michaeldgarber.github.io/teach-r/osmdata-for-bikes-part-2), we'll dive into the R code.

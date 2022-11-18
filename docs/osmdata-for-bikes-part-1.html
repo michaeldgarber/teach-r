@@ -352,19 +352,21 @@ div.tocify {
 </div>
 
 
+<p>Part 1 url: <a href="https://michaeldgarber.github.io/teach-r/osmdata-for-bikes-part-1" class="uri">https://michaeldgarber.github.io/teach-r/osmdata-for-bikes-part-1</a></p>
+<p>Part 2 url: <a href="https://michaeldgarber.github.io/teach-r/osmdata-for-bikes-part-2" class="uri">https://michaeldgarber.github.io/teach-r/osmdata-for-bikes-part-2</a></p>
 <div id="introduction" class="section level1" number="1">
 <h1><span class="header-section-number">1</span> Introduction</h1>
 <p>An important element of research on the health effects of the built environment is accurate and accessible data on the built environment. Traditionally, spatial data on bicycle lanes and paths have been difficult to collect. In-person audits of the built environment are time-consuming to conduct at scale, even if done <a href="https://journals.sagepub.com/doi/abs/10.1177/0002716216681488">virtually</a>. And identifying the appropriate contact with access to local digital files, perhaps someone in city government, is not always feasible.</p>
 <p>To facilitate access to data, municipalities have begun posting data on transportation infrastructure (i.e., roadways and paths) on publicly available online web portals. For example, the Atlanta Regional Commission has shared a publicly available <a href="https://opendata.atlantaregional.com/datasets/5c40e76746374d71acaa0a7b3973b195_120">inventory</a> of bicycle infrastructure for the Atlanta metropolitan area. These online portals have made data access easier, but they nonetheless have limitations for some applications. Not every agency posts data on bicycle infrastructure, making between-city comparisons relying on these portals difficult. In addition, naming conventions may differ between posted datasets. Finally, staffing constraints may mean that data that are not updated regularly.</p>
 <p>OpenStreetMap (OSM) is an appealing alternative to agency portals for gathering data on the transportation environment because it is a single source with (mostly) common naming conventions. And because anyone can contribute, the data may be updated more regularly.</p>
-<p>The goal of this demo series (<a href="https://htmlpreview.github.io/?https://github.com/michaeldgarber/osmdata_for_bikes/blob/main/r_teach_osmdata_p1.html">1</a> and <a href="https://rpubs.com/michaeldgarber/osm_data_for_bikes_2">2</a>) is to illustrate use of an R package, <strong>osmdata</strong>, to download OpenStreetMap data, with a focus on gathering bicycle infrastructure in Atlanta. The present document focuses on the data structure.</p>
+<p>The goal of this demo series (<a href="https://michaeldgarber.github.io/teach-r/osmdata-for-bikes-part-1">part 1</a> and <a href="https://michaeldgarber.github.io/teach-r/osmdata-for-bikes-part-2">part 2</a>) is to illustrate use of an R package, <strong>osmdata</strong>, to download OpenStreetMap data, with a focus on gathering bicycle infrastructure in Atlanta. The present document focuses on the data structure.</p>
 </div>
 <div id="outline" class="section level1" number="2">
 <h1><span class="header-section-number">2</span> Outline</h1>
 <ul>
 <li>Overview of OpenStreetMap’s data structure</li>
 <li>Overview of OpenStreetMap’s representation of bicycle infrastructure data</li>
-<li>Use of osmdata to download OpenStreetMap data (<a href="https://rpubs.com/michaeldgarber/osm_data_for_bikes_2">part 2</a>)</li>
+<li>Use of osmdata to download OpenStreetMap data (<a href="https://michaeldgarber.github.io/teach-r/osmdata-for-bikes-part-2">part 2</a>)</li>
 </ul>
 </div>
 <div id="overview-of-openstreetmap-and-bicycle-infrastructure" class="section level1" number="3">
@@ -458,7 +460,7 @@ div.tocify {
 <p><img src="images/RUG-osmdata-pres/osm-interface-luckie-st.PNG" width="75%" style="display: block; margin: auto auto auto 0;" /></p>
 <p><img src="images/RUG-osmdata-pres/osm-interface-freedom-park.PNG" width="75%" style="display: block; margin: auto auto auto 0;" /></p>
 <p>These clues are not always available, however. To correctly classify the infrastructure, it may be necessary to check with personal knowledge, other data sources, or a Google Street View virtual audit.</p>
-<p>That concludes this part. In the <a href="https://rpubs.com/michaeldgarber/osm_data_for_bikes_2">next one</a>, we’ll dive into the R code.</p>
+<p>That concludes this part. In <a href="https://michaeldgarber.github.io/teach-r/osmdata-for-bikes-part-2">part 2</a>, we’ll dive into the R code.</p>
 </div>
 </div>
 </div>
