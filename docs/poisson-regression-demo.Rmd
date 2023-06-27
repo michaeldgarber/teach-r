@@ -36,17 +36,17 @@ ln(rate)=ln(y/t) = b0+b1\*x1+b2\*x2 +...
 
 where
 
--   y is the number of events (or a count),
+-   y is the number of events (i.e., a count variable),
 
--   t is follow-up time (the rate's denominator),
+-   t is follow-up time (or generally the rate's denominator),
 
 -   b0 is the intercept,
 
 -   b1 is the coefficient for variable x1,
 
--   b2 is the cofficient forindependent variable x2,
+-   b2 is the cofficient for independent variable x2,
 
-and additional variables and coefficients can be added.
+And additional variables and coefficients can be added.
 
 Then, because of the properties of logarithms, we can rewrite the log(rate) as:
 
@@ -62,7 +62,7 @@ ln(y)-ln(t)= b0+b1\*x1+b2\*x2
 
 ln(y)= b0+b1\*x1+b2\*x2 +ln(t)
 
-This ln(t) is what is known as the "offset" when fitting the Poisson model for rate data in software.
+This ln(t) is what is known as the "log offset" when fitting the Poisson model for rate data in software.
 
 ## Suggested YouTube videos on Poisson regression
 
@@ -92,9 +92,9 @@ bs1 #Take a look at the data.
 
 I like to work in the tidyverse, so let's make it a tibble (a data frame with some nice formatting).
 
-Please see here for my intro to data wrangling in the tidyverse: <https://michaeldgarber.github.io/teach-r/dplyr-1-nyt-covid.html>
+My intro data wrangling in the tidyverse is here: <https://michaeldgarber.github.io/teach-r/dplyr-1-nyt-covid.html>
 
-Or of course, there's <https://r4ds.had.co.nz/wrangle-intro.html>
+The canonical source on the tidyverse is R for Data Science <https://r4ds.had.co.nz/wrangle-intro.html>
 
 ```{r}
 library(tidyverse)
@@ -147,7 +147,7 @@ Check out the model results by printing the object corresponding to the model.
 pois_model
 ```
 
-The rate ratio corresponding to each predictor can be found by exponentiating the coefficient. The coefficients can be accessed by the syntax `model_object$coefficients`
+sThe rate ratio corresponding to each predictor can be found by exponentiating the coefficient. The coefficients can be accessed by the syntax `model_object$coefficients`
 
 ```{r}
 pois_model_coefficients=pois_model$coefficients
