@@ -8,7 +8,7 @@
 #A rate is defined as the number of events divided by some denominator that measures the at-risk experience
 #giving rise to those events. In epidemiology, it is often expressed as number of events per person time.
 #Note this is different from a "risk", because a risk can be viewed as a probability bounded
-#by 0 and 1, whereas
+#by 0 and 1, whereas a rate is not bounded by 1.
 
 #We can use poisson regression to model those rates as a function of predictor variables.
 #Specifically, we model a Poisson distributed variable (integer 0, 1, 2, 3, ...)

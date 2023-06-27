@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Michael D. Garber, PhD MPH" />
+
+<meta name="date" content="2023-06-27" />
+
+<title>Poisson regression for rate data</title>
+
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.2.1/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.2.1/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="https://michaeldgarber.github.io/">
+    <span class="fa fa-home"></span>
+     
+    MDG
+  </a>
+</li>
+<li>
+  <a href="index.html">R course</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Poisson regression for rate data</h1>
+<h4 class="author">Michael D. Garber, PhD MPH</h4>
+<h4 class="date">2023-06-27</h4>
+
+</div>
+
+
+<div id="outline" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> Outline</h1>
+<ol style="list-style-type: decimal">
+<li>Overview of Poisson regression for rate data</li>
+<li>Load British Doctor’s Data</li>
+<li>Fit the model in the British Doctor’s Data</li>
+<li>Use the model to predict values</li>
+</ol>
+</div>
+<div id="poisson-regression-for-modeling-rates" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Poisson regression for modeling rates</h1>
+<p>A rate is defined as the number of events divided by some denominator that measures the at-risk experience giving rise to those events. In epidemiology, it is often expressed as number of events per person time.</p>
+<p>Note this is different from a “risk”, because a risk can be viewed as a probability bounded by 0 and 1, whereas a rate is not bounded by 1.</p>
+<p>We can use poisson regression to model those rates as a function of predictor variables.</p>
+<p>Specifically, we model a Poisson distributed variable (integer 0, 1, 2, 3, …) (<a href="https://en.wikipedia.org/wiki/Poisson_distribution" class="uri">https://en.wikipedia.org/wiki/Poisson_distribution</a>), and we include the denominator of the rate as an “offset.”</p>
+<p>Technically, we model the logarithm of the rate as a linear function of predictor variables.</p>
+<p>As described in video 9.9 below, the model takes the following functional form:</p>
+<p>ln(rate)=ln(y/t) = b0+b1*x1+b2*x2 +…</p>
+<p>where</p>
+<ul>
+<li><p>y is the number of events (or a count),</p></li>
+<li><p>t is follow-up time (the rate’s denominator),</p></li>
+<li><p>b0 is the intercept,</p></li>
+<li><p>b1 is the coefficient for variable x1,</p></li>
+<li><p>b2 is the cofficient forindependent variable x2,</p></li>
+</ul>
+<p>and additional variables and coefficients can be added.</p>
+<p>Then, because of the properties of logarithms, we can rewrite the log(rate) as:</p>
+<p>ln(y/t)=ln(y)-ln(t)</p>
+<p>So the full model can be expressed as</p>
+<p>ln(rate)=ln(y/t) =ln(y)-ln(t)= b0+b1*x1+b2*x2</p>
+<p>Now we can move ln(t) over to the other side</p>
+<p>ln(y)-ln(t)= b0+b1*x1+b2*x2</p>
+<p>ln(y)= b0+b1*x1+b2*x2 +ln(t)</p>
+<p>This ln(t) is what is known as the “offset” when fitting the Poisson model for rate data in software.</p>
+<div id="suggested-youtube-videos-on-poisson-regression" class="section level2" number="2.1">
+<h2><span class="header-section-number">2.1</span> Suggested YouTube videos on Poisson regression</h2>
+<p>I recommend this series of YouTube videos by MarinStatsLectures-R Programming, which discuss theory and application of the Poisson model</p>
+<ul>
+<li><p>9.9 Poisson Regression: The Model For Rate Data (what is an offset?)
+<a href="https://www.youtube.com/watch?v=5pZbER_mR4k&amp;list=RDCMUCaNIxVagLhqupvUiDK01Mgg&amp;index=4" class="uri">https://www.youtube.com/watch?v=5pZbER_mR4k&amp;list=RDCMUCaNIxVagLhqupvUiDK01Mgg&amp;index=4</a></p></li>
+<li><p>9.10 Poisson Regression in R: Fitting a Model To Rate Data (with offset) in R
+<a href="https://www.youtube.com/watch?v=QP4F98ysrEA" class="uri">https://www.youtube.com/watch?v=QP4F98ysrEA</a></p></li>
+<li><p>9.11 Poisson Regression: Model Assumptions
+<a href="https://www.youtube.com/watch?v=r492fF9XZl8&amp;t=2s" class="uri">https://www.youtube.com/watch?v=r492fF9XZl8&amp;t=2s</a></p></li>
+</ul>
+<p>The videos use the British doctor’s data, a famous study on lung cancer and smoking: <a href="https://en.wikipedia.org/wiki/British_Doctors_Study" class="uri">https://en.wikipedia.org/wiki/British_Doctors_Study</a>Load British Doctor’s Data</p>
+<p>To download British doctor’s data, we can use this package: <a href="https://rdrr.io/cran/ACSWR/man/bs1.html" class="uri">https://rdrr.io/cran/ACSWR/man/bs1.html</a></p>
+<pre class="r"><code>install.packages(&quot;ACSWR&quot;) #This installs the package containing the data</code></pre>
+<pre class="r"><code>library(ACSWR) #This loads the package containing the data
+data(bs1) #This brings data into the working environment.
+bs1 #Take a look at the data.</code></pre>
+<pre><code>##    Age_Group Age_Cat Age_Square Smoker_Cat Smoke_Ind Smoke_Age Deaths
+## 1      35-44       1          1        YES         1         1     32
+## 2      45-54       2          4        YES         1         2    104
+## 3      55-64       3          9        YES         1         3    206
+## 4      65-74       4         16        YES         1         4    186
+## 5      75-84       5         25        YES         1         5    102
+## 6      35-44       1          1         NO         0         0      2
+## 7      45-54       2          4         NO         0         0     12
+## 8      55-64       3          9         NO         0         0     28
+## 9      65-74       4         16         NO         0         0     28
+## 10     75-84       5         25         NO         0         0     31
+##    Person_Years Deaths_Per_Lakh_Years
+## 1         52407              61.06055
+## 2         43248             240.47355
+## 3         28612             719.97763
+## 4         12663            1468.84624
+## 5          5317            1918.37502
+## 6         18790              10.64396
+## 7         10673             112.43324
+## 8          5710             490.36778
+## 9          2585            1083.17215
+## 10         1462            2120.38304</code></pre>
+<p>I like to work in the tidyverse, so let’s make it a tibble (a data frame with some nice formatting).</p>
+<p>Please see here for an intro to data wrangling in the tidyverse: <a href="https://michaeldgarber.github.io/teach-r/dplyr-1-nyt-covid.html" class="uri">https://michaeldgarber.github.io/teach-r/dplyr-1-nyt-covid.html</a></p>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+## ✔ dplyr     1.1.2     ✔ readr     2.1.4
+## ✔ forcats   1.0.0     ✔ stringr   1.5.0
+## ✔ ggplot2   3.4.1     ✔ tibble    3.2.1
+## ✔ lubridate 1.9.2     ✔ tidyr     1.3.0
+## ✔ purrr     1.0.1     
+## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()
+## ℹ Use the ]8;;http://conflicted.r-lib.org/conflicted package]8;; to force all conflicts to become errors</code></pre>
+<pre class="r"><code>bs1_tibble=bs1 %&gt;% as_tibble()
+
+bs1_tibble</code></pre>
+<pre><code>## # A tibble: 10 × 9
+##    Age_Group Age_Cat Age_Square Smoker_Cat Smoke_Ind Smoke_Age Deaths
+##    &lt;fct&gt;       &lt;int&gt;      &lt;int&gt; &lt;fct&gt;          &lt;int&gt;     &lt;int&gt;  &lt;int&gt;
+##  1 35-44           1          1 YES                1         1     32
+##  2 45-54           2          4 YES                1         2    104
+##  3 55-64           3          9 YES                1         3    206
+##  4 65-74           4         16 YES                1         4    186
+##  5 75-84           5         25 YES                1         5    102
+##  6 35-44           1          1 NO                 0         0      2
+##  7 45-54           2          4 NO                 0         0     12
+##  8 55-64           3          9 NO                 0         0     28
+##  9 65-74           4         16 NO                 0         0     28
+## 10 75-84           5         25 NO                 0         0     31
+## # ℹ 2 more variables: Person_Years &lt;int&gt;, Deaths_Per_Lakh_Years &lt;dbl&gt;</code></pre>
+<p>In looking at the data, we can see that the variable <code>Deaths</code> in this dataset is the Poisson (count) variable.</p>
+<p>And the denominator for the rate is <code>Person_Years</code>.</p>
+<p>So the rate is rate=(Deaths/Person_Years)</p>
+</div>
+</div>
+<div id="fit-a-poisson-regression-to-model-the-rate" class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Fit a Poisson regression to model the rate</h1>
+<p>Following video 9.10 above, let’s model the rate as a function of smoking (yes/no) and the age category.</p>
+<p>We use the <code>glm()</code> function to fit this model.</p>
+<pre class="r"><code>#Use names() to get variable names to make sure we type them correctly in the model.
+names(bs1_tibble)</code></pre>
+<pre><code>## [1] &quot;Age_Group&quot;             &quot;Age_Cat&quot;               &quot;Age_Square&quot;           
+## [4] &quot;Smoker_Cat&quot;            &quot;Smoke_Ind&quot;             &quot;Smoke_Age&quot;            
+## [7] &quot;Deaths&quot;                &quot;Person_Years&quot;          &quot;Deaths_Per_Lakh_Years&quot;</code></pre>
+<pre class="r"><code>pois_model = glm(
+  formula=  Deaths~ #  #the outcome variable is Deaths, a count variable
+    Smoke_Ind+Age_Group+ #the two predictor variables
+    
+    #here is where we specify the offset, i.e., the denominator of the rate
+    offset(log(Person_Years)),
+  
+  #Poisson family for Poisson regression. Note lowercase. R is case-sensitive.
+  family=&quot;poisson&quot;,   
+  data=bs1_tibble #the data in which the model is fit
+           )
+
+#Note this can all be done on fewer lines, as long as arguments are separated by commas.
+#I put on multiple lines so I could annotate each.
+pois_model = glm(
+  formula=  Deaths~ Smoke_Ind+Age_Group+ offset(log(Person_Years)),
+  family=&quot;poisson&quot;, data=bs1_tibble
+  )</code></pre>
+<p>Check out the model results by printing the object corresponding to the model.</p>
+<pre class="r"><code>pois_model</code></pre>
+<pre><code>## 
+## Call:  glm(formula = Deaths ~ Smoke_Ind + Age_Group + offset(log(Person_Years)), 
+##     family = &quot;poisson&quot;, data = bs1_tibble)
+## 
+## Coefficients:
+##    (Intercept)       Smoke_Ind  Age_Group45-54  Age_Group55-64  Age_Group65-74  
+##        -7.9193          0.3545          1.4840          2.6275          3.3505  
+## Age_Group75-84  
+##         3.7001  
+## 
+## Degrees of Freedom: 9 Total (i.e. Null);  4 Residual
+## Null Deviance:       935.1 
+## Residual Deviance: 12.13     AIC: 79.2</code></pre>
+<p>The rate ratio corresponding to each predictor can be found by exponentiating the coefficient. The coefficients can be accessed by the syntax <code>model_object$coefficients</code></p>
+<pre class="r"><code>pois_model_coefficients=pois_model$coefficients
+rate_ratios=exp(pois_model_coefficients)
+rate_ratios</code></pre>
+<pre><code>##    (Intercept)      Smoke_Ind Age_Group45-54 Age_Group55-64 Age_Group65-74 
+##   3.636474e-04   1.425519e+00   4.410584e+00   1.383920e+01   2.851678e+01 
+## Age_Group75-84 
+##   4.045121e+01</code></pre>
+<p>So adjusting for age category, smokers have a 1.4-times higher rate of lung cancer death.</p>
+</div>
+<div id="use-the-model-to-predict-values" class="section level1" number="4">
+<h1><span class="header-section-number">4</span> Use the model to predict values</h1>
+<p>We can use this model to predict expected values based on values of age category, smoking, and the number of person-years.</p>
+<p>We use the <code>predict.glm()</code> to do this. Each argument is described in this documentation: <a href="https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/predict.glm" class="uri">https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/predict.glm</a></p>
+<p>Below, we specify the following arguments: <code>object</code>, <code>newdata</code>, and <code>type</code> .</p>
+<p>The <code>object</code> is the object corresponding to the model that we fit.</p>
+<p><code>newdata</code> is the dataset in which the values will be predicted. This can be any dataset as long as it has the variables included in the model.</p>
+<p>If we say, <code>type="response"</code>, the resulting predicted value will be on the scale of the response variable.</p>
+<pre class="r"><code>predicted_values=predict.glm(
+  pois_model,#the model,
+  
+  #We can use any dataset in &quot;newdata&quot; as long as it has the variables included in the model.
+  #Here, we&#39;re simply going to use the original data in which the model was fit.
+  #We can then compare the true values in the dataset with the model&#39;s predicted values for that observation.
+  newdata = bs1_tibble,
+  type=&quot;response&quot;
+) %&gt;% 
+  as_tibble()#Convert the result to a tibble for easier data wrangling</code></pre>
+<p>We can see here that we have just one column of data. These are the expected values corresponding to each row in the original dataset.</p>
+<pre class="r"><code>predicted_values</code></pre>
+<pre><code>## # A tibble: 10 × 1
+##     value
+##     &lt;dbl&gt;
+##  1  27.2 
+##  2  98.9 
+##  3 205.  
+##  4 187.  
+##  5 111.  
+##  6   6.83
+##  7  17.1 
+##  8  28.7 
+##  9  26.8 
+## 10  21.5</code></pre>
+<p>We can append these predicted values to the original dataset using the dplyr function <code>bind_cols().</code> I’m creating a new tibble called <code>bs1_tibble_w_pred_values</code> which begins with <code>bs1_tibble</code> and then gets <code>predicted_values</code> appended to it.</p>
+<pre class="r"><code>bs1_tibble_w_pred_values=bs1_tibble %&gt;% 
+  bind_cols(predicted_values) %&gt;% 
+  #The predicted values are called &quot;value&quot;. Let&#39;s change that to 
+  #Deaths_expected
+  rename(Deaths_expected=value) %&gt;% 
+  #We could calculate a residual
+  #Residual=actual value - predicted value
+  mutate(residual=Deaths-Deaths_expected)</code></pre>
+<p>Check out the data including the predicted values:</p>
+<pre class="r"><code>bs1_tibble_w_pred_values</code></pre>
+<pre><code>## # A tibble: 10 × 11
+##    Age_Group Age_Cat Age_Square Smoker_Cat Smoke_Ind Smoke_Age Deaths
+##    &lt;fct&gt;       &lt;int&gt;      &lt;int&gt; &lt;fct&gt;          &lt;int&gt;     &lt;int&gt;  &lt;int&gt;
+##  1 35-44           1          1 YES                1         1     32
+##  2 45-54           2          4 YES                1         2    104
+##  3 55-64           3          9 YES                1         3    206
+##  4 65-74           4         16 YES                1         4    186
+##  5 75-84           5         25 YES                1         5    102
+##  6 35-44           1          1 NO                 0         0      2
+##  7 45-54           2          4 NO                 0         0     12
+##  8 55-64           3          9 NO                 0         0     28
+##  9 65-74           4         16 NO                 0         0     28
+## 10 75-84           5         25 NO                 0         0     31
+## # ℹ 4 more variables: Person_Years &lt;int&gt;, Deaths_Per_Lakh_Years &lt;dbl&gt;,
+## #   Deaths_expected &lt;dbl&gt;, residual &lt;dbl&gt;</code></pre>
+<p>Now let’s do some checks.</p>
+<div id="print-actual-and-expected-number-of-deaths-for-each-observation" class="section level2" number="4.1">
+<h2><span class="header-section-number">4.1</span> Print actual and expected number of deaths for each observation</h2>
+<p>We can examine the actual number of deaths and the expected number based on the model to see how well the model performed.
+Here I’m using dplyr::select() to just select the two deaths variables and then will print them in the console so we can compare the two.</p>
+<pre class="r"><code>bs1_tibble_w_pred_values %&gt;% 
+  dplyr::select(Deaths,Deaths_expected)</code></pre>
+<pre><code>## # A tibble: 10 × 2
+##    Deaths Deaths_expected
+##     &lt;int&gt;           &lt;dbl&gt;
+##  1     32           27.2 
+##  2    104           98.9 
+##  3    206          205.  
+##  4    186          187.  
+##  5    102          111.  
+##  6      2            6.83
+##  7     12           17.1 
+##  8     28           28.7 
+##  9     28           26.8 
+## 10     31           21.5</code></pre>
+</div>
+<div id="histogram-for-residuals" class="section level2" number="4.2">
+<h2><span class="header-section-number">4.2</span> Histogram for residuals</h2>
+<p>How are the residuals distributed?</p>
+<pre class="r"><code>bs1_tibble_w_pred_values %&gt;% 
+  ggplot()+
+  geom_histogram(
+    aes(residual),#the variable to be visualized with the histogram
+    bins = 5#customize the histogram&#39;s bin width
+    )</code></pre>
+<p><img src="poisson-regression-demo_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+</div>
+</div>
+
+<br>
+<br>
+<p>Copyright &copy; 2022 Michael D. Garber </p>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3,h4",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
