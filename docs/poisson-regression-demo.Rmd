@@ -9,11 +9,6 @@ output:
     number_sections: true
 ---
 
-```{r "setup", include=FALSE, eval=TRUE, echo=FALSE}
-require("knitr")
-library(here)
-```
-
 # Outline
 
 1.  Overview of Poisson regression for rate data
@@ -71,17 +66,11 @@ This ln(t) is what is known as the "offset" when fitting the Poisson model for r
 
 I recommend this series of YouTube videos by MarinStatsLectures-R Programming, which discuss theory and application of the Poisson model
 
--   9.9 Poisson Regression: The Model For Rate Data (what is an offset?)
-    <https://www.youtube.com/watch?v=5pZbER_mR4k&list=RDCMUCaNIxVagLhqupvUiDK01Mgg&index=4>
+-   9.9 Poisson Regression: The Model For Rate Data (what is an offset?) <https://www.youtube.com/watch?v=5pZbER_mR4k&list=RDCMUCaNIxVagLhqupvUiDK01Mgg&index=4>
 
+-   9.10 Poisson Regression in R: Fitting a Model To Rate Data (with offset) in R <https://www.youtube.com/watch?v=QP4F98ysrEA>
 
--   9.10 Poisson Regression in R: Fitting a Model To Rate Data (with offset) in R
-    <https://www.youtube.com/watch?v=QP4F98ysrEA>
-
-
--   9.11 Poisson Regression: Model Assumptions
-    <https://www.youtube.com/watch?v=r492fF9XZl8&t=2s>
-
+-   9.11 Poisson Regression: Model Assumptions <https://www.youtube.com/watch?v=r492fF9XZl8&t=2s>
 
 The videos use the British doctor's data, a famous study on lung cancer and smoking: <https://en.wikipedia.org/wiki/British_Doctors_Study>Load British Doctor's Data
 
@@ -219,8 +208,7 @@ Now let's do some checks.
 
 ## Print actual and expected number of deaths for each observation
 
-We can examine the actual number of deaths and the expected number based on the model to see how well the model performed.
-Here I'm using dplyr::select() to just select the two deaths variables and then will print them in the console so we can compare the two.
+We can examine the actual number of deaths and the expected number based on the model to see how well the model performed. Here I'm using dplyr::select() to just select the two deaths variables and then will print them in the console so we can compare the two.
 
 ```{r}
 
@@ -240,5 +228,3 @@ bs1_tibble_w_pred_values %>%
     bins = 5#customize the histogram's bin width
     )
 ```
-
-

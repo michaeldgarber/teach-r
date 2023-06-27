@@ -389,12 +389,9 @@ div.tocify {
 <h2><span class="header-section-number">2.1</span> Suggested YouTube videos on Poisson regression</h2>
 <p>I recommend this series of YouTube videos by MarinStatsLectures-R Programming, which discuss theory and application of the Poisson model</p>
 <ul>
-<li><p>9.9 Poisson Regression: The Model For Rate Data (what is an offset?)
-<a href="https://www.youtube.com/watch?v=5pZbER_mR4k&amp;list=RDCMUCaNIxVagLhqupvUiDK01Mgg&amp;index=4" class="uri">https://www.youtube.com/watch?v=5pZbER_mR4k&amp;list=RDCMUCaNIxVagLhqupvUiDK01Mgg&amp;index=4</a></p></li>
-<li><p>9.10 Poisson Regression in R: Fitting a Model To Rate Data (with offset) in R
-<a href="https://www.youtube.com/watch?v=QP4F98ysrEA" class="uri">https://www.youtube.com/watch?v=QP4F98ysrEA</a></p></li>
-<li><p>9.11 Poisson Regression: Model Assumptions
-<a href="https://www.youtube.com/watch?v=r492fF9XZl8&amp;t=2s" class="uri">https://www.youtube.com/watch?v=r492fF9XZl8&amp;t=2s</a></p></li>
+<li><p>9.9 Poisson Regression: The Model For Rate Data (what is an offset?) <a href="https://www.youtube.com/watch?v=5pZbER_mR4k&amp;list=RDCMUCaNIxVagLhqupvUiDK01Mgg&amp;index=4" class="uri">https://www.youtube.com/watch?v=5pZbER_mR4k&amp;list=RDCMUCaNIxVagLhqupvUiDK01Mgg&amp;index=4</a></p></li>
+<li><p>9.10 Poisson Regression in R: Fitting a Model To Rate Data (with offset) in R <a href="https://www.youtube.com/watch?v=QP4F98ysrEA" class="uri">https://www.youtube.com/watch?v=QP4F98ysrEA</a></p></li>
+<li><p>9.11 Poisson Regression: Model Assumptions <a href="https://www.youtube.com/watch?v=r492fF9XZl8&amp;t=2s" class="uri">https://www.youtube.com/watch?v=r492fF9XZl8&amp;t=2s</a></p></li>
 </ul>
 <p>The videos use the British doctor’s data, a famous study on lung cancer and smoking: <a href="https://en.wikipedia.org/wiki/British_Doctors_Study" class="uri">https://en.wikipedia.org/wiki/British_Doctors_Study</a>Load British Doctor’s Data</p>
 <p>To download British doctor’s data, we can use this package: <a href="https://rdrr.io/cran/ACSWR/man/bs1.html" class="uri">https://rdrr.io/cran/ACSWR/man/bs1.html</a></p>
@@ -573,8 +570,7 @@ rate_ratios</code></pre>
 <p>Now let’s do some checks.</p>
 <div id="print-actual-and-expected-number-of-deaths-for-each-observation" class="section level2" number="4.1">
 <h2><span class="header-section-number">4.1</span> Print actual and expected number of deaths for each observation</h2>
-<p>We can examine the actual number of deaths and the expected number based on the model to see how well the model performed.
-Here I’m using dplyr::select() to just select the two deaths variables and then will print them in the console so we can compare the two.</p>
+<p>We can examine the actual number of deaths and the expected number based on the model to see how well the model performed. Here I’m using dplyr::select() to just select the two deaths variables and then will print them in the console so we can compare the two.</p>
 <pre class="r"><code>bs1_tibble_w_pred_values %&gt;% 
   dplyr::select(Deaths,Deaths_expected)</code></pre>
 <pre><code>## # A tibble: 10 × 2
