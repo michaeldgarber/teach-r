@@ -350,17 +350,16 @@ div.tocify {
 </div>
 
 
-<div id="outline" class="section level1" number="1">
-<h1><span class="header-section-number">1</span> Outline</h1>
+<p>In this demo, we introduce Poisson regression and go through an example using the British Doctor’s Data.</p>
+<p>Outline:</p>
 <ol style="list-style-type: decimal">
 <li>Overview of Poisson regression for rate data</li>
 <li>Load British Doctor’s Data</li>
 <li>Fit the model in the British Doctor’s Data</li>
 <li>Use the model to predict values</li>
 </ol>
-</div>
-<div id="poisson-regression-for-modeling-rates" class="section level1" number="2">
-<h1><span class="header-section-number">2</span> Poisson regression for modeling rates</h1>
+<div id="poisson-regression-for-modeling-rates" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> Poisson regression for modeling rates</h1>
 <p>A rate is defined as the number of events divided by some denominator that measures the at-risk experience giving rise to those events. In epidemiology, it is often expressed as number of events per person time.</p>
 <p>Note this is different from a “risk”, because a risk can be viewed as a probability bounded by 0 and 1, whereas a rate is not bounded by 1.</p>
 <p>We can use poisson regression to model those rates as a function of predictor variables.</p>
@@ -385,15 +384,19 @@ div.tocify {
 <p>ln(y)-ln(t)= b0+b1*x1+b2*x2</p>
 <p>ln(y)= b0+b1*x1+b2*x2 +ln(t)</p>
 <p>This ln(t) is what is known as the “offset” when fitting the Poisson model for rate data in software.</p>
-<div id="suggested-youtube-videos-on-poisson-regression" class="section level2" number="2.1">
-<h2><span class="header-section-number">2.1</span> Suggested YouTube videos on Poisson regression</h2>
+<div id="suggested-youtube-videos-on-poisson-regression" class="section level2" number="1.1">
+<h2><span class="header-section-number">1.1</span> Suggested YouTube videos on Poisson regression</h2>
 <p>I recommend this series of YouTube videos by MarinStatsLectures-R Programming, which discuss theory and application of the Poisson model</p>
 <ul>
-<li><p>9.9 Poisson Regression: The Model For Rate Data (what is an offset?) <a href="https://www.youtube.com/watch?v=5pZbER_mR4k&amp;list=RDCMUCaNIxVagLhqupvUiDK01Mgg&amp;index=4" class="uri">https://www.youtube.com/watch?v=5pZbER_mR4k&amp;list=RDCMUCaNIxVagLhqupvUiDK01Mgg&amp;index=4</a></p></li>
-<li><p>9.10 Poisson Regression in R: Fitting a Model To Rate Data (with offset) in R <a href="https://www.youtube.com/watch?v=QP4F98ysrEA" class="uri">https://www.youtube.com/watch?v=QP4F98ysrEA</a></p></li>
-<li><p>9.11 Poisson Regression: Model Assumptions <a href="https://www.youtube.com/watch?v=r492fF9XZl8&amp;t=2s" class="uri">https://www.youtube.com/watch?v=r492fF9XZl8&amp;t=2s</a></p></li>
+<li><p>9.9 Poisson Regression: The Model For Rate Data (what is an offset?): <a href="https://www.youtube.com/watch?v=5pZbER_mR4k&amp;list=RDCMUCaNIxVagLhqupvUiDK01Mgg&amp;index=4" class="uri">https://www.youtube.com/watch?v=5pZbER_mR4k&amp;list=RDCMUCaNIxVagLhqupvUiDK01Mgg&amp;index=4</a></p></li>
+<li><p>9.10 Poisson Regression in R: Fitting a Model To Rate Data (with offset) in R: <a href="https://www.youtube.com/watch?v=QP4F98ysrEA" class="uri">https://www.youtube.com/watch?v=QP4F98ysrEA</a></p></li>
+<li><p>9.11 Poisson Regression: Model Assumptions: <a href="https://www.youtube.com/watch?v=r492fF9XZl8&amp;t=2s" class="uri">https://www.youtube.com/watch?v=r492fF9XZl8&amp;t=2s</a></p></li>
 </ul>
-<p>The videos use the British doctor’s data, a famous study on lung cancer and smoking: <a href="https://en.wikipedia.org/wiki/British_Doctors_Study" class="uri">https://en.wikipedia.org/wiki/British_Doctors_Study</a>Load British Doctor’s Data</p>
+<p>The videos use the British doctor’s data, a famous study on lung cancer and smoking: <a href="https://en.wikipedia.org/wiki/British_Doctors_Study" class="uri">https://en.wikipedia.org/wiki/British_Doctors_Study</a></p>
+</div>
+</div>
+<div id="load-british-doctors-data" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Load British Doctor’s Data</h1>
 <p>To download British doctor’s data, we can use this package: <a href="https://rdrr.io/cran/ACSWR/man/bs1.html" class="uri">https://rdrr.io/cran/ACSWR/man/bs1.html</a></p>
 <pre class="r"><code>install.packages(&quot;ACSWR&quot;) #This installs the package containing the data</code></pre>
 <pre class="r"><code>library(ACSWR) #This loads the package containing the data
@@ -422,7 +425,8 @@ bs1 #Take a look at the data.</code></pre>
 ## 9          2585            1083.17215
 ## 10         1462            2120.38304</code></pre>
 <p>I like to work in the tidyverse, so let’s make it a tibble (a data frame with some nice formatting).</p>
-<p>Please see here for an intro to data wrangling in the tidyverse: <a href="https://michaeldgarber.github.io/teach-r/dplyr-1-nyt-covid.html" class="uri">https://michaeldgarber.github.io/teach-r/dplyr-1-nyt-covid.html</a></p>
+<p>Please see here for my intro to data wrangling in the tidyverse: <a href="https://michaeldgarber.github.io/teach-r/dplyr-1-nyt-covid.html" class="uri">https://michaeldgarber.github.io/teach-r/dplyr-1-nyt-covid.html</a></p>
+<p>Or of course, there’s <a href="https://r4ds.had.co.nz/wrangle-intro.html" class="uri">https://r4ds.had.co.nz/wrangle-intro.html</a></p>
 <pre class="r"><code>library(tidyverse)</code></pre>
 <pre><code>## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
 ## ✔ dplyr     1.1.2     ✔ readr     2.1.4
@@ -453,13 +457,12 @@ bs1_tibble</code></pre>
 ## # ℹ 2 more variables: Person_Years &lt;int&gt;, Deaths_Per_Lakh_Years &lt;dbl&gt;</code></pre>
 <p>In looking at the data, we can see that the variable <code>Deaths</code> in this dataset is the Poisson (count) variable.</p>
 <p>And the denominator for the rate is <code>Person_Years</code>.</p>
-<p>So the rate is rate=(Deaths/Person_Years)</p>
-</div>
+<p>So the rate is <code>Deaths</code>/<code>Person_Years</code>.</p>
 </div>
 <div id="fit-a-poisson-regression-to-model-the-rate" class="section level1" number="3">
 <h1><span class="header-section-number">3</span> Fit a Poisson regression to model the rate</h1>
-<p>Following video 9.10 above, let’s model the rate as a function of smoking (yes/no) and the age category.</p>
-<p>We use the <code>glm()</code> function to fit this model.</p>
+<p>Following video 9.10 above, let’s model the rate as a function of the smoking indicator variable (yes or no; <code>Smoke_Ind</code>) and the age category (<code>Age_Group</code>).</p>
+<p>We use the <code>glm()</code> function to fit this model. Documentation is here: <a href="https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/glm" class="uri">https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/glm</a></p>
 <pre class="r"><code>#Use names() to get variable names to make sure we type them correctly in the model.
 names(bs1_tibble)</code></pre>
 <pre><code>## [1] &quot;Age_Group&quot;             &quot;Age_Cat&quot;               &quot;Age_Square&quot;           

@@ -9,7 +9,9 @@ output:
     number_sections: true
 ---
 
-# Outline
+In this demo, we introduce Poisson regression and go through an example using the British Doctor's Data.
+
+Outline:
 
 1.  Overview of Poisson regression for rate data
 2.  Load British Doctor's Data
@@ -66,13 +68,15 @@ This ln(t) is what is known as the "offset" when fitting the Poisson model for r
 
 I recommend this series of YouTube videos by MarinStatsLectures-R Programming, which discuss theory and application of the Poisson model
 
--   9.9 Poisson Regression: The Model For Rate Data (what is an offset?) <https://www.youtube.com/watch?v=5pZbER_mR4k&list=RDCMUCaNIxVagLhqupvUiDK01Mgg&index=4>
+-   9.9 Poisson Regression: The Model For Rate Data (what is an offset?): <https://www.youtube.com/watch?v=5pZbER_mR4k&list=RDCMUCaNIxVagLhqupvUiDK01Mgg&index=4>
 
--   9.10 Poisson Regression in R: Fitting a Model To Rate Data (with offset) in R <https://www.youtube.com/watch?v=QP4F98ysrEA>
+-   9.10 Poisson Regression in R: Fitting a Model To Rate Data (with offset) in R: <https://www.youtube.com/watch?v=QP4F98ysrEA>
 
--   9.11 Poisson Regression: Model Assumptions <https://www.youtube.com/watch?v=r492fF9XZl8&t=2s>
+-   9.11 Poisson Regression: Model Assumptions: <https://www.youtube.com/watch?v=r492fF9XZl8&t=2s>
 
-The videos use the British doctor's data, a famous study on lung cancer and smoking: <https://en.wikipedia.org/wiki/British_Doctors_Study>Load British Doctor's Data
+The videos use the British doctor's data, a famous study on lung cancer and smoking: <https://en.wikipedia.org/wiki/British_Doctors_Study>
+
+# Load British Doctor's Data
 
 To download British doctor's data, we can use this package: <https://rdrr.io/cran/ACSWR/man/bs1.html>
 
@@ -88,7 +92,9 @@ bs1 #Take a look at the data.
 
 I like to work in the tidyverse, so let's make it a tibble (a data frame with some nice formatting).
 
-Please see here for an intro to data wrangling in the tidyverse: <https://michaeldgarber.github.io/teach-r/dplyr-1-nyt-covid.html>
+Please see here for my intro to data wrangling in the tidyverse: <https://michaeldgarber.github.io/teach-r/dplyr-1-nyt-covid.html>
+
+Or of course, there's <https://r4ds.had.co.nz/wrangle-intro.html>
 
 ```{r}
 library(tidyverse)
@@ -102,13 +108,13 @@ In looking at the data, we can see that the variable `Deaths` in this dataset is
 
 And the denominator for the rate is `Person_Years`.
 
-So the rate is rate=(Deaths/Person_Years)
+So the rate is `Deaths`/`Person_Years`.
 
 # Fit a Poisson regression to model the rate
 
-Following video 9.10 above, let's model the rate as a function of smoking (yes/no) and the age category.
+Following video 9.10 above, let's model the rate as a function of the smoking indicator variable (yes or no; `Smoke_Ind`) and the age category (`Age_Group`).
 
-We use the `glm()` function to fit this model.
+We use the `glm()` function to fit this model. Documentation is here: <https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/glm>
 
 ```{r}
 #Use names() to get variable names to make sure we type them correctly in the model.
