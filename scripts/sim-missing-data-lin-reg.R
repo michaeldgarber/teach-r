@@ -80,10 +80,12 @@ data_no_missing=data %>%
   filter(any_missing==0)
 
 #How many rows did we lose?
-nrow(data) #100
-nrow(data_no_missing)#24
+nrow(data) #100 observations
+nrow(data_no_missing)#24 observations
 
 #In this case, we lost a lot because the missingness was random in each variable.
+#From 100 to 24 (24 could change, as it's random)
+
 #Fit the model in this data now
 linear_regression_model_alt_way=glm(
   formula=  rate~ #  the outcome variable
