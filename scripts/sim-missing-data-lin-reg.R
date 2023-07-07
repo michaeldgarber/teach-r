@@ -38,10 +38,12 @@ data=1:100 %>%
   rate=y/p
   )
 
+#Preview the data by highlighting the text and running it
 data
 
-# Fit a linear regression model in this data-------
 
+
+# Fit a linear regression model in this data-------
 
 linear_regression_model= glm(
   formula=  rate~ #  the outcome variable
@@ -56,3 +58,43 @@ linear_regression_model
 
 #Check out model coefficients
 linear_regression_model$coefficients
+
+#another option would be to filter to values without missingness
+#We can use the filter() argument to do this.
+#is.na() returns TRUE/FALSE, true if the variable is missing and false if not.
+#Below, I'm first making an indicator variable that indicates whether ANY of the variables
+#are missing, and then I'm filtering to a level of that variable.
+#The case_when() syntax is like an if/then statement.
+#https://dplyr.tidyverse.org/reference/case_when.html
+data_no_missing=data %>% 
+  mutate(
+    any_missing=case_when(
+      is.na(x)~1,
+      is.na(rate)~1,
+      is.na(p)~1,
+      is.na(a)~1,
+      #if NOT, then
+      TRUE~0
+  )) %>% 
+  #limit to values where any missing is zero
+  filter(any_missing==0)
+
+#How many rows did we lose?
+nrow(data) #100
+nrow(data_no_missing)#24
+
+#In this case, we lost a lot because the missingness was random in each variable.
+#Fit the model in this data now
+linear_regression_model_alt_way=glm(
+  formula=  rate~ #  the outcome variable
+    x+a ,#independent variables (predictor variables)
+  
+  family="gaussian", 
+  
+  data=data_no_missing #dataset without any missings
+  #Note I'm not including the na.omit statement now
+  )
+
+#Compare the two results
+linear_regression_model$coefficients
+linear_regression_model_alt_way$coefficients
